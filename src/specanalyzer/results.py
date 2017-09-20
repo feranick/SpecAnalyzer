@@ -36,27 +36,23 @@ class Results(QMainWindow):
         super(Results, self).__init__(parent)
         self.deviceID = np.zeros((0,1))
         self.perfData = np.zeros((0,8))
-        #self.JV = np.array([])
-        #self.setupDataFrame()
-        #self.csvFolder = self.parent().config.csvSavingFolder
+        self.JV = np.array([])
+        self.setupDataFrame()
+        self.csvFolder = self.parent().config.csvSavingFolder
         self.initUI()
-        #self.initPlots(self.perfData)
         self.initJVPlot()
     
     # Define UI elements
     def initUI(self):
-        self.setGeometry(500, 100, 1150, 950)
-        self.setWindowTitle('Results Panel')
         
         # A figure instance to plot on
         self.figureJV = plt.figure()
         self.figureJV.subplots_adjust(left=0.15, right=0.85, top=0.95, bottom=0.21)
 
-
-        self.resTableW = 1100
-        self.resTableH = 145
-        self.resTableWidget = QTableWidget(self)
-        self.resTableWidget.setGeometry(QRect(20, 770, self.resTableW, self.resTableH))
+        self.resTableW = 940
+        self.resTableH = 130
+        self.resTableWidget = QTableWidget(self.parent())
+        self.resTableWidget.setGeometry(QRect(20, 530, self.resTableW, self.resTableH))
         self.resTableWidget.setColumnCount(9)
         self.resTableWidget.setRowCount(0)
         self.resTableWidget.setItem(0,0, QTableWidgetItem(""))
@@ -121,80 +117,14 @@ class Results(QMainWindow):
         ax.tick_params(axis='both', which='major', labelsize=8)
         ax.tick_params(axis='both', which='minor', labelsize=8)
     
-    # Initialize Time-based plots
-    def initPlots(self, data):
-        self.figureTJsc.clf()
-        self.axTJsc = self.figureTJsc.add_subplot(111)
-        self.plotSettings(self.axTJsc)
-        self.axTJsc.set_xlabel('Time [s]$',fontsize=8)
-        self.axTJsc.set_ylabel('Jsc [mA/cm$^2$]',fontsize=8)
-        self.axTJsc.set_autoscale_on(True)
-        self.axTJsc.autoscale_view(True,True,True)
-        self.canvasTJsc.draw()
-        self.lineTJsc, = self.axTJsc.plot(data[:,0],data[:,2], '.-',linewidth=0.5)
-        
-        self.figureTVoc.clf()
-        self.axTVoc = self.figureTVoc.add_subplot(111)
-        self.plotSettings(self.axTVoc)
-        self.axTVoc.set_xlabel('Time [s]',fontsize=8)
-        self.axTVoc.set_ylabel('Voc [V]',fontsize=8)
-        self.axTVoc.set_autoscale_on(True)
-        self.axTVoc.autoscale_view(True,True,True)
-        self.canvasTVoc.draw()
-        self.lineTVoc, = self.axTVoc.plot(data[:,0],data[:,1], '.-',linewidth=0.5)
-        
-        self.figureMPP.clf()
-        self.axMPP = self.figureMPP.add_subplot(111)
-        self.plotSettings(self.axMPP)
-        self.axMPP.set_xlabel('Time [s]',fontsize=8)
-        self.axMPP.set_ylabel('Max power point [mW]',fontsize=8)
-        self.axMPP.set_autoscale_on(True)
-        self.axMPP.autoscale_view(True,True,True)
-        self.canvasMPP.draw()
-        self.lineMPP, = self.axMPP.plot(data[:,0],data[:,4], '.-',linewidth=0.5)
-    
-    # Initialize JV and PV plots
-    def initJVPlot(self):
-        self.figureJV.clf()
-        self.axJV = self.figureJV.add_subplot(111)
-        #self.axPV = self.axJV.twinx()
-        self.plotSettings(self.axJV)
-        #self.plotSettings(self.axPVresp)
-        self.axJV.set_xlabel('Voltage [V]',fontsize=8)
-        self.axJV.set_ylabel('Current density [mA/cm$^2$]',fontsize=8)
-        #self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
-        self.axJV.axvline(x=0, linewidth=0.5)
-        self.axJV.axhline(y=0, linewidth=0.5)
-        #self.canvasJV.draw()
-
-    # Plot Transient Jsc
-    def plotTJsc(self, data):
-        self.lineTJsc.set_data(data[:,2], data[:,4])
-        self.axTJsc.relim()
-        self.axTJsc.autoscale_view(True,True,True)
-        self.canvasTJsc.draw()
-    
-    # Plot Transient Voc
-    def plotTVoc(self, data):
-        self.lineTVoc.set_data(data[:,2], data[:,3])
-        self.axTVoc.relim()
-        self.axTVoc.autoscale_view(True,True,True)
-        self.canvasTVoc.draw()
-
-    # Plot MPP with tracking
-    def plotMPP(self, data):
-        self.lineMPP.set_data(data[:,2], data[:,5])
-        self.axMPP.relim()
-        self.axMPP.autoscale_view(True,True,True)
-        self.canvasMPP.draw()
     
     # Plot JV response
-    def plotJVresp(self, JV):
+    def plotJV(self, JV):
         self.initJVPlot()
-        self.axJVresp.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
-        self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
+        self.axJV.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
+        self.axPV.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
                 color='orange')
-        self.canvasJVresp.draw()
+        self.parent().canvasJV.draw()
     
     # Clear all plots and fields
     def clearPlots(self, includeTable):

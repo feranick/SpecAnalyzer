@@ -29,9 +29,9 @@ import matplotlib.pyplot as plt
 
 from . import __version__
 from . import __author__
-from .configuration import *
 from . import logger
 
+from .configuration import *
 #from .acquisition import *
 from .sourcemeterWindow import *
 from .results import *
@@ -51,18 +51,17 @@ class MainWindow(QMainWindow):
     def initUI(self):
         logger.info("SpecAnalyzer v."+__version__)
         self.setWindowTitle("SpecAnalyzer %s" % __version__)
-        self.setGeometry(10,30,1000,500)
+        self.setGeometry(10,30,1000,700)
         self.aboutwid = AboutWidget()
         #self.acquisition = Acquisition()
-        self.results = Results()
+        self.results = Results(parent=self)
         self.sourcemeterwind = SourcemeterWindow(parent=self)
         self.weblinks = WebLinksWidget()
-
 
         self.centralwidget = QWidget(self)
 
         self.gridLayoutWidget = QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QRect(10, 40, 950, 400))
+        self.gridLayoutWidget.setGeometry(QRect(10, 40, 950, 480))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.mainGridLayout = QGridLayout(self.gridLayoutWidget)
         self.mainGridLayout.setContentsMargins(0, 0, 0, 0)
@@ -117,7 +116,6 @@ class MainWindow(QMainWindow):
         self.stepVText.setObjectName("stepVText")
         self.gridLayout.addWidget(self.stepVText, 3, 1, 1, 1)
         self.mainGridLayout.addLayout(self.gridLayout, 0, 0, 1, 1)
-        self.setCentralWidget(self.centralwidget)
         
         self.minVLabel.setText("Min Voltage [V]")
         self.numAverScansLabel.setText("# averaged scans ")
@@ -143,7 +141,12 @@ class MainWindow(QMainWindow):
         self.stopAcqButton.setEnabled(False)
         self.stopAcqButton.clicked.connect(lambda: self.acquisition.stop(self))
         
+        self.results.resTableWidget
+        
+        self.setCentralWidget(self.centralwidget)
+
         self.initParameters()
+
         
         # Create menu and toolbar
         self.menuBar = QMenuBar(self)
