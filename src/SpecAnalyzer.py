@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 '''
-GridEdge Autotesting runtime
-------------------
-Launcher for the GridEdge Autotesting Software
+Spectrum Analyzer with Tracking
+---------------------------------
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 

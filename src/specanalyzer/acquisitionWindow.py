@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction,
     QVBoxLayout,QGridLayout,QLabel,QGraphicsView,QFileDialog,QStatusBar,QSpinBox,
-    QGraphicsScene,QLineEdit,QMessageBox,QDialog,QDialogButtonBox,QMenuBar)
+    QGraphicsScene,QLineEdit,QMessageBox,QDialog,QDialogButtonBox,QMenuBar,QCheckBox)
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter,QDoubleValidator)
 from PyQt5.QtCore import (pyqtSlot,QRectF,QRect)
 
@@ -34,7 +34,7 @@ class AcquisitionWindow(QMainWindow):
     # Setup UI elements
     def initUI(self,MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(10, 270, 350, 490)
+        MainWindow.setGeometry(10, 290, 350, 490)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayoutWidget = QWidget(self.centralwidget)
@@ -80,10 +80,14 @@ class AcquisitionWindow(QMainWindow):
         self.steadyStatLabel.setGeometry(QRect(20, 10, 111, 16))
         self.steadyStatLabel.setObjectName("steadyStatLabel")
         self.trackingLabel = QLabel(self.centralwidget)
-        self.trackingLabel.setGeometry(QRect(20, 280, 141, 16))
+        self.trackingLabel.setGeometry(QRect(20, 280, 160, 16))
         self.trackingLabel.setObjectName("trackingLabel")
+        
+        self.enableTrackingBox = QCheckBox(self.centralwidget)
+        self.enableTrackingBox.setGeometry(QRect(180, 280, 87, 20))
+        
         self.gridLayoutWidget_2 = QWidget(self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QRect(10, 300, 340, 181))
+        self.gridLayoutWidget_2.setGeometry(QRect(10, 310, 340, 181))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.gridLayout_2 = QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(10, 1, 10, 1)
@@ -125,7 +129,7 @@ class AcquisitionWindow(QMainWindow):
         self.maxVLabel.setText("Max Voltage [V]")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.steadyStatLabel.setText("<qt><b>Steady State</b></qt>")
-        self.trackingLabel.setText("<qt><b>Tracking Voc, Jsc, MPP</b></qt>")
+        self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")
         self.totTimePerDeviceLabel.setText("Total time per device")
         self.intervalLabel.setText("Interval")
         self.numPointsLabel.setText("Number of points")
@@ -211,3 +215,4 @@ class AcquisitionWindow(QMainWindow):
         self.IntervalText.setEnabled(flag)
         self.saveButton.setEnabled(flag)
         self.defaultButton.setEnabled(flag)
+        self.enableTrackingBox.setEnabled(flag)

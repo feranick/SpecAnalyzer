@@ -12,6 +12,7 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 '''
+
 import time
 from PyQt5.QtCore import (QRect,QObject, QThread, pyqtSlot, pyqtSignal)
 from PyQt5.QtWidgets import (QLabel, QLineEdit, QCheckBox, QWidget,

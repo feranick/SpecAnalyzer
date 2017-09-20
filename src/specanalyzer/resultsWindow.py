@@ -26,7 +26,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-from .dataManagement import *
+#from .dataManagement import *
 from . import logger
 
 '''
@@ -103,7 +103,7 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.resTableWidget.itemClicked.connect(self.onCellClick)
-        self.resTableWidget.itemDoubleClicked.connect(self.onCellDoubleClick)
+        #self.resTableWidget.itemDoubleClicked.connect(self.onCellDoubleClick)
         self.setCentralWidget(self.centralwidget)
 
         # Make Menu for plot related calls
@@ -252,11 +252,13 @@ class ResultsWindow(QMainWindow):
                 self.dfTotJV.get_value(0,row,takeable=True)[\
                         self.dfTotJV.get_value(0,row,takeable=True).shape[0]-1])
     
+    '''
     # Action upon selecting a row in the table.
     @pyqtSlot()
     def onCellDoubleClick(self):
         row = self.resTableWidget.selectedItems()[0].row()
         self.redirectToDM(self.dfTotDeviceID.get_value(0,row,takeable=True)[0][0][:-1])
+    '''
 
     # Enable right click on substrates for saving locally
     def contextMenuEvent(self, event):
@@ -327,8 +329,8 @@ class ResultsWindow(QMainWindow):
             if self.parent().config.saveLocalCsv == True or \
                     self.parent().acquisition.modifiers == Qt.AltModifier:
                 self.save_csv(deviceID, dfAcqParams, self.perfData, self.JV)
-            if self.parent().config.submitToDb == True:
-                self.submit_DM(deviceID, dfAcqParams, self.perfData, self.JV)
+            #if self.parent().config.submitToDb == True:
+            #    self.submit_DM(deviceID, dfAcqParams, self.perfData, self.JV)
 
     # Plot data from devices
     def plotData(self, deviceID, perfData, JV):
@@ -402,7 +404,7 @@ class ResultsWindow(QMainWindow):
                     msg = " Submission to DM via Mongo: failed."
             except:
                 msg = " Connection to DM server: failed. Saving local file"
-                self.save_csv(deviceID, dfAcqParams, dfPerfData, dfJV)
+                self.save_csv(deviceID, dfAcqParams, perfData, JV)
         print(msg)
         logger.info(msg)
 

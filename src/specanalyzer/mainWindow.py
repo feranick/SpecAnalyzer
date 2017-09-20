@@ -1,7 +1,6 @@
 '''
 mainWindow
 -------------
-Various classes for providing a graphical user interface
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 
@@ -11,30 +10,28 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 '''
+
 import sys, webbrowser, random, time
 import configparser
 from datetime import datetime
-import numpy as np
-import pandas as pd
 
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton,
     QWidget, QAction,QVBoxLayout,QGridLayout,QLabel,QGraphicsView,
     QFileDialog,QStatusBar,QGraphicsScene,QLineEdit,QMessageBox,
-    QDialog,QToolBar,QMenuBar,QHeaderView,QMenu)
+    QDialog,QToolBar,QMenuBar)
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter)
 from PyQt5.QtCore import (pyqtSlot,QRectF)
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-import matplotlib.pyplot as plt
 
 from . import __version__
 from . import __author__
 from . import logger
-
 from .configuration import *
+from .cameraWindow import *
+from .resultsWindow import *
 from .acquisition import *
+from .acquisitionWindow import *
+from .powermeterWindow import *
 from .sourcemeterWindow import *
-from .results import *
 
 '''
    Main Window
@@ -51,109 +48,49 @@ class MainWindow(QMainWindow):
     def initUI(self):
         logger.info("SpecAnalyzer v."+__version__)
         self.setWindowTitle("SpecAnalyzer %s" % __version__)
-        self.setGeometry(10,30,1000,700)
+        self.setGeometry(10,30,340,220)
         self.aboutwid = AboutWidget()
-        self.acquisition = Acquisition(parent=self)
-        self.results = Results(parent=self)
-        self.sourcemeterwind = SourcemeterWindow(parent=self)
+        self.resultswind = ResultsWindow(parent=self)
+        self.camerawind = CameraWindow(parent=self)
         self.weblinks = WebLinksWidget()
-
-        self.centralwidget = QWidget(self)
-
-        self.gridLayoutWidget = QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QRect(10, 40, 950, 480))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.mainGridLayout = QGridLayout(self.gridLayoutWidget)
-        self.mainGridLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainGridLayout.setObjectName("mainGridLayout")
-
-        self.plotVLayout = QGridLayout()
-        self.canvasJV = FigureCanvas(self.results.figureJV)
-        self.toolbarJV = NavigationToolbar(self.canvasJV, self)
-        self.plotVLayout.addWidget(self.toolbarJV)
-        self.plotVLayout.addWidget(self.canvasJV)
-        self.mainGridLayout.addLayout(self.plotVLayout, 0, 1, 1, 1)
-        self.canvasJV.draw()
-
-        self.gridLayout = QGridLayout()
-        self.gridLayout.setContentsMargins(10, 1, 10, 1)
-        self.gridLayout.setHorizontalSpacing(10)
-        self.gridLayout.setObjectName("gridLayout")
-        self.delayBeforeMeasText = QLineEdit(self.gridLayoutWidget)
-        self.delayBeforeMeasText.setObjectName("delayBeforeMeasText")
-        self.gridLayout.addWidget(self.delayBeforeMeasText, 5, 1, 1, 1)
-        self.minVLabel = QLabel(self.gridLayoutWidget)
-        self.minVLabel.setObjectName("minVLabel")
-        self.gridLayout.addWidget(self.minVLabel, 0, 0, 1, 1)
-        self.minVText = QLineEdit(self.gridLayoutWidget)
-        self.minVText.setObjectName("minVText")
-        self.gridLayout.addWidget(self.minVText, 0, 1, 1, 1)
-        self.numAverScansText = QLineEdit(self.gridLayoutWidget)
-        self.numAverScansText.setObjectName("numAverScansText")
-        self.gridLayout.addWidget(self.numAverScansText, 4, 1, 1, 1)
-        self.numAverScansLabel = QLabel(self.gridLayoutWidget)
-        self.numAverScansLabel.setObjectName("numAverScansLabel")
-        self.gridLayout.addWidget(self.numAverScansLabel, 4, 0, 1, 1)
-        self.startVLabel = QLabel(self.gridLayoutWidget)
-        self.startVLabel.setObjectName("startVLabel")
-        self.gridLayout.addWidget(self.startVLabel, 2, 0, 1, 1)
-        self.startVText = QLineEdit(self.gridLayoutWidget)
-        self.startVText.setObjectName("startVText")
-        self.gridLayout.addWidget(self.startVText, 2, 1, 1, 1)
-        self.stepVLabel = QLabel(self.gridLayoutWidget)
-        self.stepVLabel.setObjectName("stepVLabel")
-        self.gridLayout.addWidget(self.stepVLabel, 3, 0, 1, 1)
-        self.maxVText = QLineEdit(self.gridLayoutWidget)
-        self.maxVText.setObjectName("maxVText")
-        self.gridLayout.addWidget(self.maxVText, 1, 1, 1, 1)
-        self.maxVLabel = QLabel(self.gridLayoutWidget)
-        self.maxVLabel.setObjectName("maxVLabel")
-        self.gridLayout.addWidget(self.maxVLabel, 1, 0, 1, 1)
-        self.delayBeforeMeasLabel = QLabel(self.gridLayoutWidget)
-        self.delayBeforeMeasLabel.setObjectName("delayBeforeMeasLabel")
-        self.gridLayout.addWidget(self.delayBeforeMeasLabel, 5, 0, 1, 1)
-        self.stepVText = QLineEdit(self.gridLayoutWidget)
-        self.stepVText.setObjectName("stepVText")
-        self.gridLayout.addWidget(self.stepVText, 3, 1, 1, 1)
-        self.mainGridLayout.addLayout(self.gridLayout, 0, 0, 1, 1)
+        self.acquisition = Acquisition(parent=self)
+        self.acquisitionwind = AcquisitionWindow(parent=self)
+        self.powermeterwind = PowermeterWindow(parent=self)
+        self.sourcemeterwind = SourcemeterWindow(parent=self)
         
-        self.minVLabel.setText("Min Voltage [V]")
-        self.numAverScansLabel.setText("# averaged scans ")
-        self.startVLabel.setText("Start Voltage [V]")
-        self.stepVLabel.setText("Step Voltage [V]")
-        self.maxVLabel.setText("Max Voltage [V]")
-        self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
+        self.deviceLabel = QLabel(self)
+        self.deviceLabel.setGeometry(QRect(10, 20, 100, 20))
+        self.deviceLabel.setText("Name:")
+        self.deviceText = QLineEdit(self)
+        self.deviceText.setText("")
+        self.deviceText.setGeometry(QRect(120, 20, 200, 20))
         
-        ### Create basic push buttons to run acquisition ####
-        self.startAcqButton = QPushButton(self)
-        self.startAcqButton.setGeometry(QRect(10, 110, 160, 50))
-        self.gridLayout.addWidget(self.startAcqButton, 6, 0, 1, 1)
-
-        self.startAcqButton.setObjectName("Start Acquisition")
-        self.startAcqButton.setText("Start Acquisition")
-        self.startAcqButton.clicked.connect(lambda: self.acquisition.start(self))
-        self.stopAcqButton = QPushButton(self)
-        self.stopAcqButton.setGeometry(QRect(170, 110, 160, 50))
-        self.gridLayout.addWidget(self.stopAcqButton, 6, 1, 1, 1)
-
-        self.stopAcqButton.setObjectName("Stop Acquisition")
-        self.stopAcqButton.setText("Stop Acquisition")
-        self.stopAcqButton.setEnabled(False)
-        self.stopAcqButton.clicked.connect(lambda: self.acquisition.stop(self))
+        self.commentsLabel = QLabel(self)
+        self.commentsLabel.setGeometry(QRect(10, 50, 100, 20))
+        self.commentsLabel.setText("Comments:")
+        self.commentsText = QLineEdit(self)
+        self.commentsText.setText("")
+        self.commentsText.setGeometry(QRect(120, 50, 200, 20))
         
-        self.results.resTableWidget
+        self.deviceLabel = QLabel(self)
+        self.deviceLabel.setGeometry(QRect(10, 20, 100, 20))
+        self.deviceLabel.setText("Name:")
+        self.deviceText = QLineEdit(self)
+        self.deviceText.setText("")
+        self.deviceText.setGeometry(QRect(120, 20, 200, 20))
         
-        self.setCentralWidget(self.centralwidget)
+        self.deviceSizeLabel = QLabel(self)
+        self.deviceSizeLabel.setGeometry(QRect(10, 80, 100, 20))
+        self.deviceSizeLabel.setText("Device size (in):")
+        self.deviceSizeText = QLineEdit(self)
+        self.deviceSizeText.setText("1")
+        self.deviceSizeText.setGeometry(QRect(120, 80, 100, 20))
 
-        self.initParameters()
-        self.results.initJVPlot()
-
-        
         # Create menu and toolbar
         self.menuBar = QMenuBar(self)
         self.menuBar.setGeometry(0,0,340,25)
-        #self.toolBar = QToolBar(self)
-        #self.toolBar.setGeometry(0,450,340,100)
+        self.toolBar = QToolBar(self)
+        self.toolBar.setGeometry(0,170,340,25)
 
         # Menu entries
         self.loadConfigMenu = QAction("&Load Configuration", self)
@@ -177,12 +114,35 @@ class MainWindow(QMainWindow):
         fileMenu.addAction(self.loadConfigMenu)
         fileMenu.addAction(self.saveConfigMenu)
         
+        #self.stageMenu = QAction("&Stage", self)
+        #self.stageMenu.setShortcut("Ctrl+x")
+        #self.stageMenu.setStatusTip('Stage controls')
+        #self.stageMenu.triggered.connect(self.stagewind.show)
+        self.powermeterMenu = QAction("&Powermeter", self)
+        self.powermeterMenu.setShortcut("Ctrl+p")
+        self.powermeterMenu.setStatusTip('Powermeter controls')
+        self.powermeterMenu.triggered.connect(self.powermeterwind.show)
         self.sourcemeterMenu = QAction("&Sourcemeter", self)
         self.sourcemeterMenu.setShortcut("Ctrl+k")
         self.sourcemeterMenu.setStatusTip('Sourcemeter controls')
         self.sourcemeterMenu.triggered.connect(self.sourcemeterwind.show)
+        #self.switchboxMenu = QAction("&Switchbox", self)
+        #self.switchboxMenu.setShortcut("Ctrl+b")
+        #self.switchboxMenu.setStatusTip('Switchbox controls')
+        #self.switchboxMenu.triggered.connect(self.switchboxwind.show)
+        self.cameraMenu = QAction("&Camera", self)
+        self.cameraMenu.setShortcut("Ctrl+c")
+        self.cameraMenu.setStatusTip('Camera controls')
+        self.cameraMenu.triggered.connect(self.camerawind.show)
+
         instrumentsMenu = self.menuBar.addMenu('&Instruments')
+        #instrumentsMenu.addAction(self.stageMenu)
         instrumentsMenu.addAction(self.sourcemeterMenu)
+        instrumentsMenu.addSeparator()
+        instrumentsMenu.addAction(self.powermeterMenu)
+        instrumentsMenu.addAction(self.cameraMenu)
+        #instrumentsMenu.addAction(self.switchboxMenu)
+        
         self.viewWindowMenus(self.menuBar, self)
 
         self.helpMenu = QAction("&Help", self)
@@ -210,12 +170,13 @@ class MainWindow(QMainWindow):
         aboutMenu.addSeparator()
         aboutMenu.addAction(self.aboutMenu)
         
-        '''
         # Toolbar Entries #
+        '''
         self.sampleToolbar = QAction("&Substrates", self)
         self.sampleToolbar.setShortcut("Ctrl+s")
         self.sampleToolbar.setStatusTip('Device Configuration')
         self.sampleToolbar.triggered.connect(self.samplewind.show)
+        '''
         
         self.acquisitionToolbar = QAction("&Acquisition", self)
         self.acquisitionToolbar.setShortcut("Ctrl+a")
@@ -228,13 +189,13 @@ class MainWindow(QMainWindow):
         self.resultsToolbar.triggered.connect(self.resultswind.show)
         
         #toolBar = self.addToolBar("&Toolbar")
-        self.toolBar.addAction(self.sampleToolbar)
-        self.toolBar.addSeparator()
+        #self.toolBar.addAction(self.sampleToolbar)
+        #self.toolBar.addSeparator()
         self.toolBar.addAction(self.acquisitionToolbar)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.resultsToolbar)
         self.toolBar.addSeparator()
-        '''
+       
         #### Create status bar ####
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -242,52 +203,20 @@ class MainWindow(QMainWindow):
         self.statusBar.addPermanentWidget(self.statusBarLabel, 1)
         self.statusBarLabel.setText("System: ready")
         #self.statusBar().showMessage("Ready", 5000)
-        
     
-    # Save acquisition parameters in configuration ini
-    def saveParameters(self):
-        self.config.conf['Acquisition']['acqMinVoltage'] = str(self.minVText.text())
-        self.config.conf['Acquisition']['acqMaxVoltage'] = str(self.maxVText.text())
-        self.config.conf['Acquisition']['acqStartVoltage'] = str(self.startVText.text())
-        self.config.conf['Acquisition']['acqStepVoltage'] = str(self.stepVText.text())
-        self.config.conf['Acquisition']['acqNumAvScans'] = str(self.numAverScansText.text())
-        self.config.conf['Acquisition']['acqDelBeforeMeas'] = str(self.delayBeforeMeasText.text())
-
-        self.config.saveConfig(self.parent().config.configFile)
-        self.config.readConfig(self.parent().config.configFile)
-        print("Acquisition parameters saved as default")
-        logger.info("Acquisition parameters saved as default")
+        #### Create basic push buttons to run acquisition ####
+        self.startAcqButton = QPushButton(self)
+        self.startAcqButton.setGeometry(QRect(10, 110, 160, 50))
+        self.startAcqButton.setObjectName("Start Acquisition")
+        self.startAcqButton.setText("Start Acquisition")
+        self.startAcqButton.clicked.connect(self.acquisition.start)
+        self.stopAcqButton = QPushButton(self)
+        self.stopAcqButton.setGeometry(QRect(170, 110, 160, 50))
+        self.stopAcqButton.setObjectName("Stop Acquisition")
+        self.stopAcqButton.setText("Stop Acquisition")
+        self.stopAcqButton.setEnabled(False)
+        self.stopAcqButton.clicked.connect(self.acquisition.stop)
     
-    # Set default acquisition parameters from configuration ini
-    def defaultParameters(self):
-        self.parent().config.createConfig()
-        self.parent().config.readConfig(self.parent().config.configFile)
-        self.initParameters()
-        print("Default acquisition parameters restored")
-        logger.info("Default acquisition parameters restored")
-        self.timePerDevice()
-
-    # Populate acquisition panel with values from config
-    def initParameters(self):
-        self.minVText.setText(str(self.config.acqMinVoltage))
-        self.maxVText.setText(str(self.config.acqMaxVoltage))
-        self.startVText.setText(str(self.config.acqStartVoltage))
-        self.stepVText.setText(str(self.config.acqStepVoltage))
-        self.numAverScansText.setText(str(self.config.acqNumAvScans))
-        self.delayBeforeMeasText.setText(str(self.config.acqDelBeforeMeas))
-
-    # Enable and disable fields (flag is either True or False) during acquisition.
-    def enableAcqPanel(self, flag):
-        self.minVText.setEnabled(flag)
-        self.maxVText.setEnabled(flag)
-        self.startVText.setEnabled(flag)
-        self.stepVText.setEnabled(flag)
-        self.numAverScansText.setEnabled(flag)
-        self.delayBeforeMeasText.setEnabled(flag)
-        self.numPointsText.setEnabled(flag)
-        self.IntervalText.setEnabled(flag)
-        self.saveButton.setEnabled(flag)
-        self.defaultButton.setEnabled(flag)
     
     # Logic for loading parameters from a configuration file
     def loadConfig(self):
@@ -317,6 +246,9 @@ class MainWindow(QMainWindow):
             self.startAcqButton.setText("Start Acquisition")
         self.startAcqButton.setEnabled(flag)
         self.stopAcqButton.setEnabled(not flag)
+        self.deviceText.setEnabled(flag)
+        self.commentsText.setEnabled(flag)
+        self.deviceSizeText.setEnabled(flag)
 
     # Adds Menus to expose other Windows.
     def viewWindowMenus(self, menuObj, obj):
@@ -324,10 +256,10 @@ class MainWindow(QMainWindow):
         viewMainWindowMenu.setShortcut("Ctrl+w")
         viewMainWindowMenu.setStatusTip('Display Main Window')
         viewMainWindowMenu.triggered.connect(lambda: self.displayMainWindow(obj))
-        viewSampleMenu = QAction("&Substrates Window", self)
-        viewSampleMenu.setShortcut("Ctrl+d")
-        viewSampleMenu.setStatusTip('Display Substrates Window')
-        viewSampleMenu.triggered.connect(lambda: self.displayMainWindow(obj.samplewind))
+        #viewSampleMenu = QAction("&Substrates Window", self)
+        #viewSampleMenu.setShortcut("Ctrl+d")
+        #viewSampleMenu.setStatusTip('Display Substrates Window')
+        #viewSampleMenu.triggered.connect(lambda: self.displayMainWindow(obj.samplewind))
         viewAcquisitionMenu = QAction("&Acquisition Window", self)
         viewAcquisitionMenu.setShortcut("Ctrl+a")
         viewAcquisitionMenu.setStatusTip('Display Acquisition Window')
@@ -339,7 +271,7 @@ class MainWindow(QMainWindow):
 
         windowMenu = menuObj.addMenu('&Window')
         windowMenu.addAction(viewMainWindowMenu)
-        windowMenu.addAction(viewSampleMenu)
+        #windowMenu.addAction(viewSampleMenu)
         windowMenu.addAction(viewAcquisitionMenu)
         windowMenu.addAction(viewResultsMenu)
 
@@ -360,10 +292,10 @@ class MainWindow(QMainWindow):
         if reply == QMessageBox.Yes:
             #if self.stagewind.activeStage == True:
             #    self.stagewind.activateStage()
-            #try:
-            #    self.acquisition.acq_thread.stop()
-            #except:
-            #    pass
+            try:
+                self.acquisition.acq_thread.stop()
+            except:
+                pass
             self.close()
         else:
             event.ignore()
@@ -397,7 +329,7 @@ class AboutWidget(QWidget):
     # Define UI elements
     def initUI(self):
         self.setGeometry(100, 200, 400, 300)
-        self.setWindowTitle('About GridEdge AutoTesting')
+        self.setWindowTitle('About SpecAnalyzer-Tracking')
     
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)

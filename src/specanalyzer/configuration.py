@@ -21,6 +21,7 @@ class Configuration():
     # Create configuration file
     def createConfig(self):
         try:
+            self.defineConfDevices()
             self.defineConfAcq()
             self.defineConfInstr()
             self.defineConfSystem()
@@ -29,7 +30,12 @@ class Configuration():
         except:
             print("Error in creating configuration file")
 
-    # Hadrcoded default definitions for the configuration file
+    # Hadrcoded default definitions for the confoguration file
+    def defineConfDevices(self):
+        self.conf['Devices'] = {
+            'numSubsHolderRow' : 4,
+            'numSubsHolderCol' : 4,
+            }
     def defineConfAcq(self):
         self.conf['Acquisition'] = {
             'acqMinVoltage' : 0,
@@ -38,6 +44,8 @@ class Configuration():
             'acqStepVoltage' : 0.02,
             'acqNumAvScans' : 5,
             'acqDelBeforeMeas' : 1,
+            'acqTrackNumPoints' : 5,
+            'acqTrackInterval' : 2,
             }
     def defineConfInstr(self):
         self.conf['Instruments'] = {
@@ -54,15 +62,19 @@ class Configuration():
             'loggingLevel' : logging.INFO,
             'loggingFilename' : "SpecAnalyzer.log",
             'csvSavingFolder' : "./data",
-            'saveLocalCsv' : False,
+            'saveLocalCsv' : True,
             }
 
     # Read configuration file into usable variables
     def readConfig(self, configFile):
         self.conf.read(configFile)
+        self.devConfig = self.conf['Devices']
         self.acqConfig = self.conf['Acquisition']
         self.instrConfig = self.conf['Instruments']
         self.sysConfig = self.conf['System']
+
+        self.numSubsHolderRow = eval(self.devConfig['numSubsHolderRow'])
+        self.numSubsHolderCol = eval(self.devConfig['numSubsHolderCol'])
         
         self.acqMinVoltage = eval(self.acqConfig['acqMinVoltage'])
         self.acqMaxVoltage = eval(self.acqConfig['acqMaxVoltage'])
@@ -70,6 +82,8 @@ class Configuration():
         self.acqStepVoltage = eval(self.acqConfig['acqStepVoltage'])
         self.acqNumAvScans = eval(self.acqConfig['acqNumAvScans'])
         self.acqDelBeforeMeas = eval(self.acqConfig['acqDelBeforeMeas'])
+        self.acqTrackNumPoints = eval(self.acqConfig['acqTrackNumPoints'])
+        self.acqTrackInterval = eval(self.acqConfig['acqTrackInterval'])
 
         self.alignmentIntThreshold = eval(self.instrConfig['alignmentIntThreshold'])
         self.alignmentContrastDefault = eval(self.instrConfig['alignmentContrastDefault'])
