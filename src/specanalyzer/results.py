@@ -40,7 +40,7 @@ class Results(QMainWindow):
         self.setupDataFrame()
         self.csvFolder = self.parent().config.csvSavingFolder
         self.initUI()
-        self.initJVPlot()
+        #self.initJVPlot()
     
     # Define UI elements
     def initUI(self):
@@ -111,6 +111,20 @@ class Results(QMainWindow):
         msg = "CSV Files will be saved in: "+self.csvFolder
         print(msg)
         logger.info(msg)
+    
+    # Initialize JV and PV plots
+    def initJVPlot(self):
+        self.figureJV.clf()
+        self.axJV = self.figureJV.add_subplot(111)
+        #self.axPV = self.axJV.twinx()
+        self.plotSettings(self.axJV)
+        #self.plotSettings(self.axPV)
+        self.axJV.set_xlabel('Voltage [V]',fontsize=8)
+        self.axJV.set_ylabel('Current density [mA/cm$^2$]',fontsize=8)
+        #self.axPV.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
+        self.axJV.axvline(x=0, linewidth=0.5)
+        self.axJV.axhline(y=0, linewidth=0.5)
+        self.parent().canvasJV.draw()
     
     # Define axis parametrs for plots
     def plotSettings(self, ax):

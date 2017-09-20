@@ -18,17 +18,17 @@ import time, random, math
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication,QAbstractItemView)
 from PyQt5.QtCore import (Qt,QObject, QThread, pyqtSlot, pyqtSignal)
-from .acquisitionWindow import *
 from . import logger
-from .modules.xystage.xystage import *
-from .modules.sourcemeter.sourcemeter import *
-from .modules.switchbox.switchbox import *
 
-class Acquisition():
+#from .modules.sourcemeter.sourcemeter import *
+
+class Acquisition(QObject):
+    def __init__(self, parent=None):
+        super(Acquisition, self).__init__(parent)
+        print(self.parent())
+
     # Collect acquisition parameters into a DataFrame to be used for storing (as csv or json)
     def getAcqParameters(self,obj):
-        self.numRow = obj.config.numSubsHolderRow
-        self.numCol = obj.config.numSubsHolderCol
         pdframe = pd.DataFrame({'Operator': [obj.samplewind.operatorText.text()],
                 'Acq Min Voltage': [obj.acquisitionwind.minVText.text()],
                 'Acq Max Voltage': [obj.acquisitionwind.maxVText.text()],
@@ -36,8 +36,6 @@ class Acquisition():
                 'Acq Step Voltage': [obj.acquisitionwind.stepVText.text()],
                 'Acq Num Aver Scans': [int(obj.acquisitionwind.numAverScansText.text())],
                 'Delay Before Meas': [obj.acquisitionwind.delayBeforeMeasText.text()],
-                'Num Track Points': [int(obj.acquisitionwind.numPointsText.value())],
-                'Track Interval': [obj.acquisitionwind.IntervalText.text()],
                 'Comments': [obj.samplewind.commentsText.text()]})
         return pdframe[['Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
                 'Acq Step Voltage','Acq Num Aver Scans','Delay Before Meas',

@@ -32,7 +32,7 @@ from . import __author__
 from . import logger
 
 from .configuration import *
-#from .acquisition import *
+from .acquisition import *
 from .sourcemeterWindow import *
 from .results import *
 
@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("SpecAnalyzer %s" % __version__)
         self.setGeometry(10,30,1000,700)
         self.aboutwid = AboutWidget()
-        #self.acquisition = Acquisition()
+        self.acquisition = Acquisition(parent=self)
         self.results = Results(parent=self)
         self.sourcemeterwind = SourcemeterWindow(parent=self)
         self.weblinks = WebLinksWidget()
@@ -146,6 +146,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralwidget)
 
         self.initParameters()
+        self.results.initJVPlot()
 
         
         # Create menu and toolbar
