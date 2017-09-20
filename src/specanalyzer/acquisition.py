@@ -239,6 +239,9 @@ class acqThread(QThread):
     ## measurements: JV
     # dfAcqParams : self.dfAcqParams
     def measure_JV(self, dfAcqParams):
+        deviceID = self.parent().parent().deviceText.text()
+        perfData = np.zeros((0,8))
+        
         #self.source_meter.set_mode('VOLT')
         self.parent().source_meter.set_mode('VOLT')
         self.parent().source_meter.on()
@@ -276,8 +279,10 @@ class acqThread(QThread):
                 data[i, 2] += 1.
                 data[i, 1] = (self.parent().source_meter.read_values()[1] + \
                     data[i,1]*(data[i,2]-1)) / data[i,2]
+                self.tempTracking.emit(data[:, 0:2], np.zeros((0,8)),
+                    self.parent().parent().deviceText.text(), False, False)
         return data[:, 0:2]
-    
+
     ## measurements: voc, jsc
     def measure_voc_jsc(self):
         # voc
