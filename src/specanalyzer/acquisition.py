@@ -183,14 +183,12 @@ class acqThread(QThread):
                 self.getDateTimeNow()[1])
         
         # If all is OK, start acquiring
-        # Start from moving to the correct substrate
-        substrateID = self.parent().parent().samplewind.tableWidget.item(i,j).text()
                 
         # Check if the holder has a substrate in that slot
-        if self.parent().parent().deviceText().text() != "":
+        if self.parent().parent().deviceText.text() != "":
             self.max_power = []
             #self.devMaxPower = 0
-            deviceID = self.parent().parent().deviceText().text()
+            deviceID = self.parent().parent().deviceText.text()
             # prepare parameters, plots, tables for acquisition
             self.Msg.emit("  Acquiring JV from device: " + deviceID)
 
@@ -200,7 +198,7 @@ class acqThread(QThread):
             perfData = self.devAcqParams()
                         
             #Right now the voc, jsc and mpp are extracted from the JV in JVDeviceProcess
-            self.acqJVComplete.emit(JV, perfData, deviceID, i, j)
+            self.acqJVComplete.emit(JV, perfData, deviceID)
             self.max_power.append(np.max(JV[:, 0] * JV[:, 1]))
             self.Msg.emit('  Device '+deviceID+' acquisition: complete')
 
@@ -238,7 +236,6 @@ class acqThread(QThread):
         QApplication.processEvents()
         self.Msg.emit("System: ready")
 
-    
     ## measurements: JV
     # dfAcqParams : self.dfAcqParams
     def measure_JV(self, dfAcqParams):

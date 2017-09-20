@@ -59,32 +59,25 @@ class MainWindow(QMainWindow):
         self.sourcemeterwind = SourcemeterWindow(parent=self)
         
         self.deviceLabel = QLabel(self)
-        self.deviceLabel.setGeometry(QRect(10, 20, 100, 20))
+        self.deviceLabel.setGeometry(QRect(10, 30, 100, 20))
         self.deviceLabel.setText("Name:")
         self.deviceText = QLineEdit(self)
         self.deviceText.setText("")
-        self.deviceText.setGeometry(QRect(120, 20, 200, 20))
+        self.deviceText.setGeometry(QRect(120, 30, 200, 20))
         
         self.commentsLabel = QLabel(self)
-        self.commentsLabel.setGeometry(QRect(10, 50, 100, 20))
+        self.commentsLabel.setGeometry(QRect(10, 60, 100, 20))
         self.commentsLabel.setText("Comments:")
         self.commentsText = QLineEdit(self)
         self.commentsText.setText("")
-        self.commentsText.setGeometry(QRect(120, 50, 200, 20))
-        
-        self.deviceLabel = QLabel(self)
-        self.deviceLabel.setGeometry(QRect(10, 20, 100, 20))
-        self.deviceLabel.setText("Name:")
-        self.deviceText = QLineEdit(self)
-        self.deviceText.setText("")
-        self.deviceText.setGeometry(QRect(120, 20, 200, 20))
+        self.commentsText.setGeometry(QRect(120, 60, 200, 20))
         
         self.deviceSizeLabel = QLabel(self)
-        self.deviceSizeLabel.setGeometry(QRect(10, 80, 100, 20))
+        self.deviceSizeLabel.setGeometry(QRect(10, 90, 100, 20))
         self.deviceSizeLabel.setText("Device size (in):")
         self.deviceSizeText = QLineEdit(self)
         self.deviceSizeText.setText("1")
-        self.deviceSizeText.setGeometry(QRect(120, 80, 100, 20))
+        self.deviceSizeText.setGeometry(QRect(120, 90, 100, 20))
 
         # Create menu and toolbar
         self.menuBar = QMenuBar(self)
@@ -206,12 +199,12 @@ class MainWindow(QMainWindow):
     
         #### Create basic push buttons to run acquisition ####
         self.startAcqButton = QPushButton(self)
-        self.startAcqButton.setGeometry(QRect(10, 110, 160, 50))
+        self.startAcqButton.setGeometry(QRect(10, 120, 160, 40))
         self.startAcqButton.setObjectName("Start Acquisition")
         self.startAcqButton.setText("Start Acquisition")
         self.startAcqButton.clicked.connect(self.acquisition.start)
         self.stopAcqButton = QPushButton(self)
-        self.stopAcqButton.setGeometry(QRect(170, 110, 160, 50))
+        self.stopAcqButton.setGeometry(QRect(170, 120, 160, 40))
         self.stopAcqButton.setObjectName("Stop Acquisition")
         self.stopAcqButton.setText("Stop Acquisition")
         self.stopAcqButton.setEnabled(False)
