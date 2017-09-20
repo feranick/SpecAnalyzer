@@ -270,7 +270,8 @@ class acqThread(QThread):
         # create data array
         data = np.zeros((N, 3))
         data[:, 0] = v_list
-
+        #self.tempTracking.emit(np.array([data[0, 0:2]]), np.zeros((1,8)),
+        #            self.parent().parent().deviceText.text(), True, False)
         # measure
         for n in range(scans):
             for i in i_list:
@@ -279,8 +280,9 @@ class acqThread(QThread):
                 data[i, 2] += 1.
                 data[i, 1] = (self.parent().source_meter.read_values()[1] + \
                     data[i,1]*(data[i,2]-1)) / data[i,2]
-                #self.tempTracking.emit(data[:, 0:2], np.zeros((0,8)),
-                #    self.parent().parent().deviceText.text(), False, False)
+                print(data)
+                #self.tempTracking.emit(data[0:i, 0:2], np.zeros((1,8)),
+                    #self.parent().parent().deviceText.text(), False, False)
         return data[:, 0:2]
 
     ## measurements: voc, jsc
