@@ -19,7 +19,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow,QPushButton,QVBoxLayout,QFileDialog,QWidget,
                              QGridLayout,QGraphicsView,QLabel,QComboBox,QLineEdit,
                              QMenuBar,QStatusBar, QApplication,QTableWidget,
-                             QTableWidgetItem,QAction,QHeaderView,QMenu)
+                             QTableWidgetItem,QAction,QHeaderView,QMenu,QCheckBox)
 from PyQt5.QtCore import (QRect,pyqtSlot,Qt)
 from PyQt5.QtGui import (QColor,QCursor)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -46,7 +46,7 @@ class ResultsWindow(QMainWindow):
     
     # Define UI elements
     def initUI(self):
-        self.setGeometry(500, 100, 1150, 950)
+        self.setGeometry(380, 30, 1150, 950)
         self.setWindowTitle('Results Panel')
         
         # A figure instance to plot on
@@ -83,6 +83,12 @@ class ResultsWindow(QMainWindow):
         self.gridLayout.addWidget(self.toolbarJVresp, 2, 0, 1, 1)
         self.toolbarMPP = NavigationToolbar(self.canvasMPP, self)
         self.gridLayout.addWidget(self.toolbarMPP, 2, 1, 1, 1)
+
+        self.plotPVlabel = QLabel(self.centralwidget)
+        self.plotPVlabel.setGeometry(QRect(20, 745, 160, 16))
+        self.plotPVlabel.setText("<qt><b>Show Power vs Voltage: </b></qt>")
+        self.plotPVbox = QCheckBox(self.centralwidget)
+        self.plotPVbox.setGeometry(QRect(160, 745, 87, 20))
 
         self.resTableW = 1100
         self.resTableH = 145
@@ -122,7 +128,7 @@ class ResultsWindow(QMainWindow):
         self.clearMenu = QAction("&Clear Plots", self)
         self.clearMenu.setShortcut("Ctrl+x")
         self.clearMenu.setStatusTip('Clear plots')
-        self.clearMenu.triggered.connect(lambda: self.clearPlots(True))
+        self.clearMenu.triggered.connect(lambda: self.clearPlots(True,True))
         
         fileMenu = self.menuBar.addMenu('&File')
         fileMenu.addAction(self.loadMenu)
@@ -185,16 +191,16 @@ class ResultsWindow(QMainWindow):
     
     # Initialize JV and PV plots
     def initJVPlot(self):
-        self.figureJVresp.clf()
         self.axJVresp = self.figureJVresp.add_subplot(111)
-        self.axPVresp = self.axJVresp.twinx()
         self.plotSettings(self.axJVresp)
-        self.plotSettings(self.axPVresp)
         self.axJVresp.set_xlabel('Voltage [V]',fontsize=8)
         self.axJVresp.set_ylabel('Current density [mA/cm$^2$]',fontsize=8)
-        self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
-        self.axJVresp.axvline(x=0, linewidth=0.5)
-        self.axJVresp.axhline(y=0, linewidth=0.5)
+        #self.axJVresp.axvline(x=0, linewidth=0.5)
+        #self.axJVresp.axhline(y=0, linewidth=0.5)
+        if self.plotPVbox.isChecked():
+            self.axPVresp = self.axJVresp.twinx()
+            self.plotSettings(self.axPVresp)
+            self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
         self.canvasJVresp.draw()
 
     # Plot Transient Jsc
@@ -219,22 +225,27 @@ class ResultsWindow(QMainWindow):
         self.canvasMPP.draw()
     
     # Plot JV response
-    def plotJVresp(self, JV):
-        self.initJVPlot()
+    def plotJVresp(self, JV,init):
+        if init is True:
+            self.initJVPlot()
         self.axJVresp.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
-        self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
+        if self.plotPVbox.isChecked():
+            self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
                 color='orange')
         self.canvasJVresp.draw()
     
     # Clear all plots and fields
-    def clearPlots(self, includeTable):
+    def clearPlots(self, includeTable,includeJVplot):
         self.deviceID = np.zeros((0,1))
         self.perfData = np.zeros((0,8))
         self.JV = np.array([])
+        if includeJVplot is True:
+            self.figureJVresp.clf()
         self.initPlots(self.perfData)
         self.initJVPlot()
         if includeTable is True:
             self.resTableWidget.setRowCount(0)
+            self.setupDataFrame()
         QApplication.processEvents()
     
     # Action upon selecting a row in the table.
@@ -247,9 +258,13 @@ class ResultsWindow(QMainWindow):
         for j in range(self.resTableWidget.columnCount()):
             self.resTableWidget.item(row,j).setBackground(QColor(0,255,0))
 
-        self.plotData(self.dfTotDeviceID.get_value(0,row,takeable=True),
-                self.dfTotPerfData.get_value(0,row,takeable=True),
-                self.dfTotJV.get_value(0,row,takeable=True))
+        for line in self.axJVresp.get_lines():
+            line.set_linewidth(0.5)
+        self.axJVresp.get_lines()[row].set_linewidth(2)
+        self.canvasJVresp.draw()
+        #self.plotData(self.dfTotDeviceID.get_value(0,row,takeable=True),
+        #        self.dfTotPerfData.get_value(0,row,takeable=True),
+        #        self.dfTotJV.get_value(0,row,takeable=True),False)
     '''
     # Action upon selecting a row in the table.
     @pyqtSlot()
@@ -312,9 +327,9 @@ class ResultsWindow(QMainWindow):
         self.fillTableData(deviceID, self.perfData)
         QApplication.processEvents()
         # Plot results
-        self.plotData(self.deviceID,self.perfData, JV)
+        self.plotData(self.deviceID,self.perfData, JV, False)
         QApplication.processEvents()
-        
+
         if flag is True:
             # Save to internal dataFrame
             self.makeInternalDataFrames(self.lastRowInd,
@@ -329,8 +344,8 @@ class ResultsWindow(QMainWindow):
             #    self.submit_DM(deviceID, dfAcqParams, self.perfData, self.JV)
 
     # Plot data from devices
-    def plotData(self, deviceID, perfData, JV):
-        self.plotJVresp(JV)
+    def plotData(self, deviceID, perfData, JV, init):
+        self.plotJVresp(JV, init)
         self.plotTVoc(perfData)
         self.plotMPP(perfData)
         self.plotTJsc(perfData)

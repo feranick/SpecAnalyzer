@@ -54,8 +54,8 @@ class Acquisition(QObject):
             return
         self.parent().acquisitionwind.enableAcqPanel(False)
         self.parent().enableButtonsAcq(False)
-        QApplication.processEvents()
-        self.parent().resultswind.clearPlots(True)
+        self.parent().resultswind.show()
+        self.parent().resultswind.clearPlots(False,False)
         
         self.acq_thread = acqThread(self.dfAcqParams, self)
         self.acq_thread.Msg.connect(self.printMsg)
@@ -88,16 +88,15 @@ class Acquisition(QObject):
 
     # Process JV Acquisition to result page
     def JVDeviceProcess(self, JV, perfData, deviceID, dfAcqParams):
-        self.parent().resultswind.clearPlots(False)
+        self.parent().resultswind.clearPlots(False,False)
         self.parent().resultswind.setupResultTable()
-        #perfData = self.analyseJV(JV)
         self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, True)
         QApplication.processEvents()
         time.sleep(1)
             
     # Plot temporary data from tracking
     def plotTempTracking(self, JV, perfData, deviceID, dfAcqParams, setupTable, saveData):
-        self.parent().resultswind.clearPlots(False)
+        self.parent().resultswind.clearPlots(False,False)
         if setupTable is True:
             self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, saveData)
@@ -141,8 +140,6 @@ class acqThread(QThread):
         self.Msg.emit(" Sourcemeter activated.")
 
         ### Setup interface and get parameters before acquisition
-        self.parent().parent().resultswind.clearPlots(True)
-        self.parent().parent().resultswind.setupDataFrame()
         self.Msg.emit("Acquisition started: "+self.getDateTimeNow()[0]+" at " + \
                 self.getDateTimeNow()[1])
         
@@ -159,11 +156,6 @@ class acqThread(QThread):
             # Acquire forward and backward JVs
             JVF, JVB = self.devAcqJV()
             # Acquire parameters
-            #perfDataF = self.devAcqParamsJV(JVF)
-            #self.acqJVComplete.emit(JVF, perfDataF, deviceID)
-            
-            #perfDataB = self.devAcqParamsJV(JVB)
-            #self.acqJVComplete.emit(JVB, perfDataB, deviceID)
 
             #perfData = self.devAcqParams()            
             #Right now the voc, jsc and mpp are extracted from the JV in JVDeviceProcess
@@ -265,10 +257,6 @@ class acqThread(QThread):
         #forward sweep 2
         i_list_forw2 = list(range(0, start_i))
 
-        print(i_list_back)
-        print(i_list_forw1)
-        print(i_list_forw2)
-
         # create data array
         data = np.zeros((N, 3))
         data[:, 0] = v_list
@@ -309,55 +297,6 @@ class acqThread(QThread):
         self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_forward")
 
         return data[:, 0:2], data[:,(0,2)]
-
-    ## measurements: JV
-    # dfAcqParams : self.dfAcqParams
-    def measure_JV_orig(self, dfAcqParams):
-        #deviceID = self.parent().parent().deviceText.text()
-        #perfData = np.zeros((0,8))
-        
-        #self.source_meter.set_mode('VOLT')
-        self.parent().source_meter.set_mode('VOLT')
-        self.parent().source_meter.on()
-
-        # measurement parameters
-        v_min = float(dfAcqParams.get_value(0,'Acq Min Voltage'))
-        v_max = float(dfAcqParams.get_value(0,'Acq Max Voltage'))
-        v_start = float(dfAcqParams.get_value(0,'Acq Start Voltage'))
-        v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
-        scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
-        hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
-
-        # enforce
-        if v_start < v_min and v_start > v_max and v_min > v_max:
-            raise ValueError('Voltage Errors')
-
-        # create list of voltage to measure
-        v_list = np.arange(v_min-2., v_max + 2., v_step)
-        v_list = v_list[np.logical_and(v_min-1e-9 <= v_list, v_list <= v_max+1e-9)]
-        start_i = np.argmin(abs(v_start - v_list))
-
-        N = len(v_list)
-        i_list = list(range(0, N))[::-1] + list(range(0, N))
-        i_list = i_list[N-start_i-1:] + i_list[:N-start_i-1]
-
-        # create data array
-        data = np.zeros((N, 3))
-        data[:, 0] = v_list
-        #self.tempTracking.emit(np.array([data[0, 0:2]]), np.zeros((1,8)),
-        #            self.parent().parent().deviceText.text(), True, False)
-        # measure
-        for n in range(scans):
-            for i in i_list:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                data[i, 2] += 1.
-                data[i, 1] = (self.parent().source_meter.read_values()[1] + \
-                    data[i,1]*(data[i,2]-1)) / data[i,2]
-                print(data)
-                #self.tempTracking.emit(data[0:i, 0:2], np.zeros((1,8)),
-                    #self.parent().parent().deviceText.text(), False, False)
-        return data[:, 0:2]
 
     ## measurements: voc, jsc
     def measure_voc_jsc(self):
@@ -472,8 +411,10 @@ class acqThread(QThread):
         PV = np.zeros(JV.shape)
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
-        Voc = JV[JV.shape[0]-1,0]
-        Jsc = JV[0,1]
+        # measurements: voc, jsc
+        Voc, Jsc = self.measure_voc_jsc()
+        #Voc = JV[JV.shape[0]-1,0]
+        #Jsc = JV[0,1]
         Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
         FF = Vpmax*Jpmax*100/(Voc*Jsc)
