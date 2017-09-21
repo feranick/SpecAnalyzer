@@ -146,10 +146,10 @@ class MainWindow(QMainWindow):
         self.devBugsMenu.setShortcut("Ctrl+b")
         self.devBugsMenu.setStatusTip('Development and bugs')
         self.devBugsMenu.triggered.connect(self.weblinks.help)
-        self.dataManagMenu = QAction("&Data management", self)
-        self.dataManagMenu.setShortcut("Ctrl+m")
-        self.dataManagMenu.setStatusTip('Data Management')
-        self.dataManagMenu.triggered.connect(self.weblinks.dm)
+        #self.dataManagMenu = QAction("&Data management", self)
+        #self.dataManagMenu.setShortcut("Ctrl+m")
+        #self.dataManagMenu.setStatusTip('Data Management')
+        #self.dataManagMenu.triggered.connect(self.weblinks.dm)
         self.aboutMenu = QAction("&About", self)
         self.aboutMenu = QAction("&About", self)
         self.aboutMenu.setShortcut("Ctrl+a")
@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         aboutMenu = self.menuBar.addMenu('&Help')
         aboutMenu.addAction(self.helpMenu)
         aboutMenu.addAction(self.devBugsMenu)
-        aboutMenu.addAction(self.dataManagMenu)
+        #aboutMenu.addAction(self.dataManagMenu)
         aboutMenu.addSeparator()
         aboutMenu.addAction(self.aboutMenu)
         
@@ -302,11 +302,11 @@ class WebLinksWidget():
         super(WebLinksWidget, self).__init__()
 
     def help(self):
-        webbrowser.open("https://sites.google.com/site/gridedgesolar/")
+        webbrowser.open("https://github.com/feranick/SpecAnalyzer")
     def dev(self):
-        webbrowser.open("https://github.mit.edu/GridEdgeSolar/Autotesting")
-    def dm(self):
-        webbrowser.open("http://gridedgedm.mit.edu")
+        webbrowser.open("https://github.com/feranick/SpecAnalyzer")
+    #def dm(self):
+    #    webbrowser.open("http://gridedgedm.mit.edu")
 
 '''
    About Widget
@@ -335,10 +335,10 @@ class AboutWidget(QWidget):
         self.logo.setPixmap(QPixmap("gridedgeat/rsrc/logo_about.png"))
         self.logo.setObjectName("logo")
 
-        self.labelTitle = QLabel("<qt><b><big><a href = http://gridedgesolar.com>Autotesting %s</a></b></big></qt>" % __version__, self)
+        self.labelTitle = QLabel("<qt><b><big><a href = https://github.com/feranick/SpecAnalyzer>SpecAnalyzer %s</a></b></big></qt>" % __version__, self)
         self.labelBy = QLabel("by: %s" % __author__, self)
-        self.labelContact = QLabel("<qt>Contact: <a href = mailto:mitgridedge@gmail.com> mitgridedge@gmail.com</a></qt>", self)
-        self.labelDetails = QLabel("GridEdgeSolar is a Solar PV project at MIT", self)
+        self.labelContact = QLabel("<qt>Contact: <a href = mailto:ferralis@mit.edu> ferralis@mit.edu</a></qt>", self)
+        self.labelDetails = QLabel("This is a homebrew project at MIT", self)
         self.labelLicense = QLabel("This software is licensed under the GNU GPL v.2.0 or later", self)
         
         for label in [self.logo, self.labelTitle, self.labelBy,

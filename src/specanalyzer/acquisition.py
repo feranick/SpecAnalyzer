@@ -19,9 +19,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QApplication,QAbstractItemView)
 from PyQt5.QtCore import (Qt,QObject, QThread, pyqtSlot, pyqtSignal)
 from .acquisitionWindow import *
-#from .modules.xystage.xystage import *
 from .modules.sourcemeter.sourcemeter import *
-#from .modules.switchbox.switchbox import *
 
 class Acquisition(QObject):
     def __init__(self, parent=None):
@@ -102,8 +100,6 @@ class Acquisition(QObject):
     def printMsg(self, msg):
         print(msg)
         logger.info(msg)
-        #self.parent().statusBar().showMessage(msg, 5000)
-        #self.parent().statusBar.showMessage(msg, 5000)
         self.parent().statusBarLabel.setText(msg)
 
     # Process JV Acquisition to result page
@@ -135,7 +131,6 @@ class acqThread(QThread):
 
     def __init__(self, dfAcqParams, parent=None):
         super(acqThread, self).__init__(parent)
-        #QThread.__init__(self)
         self.dfAcqParams = dfAcqParams
         self.powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun']) * \
             float(self.parent().parent().deviceSizeText.text()) * 0.00064516
@@ -146,21 +141,6 @@ class acqThread(QThread):
     def stop(self):
         self.terminate()
         self.endAcq()
-    
-    # JV Acquisition
-    def devAcqJV(self):
-        # Switch to correct device and start acquisition of JV
-        time.sleep(float(self.dfAcqParams.get_value(0,'Delay Before Meas')))
-        return self.measure_JV(self.dfAcqParams)
-    
-    # Parameters (Voc, Jsc, MPP, FF, eff)
-    def devAcqParams(self):
-        perfData, _, _ = self.measure_voc_jsc_mpp(self.dfAcqParams)
-        # Add fictious "zero" time for consistency in DataFrame for device.
-        perfData = np.hstack((0., perfData))
-        perfData = np.hstack((self.getDateTimeNow()[1], perfData))
-        perfData = np.hstack((self.getDateTimeNow()[0], perfData))
-        return np.array([perfData])
     
     def run(self):
 
@@ -235,6 +215,21 @@ class acqThread(QThread):
         self.parent().parent().enableButtonsAcq(True)
         QApplication.processEvents()
         self.Msg.emit("System: ready")
+
+    # JV Acquisition
+    def devAcqJV(self):
+        # Switch to correct device and start acquisition of JV
+        time.sleep(float(self.dfAcqParams.get_value(0,'Delay Before Meas')))
+        return self.measure_JV(self.dfAcqParams)
+    
+    # Parameters (Voc, Jsc, MPP, FF, eff)
+    def devAcqParams(self):
+        perfData, _, _ = self.measure_voc_jsc_mpp(self.dfAcqParams)
+        # Add fictious "zero" time for consistency in DataFrame for device.
+        perfData = np.hstack((0., perfData))
+        perfData = np.hstack((self.getDateTimeNow()[1], perfData))
+        perfData = np.hstack((self.getDateTimeNow()[0], perfData))
+        return np.array([perfData])
 
     ## measurements: JV
     # dfAcqParams : self.dfAcqParams
