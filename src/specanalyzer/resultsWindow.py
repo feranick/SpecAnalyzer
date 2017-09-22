@@ -55,9 +55,12 @@ class ResultsWindow(QMainWindow):
         self.figureTVoc = plt.figure()
         self.figureMPP = plt.figure()
         self.figureJVresp = plt.figure()
+        self.figurePVresp = plt.figure()
+        self.figureJVresp.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.10)
+        self.figurePVresp.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.10)
+
         self.figureTJsc.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
         self.figureTVoc.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
-        self.figureJVresp.subplots_adjust(left=0.15, right=0.85, top=0.95, bottom=0.10)
         self.figureMPP.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
 
         self.centralwidget = QWidget(self)
@@ -71,31 +74,45 @@ class ResultsWindow(QMainWindow):
         
         self.canvasJVresp = FigureCanvas(self.figureJVresp)
         self.toolbarJVresp = NavigationToolbar(self.canvasJVresp, self)
+        self.toolbarJVresp.setMaximumHeight(30)
+        self.toolbarJVresp.setStyleSheet("QToolBar { border: 0px }")
+
+        self.canvasPVresp = FigureCanvas(self.figurePVresp)
+        self.toolbarPVresp = NavigationToolbar(self.canvasPVresp, self)
+        self.toolbarPVresp.setMaximumHeight(30)
+        self.toolbarPVresp.setStyleSheet("QToolBar { border: 0px }")
+
+
         self.jvVLayout.addWidget(self.toolbarJVresp)
         self.jvVLayout.addWidget(self.canvasJVresp)
+        self.jvVLayout.addWidget(self.toolbarPVresp)
+        self.jvVLayout.addWidget(self.canvasPVresp)
         self.HLayout.addLayout(self.jvVLayout)
 
         self.VLayout = QVBoxLayout()
 
         self.canvasTJsc = FigureCanvas(self.figureTJsc)
         self.toolbarTJsc = NavigationToolbar(self.canvasTJsc, self)
+        self.toolbarTJsc.setMaximumHeight(30)
+        self.toolbarTJsc.setStyleSheet("QToolBar { border: 0px }")
+
         self.VLayout.addWidget(self.toolbarTJsc)
         self.VLayout.addWidget(self.canvasTJsc)
         self.canvasTVoc = FigureCanvas(self.figureTVoc)
         self.toolbarTVoc = NavigationToolbar(self.canvasTVoc, self)
+        self.toolbarTVoc.setMaximumHeight(30)
+        self.toolbarTVoc.setStyleSheet("QToolBar { border: 0px }")
+
         self.VLayout.addWidget(self.toolbarTVoc)
         self.VLayout.addWidget(self.canvasTVoc)
         self.canvasMPP = FigureCanvas(self.figureMPP)
         self.toolbarMPP = NavigationToolbar(self.canvasMPP, self)
+        self.toolbarMPP.setMaximumHeight(30)
+        self.toolbarMPP.setStyleSheet("QToolBar { border: 0px }")
+
         self.VLayout.addWidget(self.toolbarMPP)
         self.VLayout.addWidget(self.canvasMPP)
         self.HLayout.addLayout(self.VLayout)
-
-        self.plotPVlabel = QLabel(self.centralwidget)
-        self.plotPVlabel.setGeometry(QRect(20, 745, 160, 16))
-        self.plotPVlabel.setText("<qt><b>Show Power vs Voltage: </b></qt>")
-        self.plotPVbox = QCheckBox(self.centralwidget)
-        self.plotPVbox.setGeometry(QRect(160, 745, 87, 20))
 
         self.resTableW = 1100
         self.resTableH = 145
@@ -204,11 +221,16 @@ class ResultsWindow(QMainWindow):
         self.axJVresp.set_ylabel('Current density [mA/cm$^2$]',fontsize=8)
         #self.axJVresp.axvline(x=0, linewidth=0.5)
         #self.axJVresp.axhline(y=0, linewidth=0.5)
-        if self.plotPVbox.isChecked():
-            self.axPVresp = self.axJVresp.twinx()
-            self.plotSettings(self.axPVresp)
-            self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
+        
+        self.axPVresp = self.figurePVresp.add_subplot(111)
+        self.plotSettings(self.axPVresp)
+        self.axPVresp.set_xlabel('Voltage [V]',fontsize=8)
+        self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
         self.canvasJVresp.draw()
+        self.canvasPVresp.draw()
+        self.figureJVresp.tight_layout()
+        self.figurePVresp.tight_layout()
+
 
     # Plot Transient Jsc
     def plotTJsc(self, data):
@@ -236,11 +258,11 @@ class ResultsWindow(QMainWindow):
         if init is True:
             self.initJVPlot()
         self.axJVresp.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
-        if self.plotPVbox.isChecked():
-            self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
-                color='orange')
+        self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
+            color='orange')
         self.canvasJVresp.draw()
-    
+        self.canvasPVresp.draw()
+
     # Clear all plots and fields
     def clearPlots(self, includeTable,includeJVplot):
         self.deviceID = np.zeros((0,1))
@@ -248,6 +270,7 @@ class ResultsWindow(QMainWindow):
         self.JV = np.array([])
         if includeJVplot is True:
             self.figureJVresp.clf()
+            self.figurePVresp.clf()
         self.initPlots(self.perfData)
         self.initJVPlot()
         if includeTable is True:
@@ -267,8 +290,13 @@ class ResultsWindow(QMainWindow):
 
         for line in self.axJVresp.get_lines():
             line.set_linewidth(0.5)
+        for line in self.axPVresp.get_lines():
+            line.set_linewidth(0.5)
         self.axJVresp.get_lines()[row].set_linewidth(2)
+        self.axPVresp.get_lines()[row].set_linewidth(2)
         self.canvasJVresp.draw()
+        self.canvasPVresp.draw()
+
         #self.plotData(self.dfTotDeviceID.get_value(0,row,takeable=True),
         #        self.dfTotPerfData.get_value(0,row,takeable=True),
         #        self.dfTotJV.get_value(0,row,takeable=True),False)
