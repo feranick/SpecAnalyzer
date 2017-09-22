@@ -336,9 +336,9 @@ class ResultsWindow(QMainWindow):
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
-        self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1, inplace=True)
-        self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1, inplace=True)
-        self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1, inplace=True)
+        self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1)
+        self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1)
+        self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1)
         self.axPVresp.get_lines()[row].remove()
         self.axJVresp.get_lines()[row].remove()
         self.canvasJVresp.draw()
