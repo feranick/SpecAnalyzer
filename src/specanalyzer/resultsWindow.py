@@ -316,13 +316,16 @@ class ResultsWindow(QMainWindow):
                 rPos.y()>0 and rPos.y()<self.resTableH and \
                 self.resTableWidget.rowCount() > 0 :
         
-            selectCellAction = QAction('Save locally', self)
-            self.menu.addAction(selectCellAction)
+            selectCellSaveAction = QAction('Save as...', self)
+            selectCellRemoveAction = QAction('Remove...', self)
+            self.menu.addAction(selectCellRemoveAction)
+            self.menu.addAction(selectCellSaveAction)
             self.menu.popup(QCursor.pos())
             QApplication.processEvents()
         for currentQTableWidgetItem in self.resTableWidget.selectedItems():
             row = self.resTableWidget.currentRow()
-            selectCellAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
+            selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
+            selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
 
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
@@ -330,6 +333,23 @@ class ResultsWindow(QMainWindow):
             self.dfTotAcqParams.iloc[[row]],
             self.dfTotPerfData.get_value(0,row,takeable=True),
             self.dfTotJV.get_value(0,row,takeable=True))
+
+    def selectDeviceRemove(self, row):
+        print(row)
+        print(self.dfTotDeviceID.columns[row])
+        print(self.dfTotDeviceID)
+        print(self.dfTotPerfData)
+        
+        self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1, inplace=True)
+        self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1, inplace=True)
+        self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1, inplace=True)
+        
+        self.axPVresp.get_lines()[row].remove()
+        self.axJVresp.get_lines()[row].remove()
+        
+        self.canvasJVresp.draw()
+        self.canvasPVresp.draw()
+        self.resTableWidget.removeRow(row)
 
     # Add row and initialize it within the table
     def setupResultTable(self):
@@ -484,7 +504,7 @@ class ResultsWindow(QMainWindow):
                 perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Voc']))][:,range(1,9)]
                 JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(9,11)]
                 dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
-                self.plotData(deviceID, perfData, JV)
+                self.plotData(deviceID, perfData, JV, False)
                 self.setupResultTable()
                 self.fillTableData(deviceID, perfData)
                 self.makeInternalDataFrames(self.lastRowInd, deviceID, perfData, dfAcqParams, np.array([JV]))
