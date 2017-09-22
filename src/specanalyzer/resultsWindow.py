@@ -334,6 +334,7 @@ class ResultsWindow(QMainWindow):
             self.dfTotPerfData.get_value(0,row,takeable=True),
             self.dfTotJV.get_value(0,row,takeable=True))
 
+    # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
         self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1, inplace=True)
         self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1, inplace=True)
