@@ -335,18 +335,11 @@ class ResultsWindow(QMainWindow):
             self.dfTotJV.get_value(0,row,takeable=True))
 
     def selectDeviceRemove(self, row):
-        print(row)
-        print(self.dfTotDeviceID.columns[row])
-        print(self.dfTotDeviceID)
-        print(self.dfTotPerfData)
-        
         self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1, inplace=True)
         self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1, inplace=True)
         self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1, inplace=True)
-        
         self.axPVresp.get_lines()[row].remove()
         self.axJVresp.get_lines()[row].remove()
-        
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
         self.resTableWidget.removeRow(row)
