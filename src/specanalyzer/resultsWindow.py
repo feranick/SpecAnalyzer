@@ -19,8 +19,9 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow,QPushButton,QVBoxLayout,QFileDialog,QWidget,
                              QGridLayout,QGraphicsView,QLabel,QComboBox,QLineEdit,
                              QMenuBar,QStatusBar, QApplication,QTableWidget,
-                             QTableWidgetItem,QAction,QHeaderView,QMenu,QCheckBox)
-from PyQt5.QtCore import (QRect,pyqtSlot,Qt)
+                             QTableWidgetItem,QAction,QHeaderView,QMenu,QCheckBox,
+                             QHBoxLayout)
+from PyQt5.QtCore import (QSize,QRect,pyqtSlot,Qt)
 from PyQt5.QtGui import (QColor,QCursor)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -56,33 +57,39 @@ class ResultsWindow(QMainWindow):
         self.figureJVresp = plt.figure()
         self.figureTJsc.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
         self.figureTVoc.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
-        self.figureJVresp.subplots_adjust(left=0.15, right=0.85, top=0.95, bottom=0.21)
+        self.figureJVresp.subplots_adjust(left=0.15, right=0.85, top=0.95, bottom=0.10)
         self.figureMPP.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.21)
 
         self.centralwidget = QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
+        
         self.gridLayoutWidget = QWidget(self.centralwidget)
         self.gridLayoutWidget.setGeometry(QRect(20, 30, 1100, 710))
-        self.gridLayout = QGridLayout(self.gridLayoutWidget)
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.HLayout = QHBoxLayout(self.gridLayoutWidget)
+        self.jvVLayout = QVBoxLayout()
         
-        self.canvasTJsc = FigureCanvas(self.figureTJsc)
-        self.gridLayout.addWidget(self.canvasTJsc, 1, 0, 1, 1)
-        self.canvasTVoc = FigureCanvas(self.figureTVoc)
-        self.gridLayout.addWidget(self.canvasTVoc, 1, 1, 1, 1)
         self.canvasJVresp = FigureCanvas(self.figureJVresp)
-        self.gridLayout.addWidget(self.canvasJVresp, 3, 0, 1, 1)
-        self.canvasMPP = FigureCanvas(self.figureMPP)
-        self.gridLayout.addWidget(self.canvasMPP, 3, 1, 1, 1)
-        
-        self.toolbarTJsc = NavigationToolbar(self.canvasTJsc, self)
-        self.gridLayout.addWidget(self.toolbarTJsc, 0, 0, 1, 1)
-        self.toolbarTVoc = NavigationToolbar(self.canvasTVoc, self)
-        self.gridLayout.addWidget(self.toolbarTVoc, 0, 1, 1, 1)
         self.toolbarJVresp = NavigationToolbar(self.canvasJVresp, self)
-        self.gridLayout.addWidget(self.toolbarJVresp, 2, 0, 1, 1)
+        self.jvVLayout.addWidget(self.toolbarJVresp)
+        self.jvVLayout.addWidget(self.canvasJVresp)
+        self.HLayout.addLayout(self.jvVLayout)
+
+        self.VLayout = QVBoxLayout()
+
+        self.canvasTJsc = FigureCanvas(self.figureTJsc)
+        self.toolbarTJsc = NavigationToolbar(self.canvasTJsc, self)
+        self.VLayout.addWidget(self.toolbarTJsc)
+        self.VLayout.addWidget(self.canvasTJsc)
+        self.canvasTVoc = FigureCanvas(self.figureTVoc)
+        self.toolbarTVoc = NavigationToolbar(self.canvasTVoc, self)
+        self.VLayout.addWidget(self.toolbarTVoc)
+        self.VLayout.addWidget(self.canvasTVoc)
+        self.canvasMPP = FigureCanvas(self.figureMPP)
         self.toolbarMPP = NavigationToolbar(self.canvasMPP, self)
-        self.gridLayout.addWidget(self.toolbarMPP, 2, 1, 1, 1)
+        self.VLayout.addWidget(self.toolbarMPP)
+        self.VLayout.addWidget(self.canvasMPP)
+        self.HLayout.addLayout(self.VLayout)
 
         self.plotPVlabel = QLabel(self.centralwidget)
         self.plotPVlabel.setGeometry(QRect(20, 745, 160, 16))
