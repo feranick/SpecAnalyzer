@@ -37,7 +37,7 @@ class ResultsWindow(QMainWindow):
     def __init__(self, parent=None):
         super(ResultsWindow, self).__init__(parent)
         self.deviceID = np.zeros((0,1))
-        self.perfData = np.zeros((0,8))
+        self.perfData = np.zeros((0,9))
         self.JV = np.array([])
         self.setupDataFrame()
         self.csvFolder = self.parent().config.csvSavingFolder
@@ -118,18 +118,19 @@ class ResultsWindow(QMainWindow):
         self.resTableH = 145
         self.resTableWidget = QTableWidget(self.centralwidget)
         self.resTableWidget.setGeometry(QRect(20, 770, self.resTableW, self.resTableH))
-        self.resTableWidget.setColumnCount(9)
+        self.resTableWidget.setColumnCount(10)
         self.resTableWidget.setRowCount(0)
         self.resTableWidget.setItem(0,0, QTableWidgetItem(""))
         self.resTableWidget.setHorizontalHeaderItem(0,QTableWidgetItem("Device ID"))
         self.resTableWidget.setHorizontalHeaderItem(1,QTableWidgetItem("Av Voc [V]"))
         self.resTableWidget.setHorizontalHeaderItem(2,QTableWidgetItem(u"Av Jsc [mA/cm\u00B2]"))
-        self.resTableWidget.setHorizontalHeaderItem(3,QTableWidgetItem(u"MPP [mW/cm\u00B2]"))
-        self.resTableWidget.setHorizontalHeaderItem(4,QTableWidgetItem("Av FF"))
-        self.resTableWidget.setHorizontalHeaderItem(5,QTableWidgetItem("Av PCE"))
-        self.resTableWidget.setHorizontalHeaderItem(6,QTableWidgetItem("Tracking time [s]"))
-        self.resTableWidget.setHorizontalHeaderItem(7,QTableWidgetItem("Acq Date"))
-        self.resTableWidget.setHorizontalHeaderItem(8,QTableWidgetItem("Acq Time"))
+        self.resTableWidget.setHorizontalHeaderItem(3,QTableWidgetItem(u"VPP [V]"))
+        self.resTableWidget.setHorizontalHeaderItem(4,QTableWidgetItem(u"MPP [mW/cm\u00B2]"))
+        self.resTableWidget.setHorizontalHeaderItem(5,QTableWidgetItem("Av FF"))
+        self.resTableWidget.setHorizontalHeaderItem(6,QTableWidgetItem("Av PCE"))
+        self.resTableWidget.setHorizontalHeaderItem(7,QTableWidgetItem("Tracking time [s]"))
+        self.resTableWidget.setHorizontalHeaderItem(8,QTableWidgetItem("Acq Date"))
+        self.resTableWidget.setHorizontalHeaderItem(9,QTableWidgetItem("Acq Time"))
         self.resTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.resTableWidget.itemClicked.connect(self.onCellClick)
@@ -410,8 +411,8 @@ class ResultsWindow(QMainWindow):
     # Create DataFrames for saving csv and jsons
     def makeDFPerfData(self,perfData):
         dfPerfData = pd.DataFrame({'Time step': perfData[:,2], 'Voc': perfData[:,3],
-                        'Jsc': perfData[:,4], 'MPP': perfData[:,5],
-                        'FF': perfData[:,6], 'effic': perfData[:,7],
+                        'Jsc': perfData[:,4], 'VPP': perfData[:,5],'MPP': perfData[:,6],
+                        'FF': perfData[:,7], 'effic': perfData[:,8],
                         'Acq Date': perfData[:,0], 'Acq Time': perfData[:,1]})
         dfPerfData = dfPerfData[['Acq Date','Acq Time','Time step', 'Voc',
                                      'Jsc', 'MPP','FF','effic']]
@@ -513,9 +514,10 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.setItem(self.lastRowInd, 3,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,5].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 4,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,6].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 5,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,7].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 6,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,2].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem(obj[0,0]))
-        self.resTableWidget.setItem(self.lastRowInd, 8,QTableWidgetItem(obj[0,1]))
+        self.resTableWidget.setItem(self.lastRowInd, 6,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,8].astype(float)))))
+        self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,2].astype(float)))))
+        self.resTableWidget.setItem(self.lastRowInd, 8,QTableWidgetItem(obj[0,0]))
+        self.resTableWidget.setItem(self.lastRowInd, 9,QTableWidgetItem(obj[0,1]))
 
     # Redirect to DM page for substrate/device
     def redirectToDM(self, deviceID):

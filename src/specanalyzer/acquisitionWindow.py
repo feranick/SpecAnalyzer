@@ -84,7 +84,7 @@ class AcquisitionWindow(QMainWindow):
         self.trackingLabel.setObjectName("trackingLabel")
         
         self.enableTrackingBox = QCheckBox(self.centralwidget)
-        self.enableTrackingBox.setGeometry(QRect(180, 280, 87, 20))
+        self.enableTrackingBox.setGeometry(QRect(140, 280, 87, 20))
         
         self.gridLayoutWidget_2 = QWidget(self.centralwidget)
         self.gridLayoutWidget_2.setGeometry(QRect(10, 310, 330, 181))

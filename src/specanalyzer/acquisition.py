@@ -156,7 +156,7 @@ class acqThread(QThread):
             # Acquire forward and backward sweeps
             sweepF, sweepB = self.measure_sweep(self.dfAcqParams)
             # Acquire JV for performance parameters
-            JVOKflag, JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp(self.dfAcqParams)
+            JVOKflag, JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp(self.dfAcqParams)            
             if JVOKflag:
                 self.acqJVComplete.emit(JVF, perfDataF, deviceID+"_JV-forward")
                 self.acqJVComplete.emit(JVB, perfDataB, deviceID+"_JV-backward")
@@ -172,7 +172,7 @@ class acqThread(QThread):
                     time.sleep(1)
 
                     # Use this to get the simple JV used for detecting Vpmax
-                    perfData, JV = self.tracking(deviceID, self.dfAcqParams)
+                    perfData, JV = self.tracking(deviceID, self.dfAcqParams, JVF, perfDataF)
                     # Alternatively use this for a complete JV sweep
                     #JV = self.devAcqJV()
 
@@ -258,7 +258,6 @@ class acqThread(QThread):
             self.parent().source_meter.set_output(voltage = v_list[i])
             time.sleep(hold_time)
             data[i,2] = self.parent().source_meter.read_values()[1]
-            #print(data[i:N, (0,2)])
 
         perfDataB = self.analyseJV(data[:, (0,2)])
         self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
@@ -275,7 +274,6 @@ class acqThread(QThread):
         #    self.parent().parent().deviceText.text()+"_forw", True, False)
         perfDataF = self.analyseJV(data[:, (0,1)])
         self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
-
         return data[:, 0:2], data[:,(0,2)]
 
     ## measurements: voc, jsc
@@ -311,7 +309,9 @@ class acqThread(QThread):
 
         # measurement parameters
         v_min = 0.
-        v_max = voc
+        #v_max = voc
+        v_max = 2 #for testing only
+
         if v_max - v_min < v_step:
             self.Msg.emit('  Voc appears to be close to V=0. Aborting') 
             return False, None, None, None, None
@@ -345,7 +345,6 @@ class acqThread(QThread):
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
             JV[:,2] = (JVtemp[:,2] + JV[:,2]*n)/(n+1)
 
-        print(JVtemp)
         perfDataF = self.analyseJV(JV[:, (0,1)])
         perfDataB = self.analyseJV(JV[:, (0,2)])
         
@@ -353,17 +352,16 @@ class acqThread(QThread):
 
     # Tracking (take JV once and track Vpmax)
     # dfAcqParams : self.dfAcqParams
-    def tracking(self, deviceID, dfAcqParams):
+    def tracking(self, deviceID, dfAcqParams, JV, perfData):
         hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
         trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
-        perfData = np.zeros((0,8))
         startTime = time.time()
+
         self.Msg.emit("Tracking device: "+deviceID+" (time-step: 0)")
-        data, Vpmax, JV = self.measure_voc_jsc_mpp(dfAcqParams)
-        data = np.hstack(([self.getDateTimeNow()[1],self.getDateTimeNow()[0],0], data))
-        perfData = np.vstack((data, perfData))
-        self.tempTracking.emit(JV, perfData, deviceID, True, False)
+
+        Vpmax = float(perfData[0][5])
+        #self.tempTracking.emit(JV, perfData, deviceID, True, False)
         for n in range(1, numPoints):
             time.sleep(trackTime)
             timeStep = time.time()-startTime
@@ -380,33 +378,14 @@ class acqThread(QThread):
             except:
                 FF = 0.
                 effic = 0.
-            data = np.array([voc, jsc, Vpmax*Jpmax,FF,effic])
+            data = np.array([voc, jsc, Vpmax, Vpmax*Jpmax,FF,effic])
             data = np.hstack(([self.getDateTimeNow()[0],
                                    self.getDateTimeNow()[1],timeStep], data))
             perfData = np.vstack((data, perfData))
-            self.tempTracking.emit(JV, perfData, deviceID, False, False)
-        self.tempTracking.emit(JV, perfData, deviceID, False, True)
+            #self.tempTracking.emit(JV, perfData, deviceID, False, False)
+        self.tempTracking.emit(JV, perfData, deviceID+"_tracking", True, True)
         return perfData, JV
-    
-    '''
-    # Tracking (take JV at every tracking point)
-    # dfAcqParams : self.dfAcqParams
-    def tracking(self, deviceID, dfAcqParams):
-        numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
-        trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
-        perfData = np.zeros((0,8))
-        startTime = time.time()
-        for n in range(0, numPoints):
-            timeStep = time.time()-startTime
-            print("Tracking device: ",deviceID," (time-step: {0:0.1f}s)".format(timeStep))
-            data, _ , JV = self.measure_voc_jsc_mpp(dfAcqParams)
-            data = np.hstack((timeStep, data))
-            data = np.hstack((self.getDateTimeNow()[0], data))
-            data = np.hstack((self.getDateTimeNow()[1], data))
-            perfData = np.vstack((data, perfData))
-            time.sleep(trackTime)
-        return perfData, JV
-    '''
+
     # Extract parameters from JV
     def analyseJV(self, JV):
         powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun'])*0.00064516
@@ -421,7 +400,7 @@ class acqThread(QThread):
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
         FF = Vpmax*Jpmax*100/(Voc*Jsc)
         effic = Vpmax*Jpmax/powerIn
-        data = np.array([Voc, Jsc, Vpmax*Jpmax,FF,effic])
+        data = np.array([Voc, Jsc, Vpmax, Vpmax*Jpmax,FF,effic])
         data = np.hstack((0., data))
         data = np.hstack((self.getDateTimeNow()[1], data))
         data = np.hstack((self.getDateTimeNow()[0], data))
