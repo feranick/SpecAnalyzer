@@ -69,7 +69,6 @@ class SourcemeterWindow(QMainWindow):
         self.startSourcemeterButton.setEnabled(True)
         self.sourcemeterVoltageReadLabel.setText("")
         self.sourcemeterCurrentReadLabel.setText("Sourcemeter stopped")
-        print(self.smThread.isRunning())
         try:
             if self.smThread.isRunning():
                 self.smThread.stop()
