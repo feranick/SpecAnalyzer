@@ -156,30 +156,31 @@ class acqThread(QThread):
             # Acquire forward and backward sweeps
             sweepF, sweepB = self.measure_sweep(self.dfAcqParams)
             # Acquire JV for performance parameters
-            JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp(self.dfAcqParams)
-            self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_JV-forward")
-            self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_JV-backward")
+            JVOKflag, JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp(self.dfAcqParams)
+            if JVOKflag:
+                self.acqJVComplete.emit(JVF, perfDataF, deviceID+"_JV-forward")
+                self.acqJVComplete.emit(JVB, perfDataB, deviceID+"_JV-backward")
 
-            #Right now the voc, jsc and mpp are extracted from the JV in JVDeviceProcess
-            #self.acqJVComplete.emit(JVF, perfData, deviceID)
+                #Right now the voc, jsc and mpp are extracted from the JV in JVDeviceProcess
+                #self.acqJVComplete.emit(JVF, perfData, deviceID)
 
-            #self.max_power.append(np.max(JVF[:, 0] * JVF[:, 1]))
-            self.Msg.emit('  Device '+deviceID+' acquisition: complete')
+                #self.max_power.append(np.max(JVF[:, 0] * JVF[:, 1]))
+                self.Msg.emit('  Device '+deviceID+' acquisition: complete')
 
-            if self.parent().parent().acquisitionwind.enableTrackingBox.isChecked() == True:
-                # Tracking
-                time.sleep(1)
+                if self.parent().parent().acquisitionwind.enableTrackingBox.isChecked() == True:
+                    # Tracking
+                    time.sleep(1)
 
-                # Use this to get the simple JV used for detecting Vpmax
-                perfData, JV = self.tracking(deviceID, self.dfAcqParams)
-                # Alternatively use this for a complete JV sweep
-                #JV = self.devAcqJV()
+                    # Use this to get the simple JV used for detecting Vpmax
+                    perfData, JV = self.tracking(deviceID, self.dfAcqParams)
+                    # Alternatively use this for a complete JV sweep
+                    #JV = self.devAcqJV()
 
-                #self.acqJVComplete.emit(JV, perfData, substrateID+str(self.devMaxPower), i, j)
-                self.Msg.emit(' Device '+deviceID+' tracking: complete')
+                    #self.acqJVComplete.emit(JV, perfData, substrateID+str(self.devMaxPower), i, j)
+                    self.Msg.emit(' Device '+deviceID+' tracking: complete')
 
-            self.Msg.emit("Acquisition Completed: "+ self.getDateTimeNow()[0] + \
-                " at "+self.getDateTimeNow()[1])
+                self.Msg.emit("Acquisition Completed: "+ self.getDateTimeNow()[0] + \
+                    " at "+self.getDateTimeNow()[1])
             self.endAcq()
 
     def endAcq(self):
@@ -311,9 +312,13 @@ class acqThread(QThread):
         # measurement parameters
         v_min = 0.
         v_max = voc
+        if v_max - v_min < v_step:
+            self.Msg.emit('  Voc appears to be close to V=0. Aborting') 
+            return False, None, None, None, None
 
         # measure
-        v_list = np.arange(v_min, v_max, v_step)
+        v_list = np.arange(v_min, v_max+1e-9, v_step)
+        
         i_list_forw = list(range(0, len(v_list)))
         i_list_back = i_list_forw[::-1]
         
@@ -344,7 +349,7 @@ class acqThread(QThread):
         perfDataF = self.analyseJV(JV[:, (0,1)])
         perfDataB = self.analyseJV(JV[:, (0,2)])
         
-        return JV[:, 0:2], JV[:,(0,2)], perfDataF, perfDataB
+        return True, JV[:, 0:2], JV[:,(0,2)], perfDataF, perfDataB
 
     # Tracking (take JV once and track Vpmax)
     # dfAcqParams : self.dfAcqParams
