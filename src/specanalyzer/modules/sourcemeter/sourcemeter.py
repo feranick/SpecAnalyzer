@@ -25,7 +25,7 @@ class SourceMeter(object):
     '''
     def __init__(self, visa_string):
         self.manager = visa.ResourceManager().open_resource(visa_string) 
-
+        print(self.ask('*IDN?'))
         # for safety
         self.off()
         self.write('SOUR:CURR 0')

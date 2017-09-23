@@ -69,6 +69,7 @@ class SourcemeterWindow(QMainWindow):
         self.startSourcemeterButton.setEnabled(True)
         self.sourcemeterVoltageReadLabel.setText("")
         self.sourcemeterCurrentReadLabel.setText("Sourcemeter stopped")
+        print(self.smThread.isRunning())
         try:
             if self.smThread.isRunning():
                 self.smThread.stop()
@@ -100,7 +101,9 @@ class sourcemeterThread(QThread):
         self.wait()
 
     def stop(self):
-        self.sc.set_output(voltage = 0)    
+        self.runningFlag = False
+        time.sleep(0.5)
+        self.sc.set_output(voltage = 0)
         self.sc.off()
         del self.sc
         self.terminate()
@@ -109,7 +112,8 @@ class sourcemeterThread(QThread):
         #try:
         self.sc = SourceMeter(self.parent().parent().config.sourcemeterID)
         self.sc.set_limit(voltage=self.maxV, current=0.12)
-        while True:
+        self.runningFlag = True
+        while self.runningFlag is True:
             voltageText = self.parent().sourcemeterVoltageText.text()
             if voltageText == "" or voltageText == "-":
                  pass
