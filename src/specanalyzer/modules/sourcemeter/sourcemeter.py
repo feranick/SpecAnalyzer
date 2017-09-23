@@ -4,7 +4,7 @@ sourcemeter.py
 Class for providing a hardware support for 
 for the sourcemeter
 
-Version: 20170914
+Version: 20170923
 
 Copyright (C) 2017 Tony Wu <tonyw@mit.edu>
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
@@ -23,7 +23,7 @@ class SourceMeter(object):
         - Keithley 2400
         - command manual: http://research.physics.illinois.edu/bezryadin/labprotocol/Keithley2400Manual.pdf
     '''
-    def __init__(self, visa_string='GPIB0::24::INSTR'):
+    def __init__(self, visa_string):
         self.manager = visa.ResourceManager().open_resource(visa_string) 
 
         # for safety

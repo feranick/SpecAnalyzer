@@ -59,7 +59,7 @@ class SourcemeterWindow(QMainWindow):
     def startSourcemeter(self):
         self.startSourcemeterButton.setEnabled(False)
         self.stopSourcemeterButton.setEnabled(True)
-        self.smThread = sourcemeterThread(self)
+        self.smThread = sourcemeterThread(parent=self)
         self.smThread.smResponse.connect(lambda Vread, Cread, flag: self.printMsg(Vread, Cread, flag))
         self.smThread.start()
     
@@ -92,9 +92,8 @@ class SourcemeterWindow(QMainWindow):
 class sourcemeterThread(QThread):
     smResponse = pyqtSignal(str, str, bool)
     
-    def __init__(self, parent_obj):
-        QThread.__init__(self)
-        self.parent_obj = parent_obj
+    def __init__(self, parent=None):
+        super(sourcemeterThread, self).__init__(parent)
         self.maxV = 10
 
     def __del__(self):
@@ -107,21 +106,21 @@ class sourcemeterThread(QThread):
         self.terminate()
 
     def run(self):
-        try:
-            self.sc = SourceMeter()
-            self.sc.set_limit(voltage=self.maxV, current=0.12)
-            while True:
-                voltageText = self.parent_obj.sourcemeterVoltageText.text()
-                if voltageText == "" or voltageText == "-":
-                    pass
-                else:
-                    self.sc.on()
-                    voltage = float(voltageText)
-                    self.sc.set_output(voltage = voltage)
-                    self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
+        #try:
+        self.sc = SourceMeter(self.parent().parent().config.sourcemeterID)
+        self.sc.set_limit(voltage=self.maxV, current=0.12)
+        while True:
+            voltageText = self.parent().sourcemeterVoltageText.text()
+            if voltageText == "" or voltageText == "-":
+                 pass
+            else:
+                self.sc.on()
+                voltage = float(voltageText)
+                self.sc.set_output(voltage = voltage)
+                self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
                         " Current [A]: "+str(self.sc.read_values()[1]), True)
-                    self.sc.off()
-                time.sleep(0.2)
+                self.sc.off()
+            time.sleep(0.2)
 
-        except:
-            self.smResponse.emit("","Cannot connect to sourcemeter", False)
+        #except:
+        #    self.smResponse.emit("","Cannot connect to sourcemeter", False)
