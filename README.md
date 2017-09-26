@@ -1,5 +1,5 @@
-# GES_AT
-SpecAnalyzer
+# SpecAnalyzer
+SpecAnalyzer connects to sourcementers (supported keythley 2400) and/or parameter analyzers (supported Agilent 4155c) for collection of current-voltage profiles. It is specifically tailored for testing photovoltaic devices.
 
 ## Installation:
 The software can be run "offline", meaning without being connected to the hardware, for example to load data, etc. The dependencies needed for running the "online" version (i.e. to be able to control the acquisition hardware) are listed as such below. These are not needed for running the "offline" version. If you are planning to use this software for "offline" use on your computer, do not install the "online" dependencies. The software automatically recognizes the presence (or lack thereof) of the required dependencies for online/offline use.
