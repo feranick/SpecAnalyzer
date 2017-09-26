@@ -5,10 +5,10 @@ SpecAnalyzer
 The software can be run "offline", meaning without being connected to the hardware, for example to load data, etc. The dependencies needed for running the "online" version (i.e. to be able to control the acquisition hardware) are listed as such below. These are not needed for running the "offline" version. If you are planning to use this software for "offline" use on your computer, do not install the "online" dependencies. The software automatically recognizes the presence (or lack thereof) of the required dependencies for online/offline use.
 
 ### Dependencies
-SpecAnalyzer is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
+SpecAnalyzer is written in [Python 3.x](<http://www.python.org/>) and relies on the following libraries:
 - [Python v.3.5/3.6](<http://www.python.org/>)
 - [Qt5](<http://qt.io>)
-- [PyQt version](<http://www.riverbankcomputing.co.uk/>)
+- [PyQt version 5](<http://www.riverbankcomputing.co.uk/>)
 - [Numpy >1.5](http://www.numpy.org/)
 - [Scipy >0.9](<http://www.scipy.org/>)
 - [Matplotlib >0.9](<http://matplotlib.org/>) 
