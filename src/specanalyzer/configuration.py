@@ -55,6 +55,7 @@ class Configuration():
             'powermeterID' : "USB0::0x1313::0x8072::P2008173::INSTR",
             'irradiance1Sun' : 3682,
             'sourcemeterID' : "GPIB0::24::INSTR",
+            'analyzerID' : "GPIB0::17::INSTR",
             }
     def defineConfSystem(self):
         self.conf['System'] = {
@@ -90,6 +91,7 @@ class Configuration():
         self.powermeterID = self.instrConfig['powermeterID']
         self.irradiance1Sun = eval(self.instrConfig['irradiance1Sun'])
         self.sourcemeterID = self.instrConfig['sourcemeterID']
+        self.analyzerID = self.instrConfig['analyzerID']
 
         self.loggingLevel = self.sysConfig['loggingLevel']
         self.loggingFilename = self.sysConfig['loggingFilename']

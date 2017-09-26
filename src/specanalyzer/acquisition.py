@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import (QApplication,QAbstractItemView)
 from PyQt5.QtCore import (Qt,QObject, QThread, pyqtSlot, pyqtSignal)
 from .acquisitionWindow import *
 from .modules.sourcemeter.sourcemeter import *
+from .modules.analyzer.analyzer import *
 
 class Acquisition(QObject):
     def __init__(self, parent=None):
