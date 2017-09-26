@@ -45,13 +45,9 @@ class Agilent4155c(object):
         self.write(":PAGE:CHAN:SMU1:FUNC VAR1")
         self.write(":PAGE:CHAN:SMU2:MODE COMM")
         self.write(":PAGE:CHAN:SMU2:FUNC CONS")
-        self.write(":PAGE:DISP:GRAPH:X:DEL")
-        self.write(":PAGE:DISP:GRAPH:Y:DEL")
-
 
     def __del__(self):
         try:
-            self.off()
             self.manager.close()
         except:
             pass
@@ -66,24 +62,16 @@ class Agilent4155c(object):
         return self.manager.read()
     def ask(self, command):
         return self.manager.query(command)
-
-
-    def on(self):
-        #"Turn Keithley on"
-        self.write('OUTP ON')
-    def off(self):
-        #"Turn Keithley off"
-        self.write('OUTP OFF')
         
     def sweep(self, start, end, step):
-        self.write('OUTP ON')
+        self.write(":PAGE:DISP:GRAP:X:MIN %f" % float(start))
+        self.write(":PAGE:DISP:GRAP:X:MAX %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write(":PAGE:SCON:SING")
         self.write("*WAI")
-        self.write('OUTP OFF')
 
     def read_sweep_values(self):
         self.write(":FORM:DATA ASC")
@@ -118,7 +106,6 @@ if __name__ == '__main__':
     an = Agilent4155c('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
-    sweep = an.sweep(0,5,0.1)
+    sweep = an.sweep(-5,5,0.1)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
-    
     pass
