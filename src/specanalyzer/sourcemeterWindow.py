@@ -117,22 +117,25 @@ class sourcemeterThread(QThread):
         self.terminate()
 
     def run(self):
-        #try:
-        self.sc = SourceMeter(self.parent().parent().config.sourcemeterID)
-        self.sc.set_limit(voltage=self.maxV, current=0.12)
-        self.runningFlag = True
-        while self.runningFlag is True:
-            voltageText = self.parent().sourcemeterVoltageText.text()
-            if voltageText == "" or voltageText == "-":
-                 pass
+        try:
+            if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
+                self.parent().source_meter = Analyzer(self.parent().parent().config.analyzerID)
             else:
-                self.sc.on()
-                voltage = float(voltageText)
-                self.sc.set_output(voltage = voltage)
-                self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
+                self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
+        
+            self.sc.set_limit(voltage=self.maxV, current=0.12)
+            self.runningFlag = True
+            while self.runningFlag is True:
+                voltageText = self.parent().sourcemeterVoltageText.text()
+                if voltageText == "" or voltageText == "-":
+                    pass
+                else:
+                    self.sc.on()
+                    voltage = float(voltageText)
+                    self.sc.set_output(voltage = voltage)
+                    self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
                         " Current [A]: "+str(self.sc.read_values()[1]), True)
-                self.sc.off()
-            time.sleep(0.2)
-
-        #except:
-        #    self.smResponse.emit("","Cannot connect to sourcemeter", False)
+                    self.sc.off()
+                time.sleep(0.2)
+        except:
+            self.smResponse.emit("","Cannot connect to sourcemeter", False)
