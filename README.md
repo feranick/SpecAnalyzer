@@ -15,7 +15,7 @@ SpecAnalyzer is written in `Python <http://www.python.org/>`_ and relies on the 
 - [OpenCV >3.2](<http://opencv.org/>)
 - [Pillow (for .tif, .png, .jpg)](https://python-pillow.github.io/>)
 - [PyVisa](<https://pyvisa.readthedocs.io/en/stable/index.html>)
-- [ThorlabsPM100](<https://pypi.python.org/pypi/ThorlabsPM100> & <https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=PM100x>) The drivers for Windows as well as the Python library are needed 
+- [ThorlabsPM100-Pypi](<https://pypi.python.org/pypi/ThorlabsPM100>)[Official ThorlabsPM100](<https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=PM100x>) The drivers for Windows as well as the Python library are needed 
 
 ### Installing dependencies on Mac OSX
 All required packages can be obtained through [MacPorts](<http://www.macports.org/>). After installing macports, individual libraries are installed with the following:
