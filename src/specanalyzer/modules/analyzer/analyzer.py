@@ -111,8 +111,8 @@ if __name__ == '__main__':
     # test
     an = Analyzer('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
-    print("REverse Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
-    sweep = an.sweep(1,-1,-0.1)
+    print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+    sweep = an.sweep(0,5,0.1)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     
     pass

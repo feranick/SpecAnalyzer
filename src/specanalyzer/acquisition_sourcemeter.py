@@ -25,7 +25,6 @@ from .modules.analyzer.analyzer import *
 class Acquisition(QObject):
     def __init__(self, parent=None):
         super(Acquisition, self).__init__(parent)
-        self.useAnalyzer = True
         
     # Collect acquisition parameters into a DataFrame to be used for storing (as csv or json)
     def getAcqParameters(self):
@@ -133,10 +132,7 @@ class acqThread(QThread):
         self.Msg.emit("Activating sourcemeter...")
         QApplication.processEvents()
         try:
-            if self.parent().useAnalyzer == True:
-                self.parent().source_meter = Analyzer(self.parent().parent().config.analyzerID)
-            else:
-                self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
+            self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
             self.parent().source_meter.set_limit(voltage=20., current=1.)
             self.parent().source_meter.on()
         except:
@@ -246,64 +242,39 @@ class acqThread(QThread):
         data = np.zeros((N, 3))
         data[:, 0] = v_list
 
-        #self.testflag = False
-        #if self.testflag == True:
-        if self.parent().useAnalyzer == True:
-            self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
-            self.parent().source_meter.sweep(v_start, v_max, v_step)
-            data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values()[1]
+        #self.tempTracking.emit(np.array([data[start_i-1, 0:2]]), np.zeros((1,8)),
+        #            self.parent().parent().deviceText.text(), True, False)
 
-            self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-            self.parent().source_meter.sweep(v_max, v_min, - v_step)
-            data[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
-            perfDataB = self.analyseJV(data[:, (0,2)])
-            self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
+        self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
+        for i in i_list_forw1:
+            self.parent().source_meter.set_output(voltage = v_list[i])
+            time.sleep(hold_time)
+            data[i,1] = self.parent().source_meter.read_values()[1]
+            #print(data[start_i:i, 0:2])
+        #self.tempTracking.emit(data[start_i:N, 0:2], np.zeros((1,8)),
+        #    self.parent().parent().deviceText.text(), False, False)
 
-            self.Msg.emit('  Device '+deviceID+': completing forward sweep')
-            self.parent().source_meter.sweep(v_min, v_start-v_step, v_step)
-            try:
-                data[i_list_forw2, 1] = self.parent().source_meter.read_sweep_values()[1]
-            except:
-                pass
-            perfDataF = self.analyseJV(data[:, (0,1)])
-            self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
+        self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
+        for i in i_list_back:
+            self.parent().source_meter.set_output(voltage = v_list[i])
+            time.sleep(hold_time)
+            data[i,2] = self.parent().source_meter.read_values()[1]
 
-        else:
-            
-            #self.tempTracking.emit(np.array([data[start_i-1, 0:2]]), np.zeros((1,8)),
-            #            self.parent().parent().deviceText.text(), True, False)
+        perfDataB = self.analyseJV(data[:, (0,2)])
+        self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
+        #self.tempTracking.emit(data[:, (0,2)], np.zeros((1,8)),
+        #    self.parent().parent().deviceText.text()+"_back", False, False)
 
-            self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
-            for i in i_list_forw1:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                data[i,1] = self.parent().source_meter.read_values()[1]
-                #print(data[start_i:i, 0:2])
-            #self.tempTracking.emit(data[start_i:N, 0:2], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text(), False, False)
-
-            self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-            for i in i_list_back:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                data[i,2] = self.parent().source_meter.read_values()[1]
-
-            perfDataB = self.analyseJV(data[:, (0,2)])
-            self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
-            #self.tempTracking.emit(data[:, (0,2)], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text()+"_back", False, False)
-
-            self.Msg.emit('  Device '+deviceID+': completing forward sweep') 
-            for i in i_list_forw2:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                data[i,1] = self.parent().source_meter.read_values()[1]
-                #print(data[0:i, 0:2])
-            #self.tempTracking.emit(data[:, 0:2], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text()+"_forw", True, False)
-            perfDataF = self.analyseJV(data[:, (0,1)])
-            self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
-            print(data)
+        self.Msg.emit('  Device '+deviceID+': completing forward sweep') 
+        for i in i_list_forw2:
+            self.parent().source_meter.set_output(voltage = v_list[i])
+            time.sleep(hold_time)
+            data[i,1] = self.parent().source_meter.read_values()[1]
+            #print(data[0:i, 0:2])
+        #self.tempTracking.emit(data[:, 0:2], np.zeros((1,8)),
+        #    self.parent().parent().deviceText.text()+"_forw", True, False)
+        perfDataF = self.analyseJV(data[:, (0,1)])
+        self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
         return data[:, 0:2], data[:,(0,2)]
 
     ## measurements: voc, jsc
@@ -339,8 +310,8 @@ class acqThread(QThread):
 
         # measurement parameters
         v_min = 0.
-        v_max = voc
-        #v_max = 2 #for testing only
+        #v_max = voc
+        v_max = 2 #for testing only
 
         if v_max - v_min < v_step:
             self.Msg.emit('  Voc appears to be close to V=0. Aborting') 
@@ -428,12 +399,8 @@ class acqThread(QThread):
         #Jsc = JV[0,1]
         Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
-        if Voc != 0. and Jsc != 0.:
-            FF = Vpmax*Jpmax*100/(Voc*Jsc)
-            effic = Vpmax*Jpmax/self.powerIn
-        else:
-            FF = 0.
-            effic = 0.
+        FF = Vpmax*Jpmax*100/(Voc*Jsc)
+        effic = Vpmax*Jpmax/powerIn
         data = np.array([Voc, Jsc, Vpmax, Vpmax*Jpmax,FF,effic])
         data = np.hstack((0., data))
         data = np.hstack((self.getDateTimeNow()[1], data))
