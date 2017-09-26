@@ -8,14 +8,14 @@ The software can be run "offline", meaning without being connected to the hardwa
 SpecAnalyzer is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
 - [Python v.3.5/3.6](<http://www.python.org/>)
 - [Qt5](<http://qt.io>)
-- [PyQt version](<http://www.riverbankcomputing.co.uk/>) or [PySide](<https://wiki.qt.io/Category:LanguageBindings::PySide>)
+- [PyQt version](<http://www.riverbankcomputing.co.uk/>)
 - [Numpy >1.5](http://www.numpy.org/)
 - [Scipy >0.9](<http://www.scipy.org/>)
 - [Matplotlib >0.9](<http://matplotlib.org/>) 
 - [OpenCV >3.2](<http://opencv.org/>)
 - [Pillow (for .tif, .png, .jpg)](https://python-pillow.github.io/>)
 - [PyVisa](<https://pyvisa.readthedocs.io/en/stable/index.html>)
-- [ThorlabsPM100-Pypi](<https://pypi.python.org/pypi/ThorlabsPM100>)[Official ThorlabsPM100](<https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=PM100x>) The drivers for Windows as well as the Python library are needed 
+- [ThorlabsPM100-Pypi](<https://pypi.python.org/pypi/ThorlabsPM100>) - [Official ThorlabsPM100](<https://www.thorlabs.com/software_pages/viewsoftwarepage.cfm?code=PM100x>) The drivers for Windows as well as the Python library are needed 
 
 ### Installing dependencies on Mac OSX
 All required packages can be obtained through [MacPorts](<http://www.macports.org/>). After installing macports, individual libraries are installed with the following:
