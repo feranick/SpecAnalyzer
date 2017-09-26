@@ -1,10 +1,10 @@
 '''
-sourcemeter.py
+keithley2400.py
 -------------
 Class for providing a hardware support for 
-for the sourcemeter
+for the Keithley 2400 sourcemeter
 
-Version: 20170923
+Version: 20170926
 
 Copyright (C) 2017 Tony Wu <tonyw@mit.edu>
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
@@ -17,7 +17,7 @@ the Free Software Foundation; either version 2 of the License, or
 '''
 import visa
 
-class SourceMeter(object):
+class Keithley2400(object):
     '''
     SourceMeter Class
         - Keithley 2400
@@ -134,7 +134,7 @@ class SourceMeter(object):
 if __name__ == '__main__':
     import time
     # test
-    sc = SourceMeter()
+    sc = Keithley2400()
     sc.set_limit(voltage=10, current=0.12)
     sc.on()
 

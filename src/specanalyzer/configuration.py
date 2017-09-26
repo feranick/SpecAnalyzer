@@ -54,14 +54,14 @@ class Configuration():
             'alignmentIntMax' : 10,
             'powermeterID' : "USB0::0x1313::0x8072::P2008173::INSTR",
             'irradiance1Sun' : 3682,
-            'sourcemeterID' : "GPIB0::24::INSTR",
-            'analyzerID' : "GPIB0::17::INSTR",
+            'keithley2400ID' : "GPIB0::24::INSTR",
+            'agilent4155cID' : "GPIB0::17::INSTR",
             }
     def defineConfSystem(self):
         self.conf['System'] = {
             'loggingLevel' : logging.INFO,
             'loggingFilename' : "SpecAnalyzer.log",
-            'csvSavingFolder' : "./data",
+            'csvSavingFolder' : ".",
             'saveLocalCsv' : True,
             }
 
@@ -90,8 +90,8 @@ class Configuration():
         self.alignmentIntMax = eval(self.instrConfig['alignmentIntMax'])
         self.powermeterID = self.instrConfig['powermeterID']
         self.irradiance1Sun = eval(self.instrConfig['irradiance1Sun'])
-        self.sourcemeterID = self.instrConfig['sourcemeterID']
-        self.analyzerID = self.instrConfig['analyzerID']
+        self.keithley2400ID = self.instrConfig['keithley2400ID']
+        self.agilent4155cID = self.instrConfig['agilent4155cID']
 
         self.loggingLevel = self.sysConfig['loggingLevel']
         self.loggingFilename = self.sysConfig['loggingFilename']

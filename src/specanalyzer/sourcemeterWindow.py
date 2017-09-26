@@ -17,7 +17,9 @@ import time
 from PyQt5.QtCore import (QRect,QObject, QThread, pyqtSlot, pyqtSignal)
 from PyQt5.QtWidgets import (QLabel, QLineEdit, QCheckBox, QWidget,
                              QMainWindow,QPushButton,QComboBox)
-from .modules.sourcemeter.sourcemeter import *
+from .modules.sourcemeter.keithley2400 import *
+from .modules.sourcemeter.agilent4155c import *
+
 
 class SourcemeterWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -45,12 +47,12 @@ class SourcemeterWindow(QMainWindow):
         self.sourcemeterCurrentReadLabel.setText("Ready")
         
         self.startSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.startSourcemeterButton.setGeometry(QRect(10, 130, 160, 40))
+        self.startSourcemeterButton.setGeometry(QRect(10, 130, 150, 40))
         self.startSourcemeterButton.setText("Start")
         self.startSourcemeterButton.clicked.connect(self.startSourcemeter)
     
         self.stopSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.stopSourcemeterButton.setGeometry(QRect(160, 130, 160, 40))
+        self.stopSourcemeterButton.setGeometry(QRect(160, 130, 150, 40))
         self.stopSourcemeterButton.setText("Stop")
         self.stopSourcemeterButton.clicked.connect(self.stopSourcemeter)
         self.stopSourcemeterButton.setEnabled(False)
@@ -117,25 +119,25 @@ class sourcemeterThread(QThread):
         self.terminate()
 
     def run(self):
-        try:
-            if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
-                self.parent().source_meter = Analyzer(self.parent().parent().config.analyzerID)
-            else:
-                self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
+        #try:
+        if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
+            self.sc = Agilent4155c(self.parent().parent().config.agilent4155cID)
+        else:
+            self.sc = Keithley2400(self.parent().parent().config.keithley2400ID)
         
-            self.sc.set_limit(voltage=self.maxV, current=0.12)
-            self.runningFlag = True
-            while self.runningFlag is True:
-                voltageText = self.parent().sourcemeterVoltageText.text()
-                if voltageText == "" or voltageText == "-":
-                    pass
-                else:
-                    self.sc.on()
-                    voltage = float(voltageText)
-                    self.sc.set_output(voltage = voltage)
-                    self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
-                        " Current [A]: "+str(self.sc.read_values()[1]), True)
-                    self.sc.off()
-                time.sleep(0.2)
-        except:
-            self.smResponse.emit("","Cannot connect to sourcemeter", False)
+        self.sc.set_limit(voltage=self.maxV, current=0.12)
+        self.runningFlag = True
+        while self.runningFlag is True:
+            voltageText = self.parent().sourcemeterVoltageText.text()
+            if voltageText == "" or voltageText == "-":
+                pass
+            else:
+                self.sc.on()
+                voltage = float(voltageText)
+                self.sc.set_output(voltage = voltage)
+                self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
+                    " Current [A]: "+str(self.sc.read_values()[1]), True)
+                self.sc.off()
+            time.sleep(0.2)
+        #except:
+        #    self.smResponse.emit("","Cannot connect to sourcemeter", False)

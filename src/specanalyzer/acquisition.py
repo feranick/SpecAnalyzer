@@ -19,8 +19,8 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QApplication,QAbstractItemView)
 from PyQt5.QtCore import (Qt,QObject, QThread, pyqtSlot, pyqtSignal)
 from .acquisitionWindow import *
-from .modules.sourcemeter.sourcemeter import *
-from .modules.analyzer.analyzer import *
+from .modules.sourcemeter.keithley2400 import *
+from .modules.sourcemeter.agilent4155c import *
 
 class Acquisition(QObject):
     def __init__(self, parent=None):
@@ -132,9 +132,9 @@ class acqThread(QThread):
         self.Msg.emit("Activating sourcemeter...")
         try:
             if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
-                self.parent().source_meter = Analyzer(self.parent().parent().config.analyzerID)
+                self.parent().source_meter = Agilent4155c(self.parent().parent().config.agilent4155cID)
             else:
-                self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
+                self.parent().source_meter = Keithley2400(self.parent().parent().config.keithley2400ID)
             self.parent().source_meter.set_limit(voltage=20., current=1.)
             self.parent().source_meter.on()
         except:
