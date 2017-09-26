@@ -45,6 +45,9 @@ class Agilent4155c(object):
         self.write(":PAGE:CHAN:SMU1:FUNC VAR1")
         self.write(":PAGE:CHAN:SMU2:MODE COMM")
         self.write(":PAGE:CHAN:SMU2:FUNC CONS")
+        self.write(":PAGE:DISP:GRAPH:X:DEL")
+        self.write(":PAGE:DISP:GRAPH:Y:DEL")
+
 
     def __del__(self):
         try:

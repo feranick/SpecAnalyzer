@@ -61,7 +61,7 @@ class Configuration():
         self.conf['System'] = {
             'loggingLevel' : logging.INFO,
             'loggingFilename' : "SpecAnalyzer.log",
-            'csvSavingFolder' : ".",
+            'csvSavingFolder' : "./data",
             'saveLocalCsv' : True,
             }
 
