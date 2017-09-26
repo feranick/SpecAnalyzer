@@ -16,7 +16,7 @@ the Free Software Foundation; either version 2 of the License, or
 import time
 from PyQt5.QtCore import (QRect,QObject, QThread, pyqtSlot, pyqtSignal)
 from PyQt5.QtWidgets import (QLabel, QLineEdit, QCheckBox, QWidget,
-                             QMainWindow,QPushButton)
+                             QMainWindow,QPushButton,QComboBox)
 from .modules.sourcemeter.sourcemeter import *
 
 class SourcemeterWindow(QMainWindow):
@@ -26,34 +26,43 @@ class SourcemeterWindow(QMainWindow):
     
     # Setup UI elements
     def initUI(self, SourcemeterWindow):
-        self.setGeometry(10, 200, 320, 150)
+        self.setGeometry(10, 250, 320, 180)
         SourcemeterWindow.setWindowTitle("Sourcemeter controls")
 
         self.sourcemeterVoltageLabel = QLabel(SourcemeterWindow)
-        self.sourcemeterVoltageLabel.setGeometry(QRect(20, 10, 120, 20))
+        self.sourcemeterVoltageLabel.setGeometry(QRect(20, 50, 120, 20))
         self.sourcemeterVoltageLabel.setText("Voltage: ")
         self.sourcemeterVoltageText = QLineEdit(SourcemeterWindow)
-        self.sourcemeterVoltageText.setGeometry(QRect(80, 10, 50, 20))
+        self.sourcemeterVoltageText.setGeometry(QRect(80, 50, 50, 20))
         self.sourcemeterVoltageText.setText("1")
         
         self.sourcemeterVoltageReadLabel = QLabel(SourcemeterWindow)
-        self.sourcemeterVoltageReadLabel.setGeometry(QRect(20, 40, 300, 20))
+        self.sourcemeterVoltageReadLabel.setGeometry(QRect(20, 80, 300, 20))
         self.sourcemeterVoltageReadLabel.setText("")
         
         self.sourcemeterCurrentReadLabel = QLabel(SourcemeterWindow)
-        self.sourcemeterCurrentReadLabel.setGeometry(QRect(20,70, 300, 20))
+        self.sourcemeterCurrentReadLabel.setGeometry(QRect(20,110, 300, 20))
         self.sourcemeterCurrentReadLabel.setText("Ready")
         
         self.startSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.startSourcemeterButton.setGeometry(QRect(10, 100, 150, 40))
+        self.startSourcemeterButton.setGeometry(QRect(10, 130, 160, 40))
         self.startSourcemeterButton.setText("Start")
         self.startSourcemeterButton.clicked.connect(self.startSourcemeter)
     
         self.stopSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.stopSourcemeterButton.setGeometry(QRect(160, 100, 150, 40))
+        self.stopSourcemeterButton.setGeometry(QRect(160, 130, 160, 40))
         self.stopSourcemeterButton.setText("Stop")
         self.stopSourcemeterButton.clicked.connect(self.stopSourcemeter)
         self.stopSourcemeterButton.setEnabled(False)
+    
+        self.instrumentLabel = QLabel(SourcemeterWindow)
+        self.instrumentLabel.setGeometry(QRect(20, 10, 100, 20))
+        self.instrumentLabel.setText("Instrument: ")
+        self.instrumentCBox = QComboBox(self)
+        self.instrumentCBox.setGeometry(QRect(100, 5, 150, 30))
+        self.instrumentCBox.setObjectName("instrumentCBoxx")
+        self.instrumentCBox.addItem("Agilent 4155")
+        self.instrumentCBox.addItem("Keithley 2400")
 
     # Start the thread for connecting and collecting basic V,I data
     def startSourcemeter(self):

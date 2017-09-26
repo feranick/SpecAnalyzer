@@ -83,7 +83,6 @@ class ResultsWindow(QMainWindow):
         self.toolbarPVresp.setMaximumHeight(30)
         self.toolbarPVresp.setStyleSheet("QToolBar { border: 0px }")
 
-
         self.jvVLayout.addWidget(self.toolbarJVresp)
         self.jvVLayout.addWidget(self.canvasJVresp)
         self.jvVLayout.addWidget(self.toolbarPVresp)

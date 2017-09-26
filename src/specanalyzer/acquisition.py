@@ -25,7 +25,7 @@ from .modules.analyzer.analyzer import *
 class Acquisition(QObject):
     def __init__(self, parent=None):
         super(Acquisition, self).__init__(parent)
-        self.useAnalyzer = True
+        #self.useAnalyzer = True
         
     # Collect acquisition parameters into a DataFrame to be used for storing (as csv or json)
     def getAcqParameters(self):
@@ -128,12 +128,14 @@ class acqThread(QThread):
         self.endAcq()
     
     def run(self):
+        print(self.parent().parent().sourcemeterwind.instrumentCBox.itemData(0).toInt())
+        print(self.parent().parent().sourcemeterwind.instrumentCBox.currentText())
 
         # Activate sourcemeter
         self.Msg.emit("Activating sourcemeter...")
         QApplication.processEvents()
         try:
-            if self.parent().useAnalyzer == True:
+            if self.parent().parent().sourcemeterwind.instrumentCBox.itemData(0).toInt() == 0:
                 self.parent().source_meter = Analyzer(self.parent().parent().config.analyzerID)
             else:
                 self.parent().source_meter = SourceMeter(self.parent().parent().config.sourcemeterID)
@@ -248,7 +250,7 @@ class acqThread(QThread):
 
         #self.testflag = False
         #if self.testflag == True:
-        if self.parent().useAnalyzer == True:
+        if self.parent().parent().sourcemeterwind.instrumentCBox.itemData(0).toInt() == 0:
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
             self.parent().source_meter.sweep(v_start, v_max, v_step)
             data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values()[1]
@@ -357,7 +359,7 @@ class acqThread(QThread):
         self.Msg.emit('  Device '+deviceID+': acquiring JV forward for analsys')
         #self.testflag = False
         #if self.testflag == True:
-        if self.parent().useAnalyzer == True:
+        if self.parent().parent().sourcemeterwind.instrumentCBox.itemData(0).toInt() == 0:
             for n in range(scans):
                 self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
                 self.parent().source_meter.sweep(v_min, v_max, v_step)
