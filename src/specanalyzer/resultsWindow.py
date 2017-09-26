@@ -12,7 +12,8 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 '''
-import sys, random, math, json, requests, webbrowser
+import sys, random, math, json
+#import requests, webbrowser
 import numpy as np
 import pandas as pd
 from datetime import datetime
