@@ -102,6 +102,11 @@ class Agilent4155c(object):
         data = self.read_sweep_values()
         return data[0][0], data[1][0]
 
+    def on(self):
+        pass
+    def off(self):
+        pass
+
 ### This is only for testing - to be removed ###
 if __name__ == '__main__':
     # test
