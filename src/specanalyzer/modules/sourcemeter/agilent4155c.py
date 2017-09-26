@@ -64,20 +64,22 @@ class Agilent4155c(object):
         return self.manager.query(command)
         
     def sweep(self, start, end, step):
-        self.write(":PAGE:DISP:GRAP:X:MIN %f" % float(start))
-        self.write(":PAGE:DISP:GRAP:X:MAX %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write(":PAGE:SCON:SING")
-        self.write("*WAI")
 
     def read_sweep_values(self):
+        self.write("*WAI")
         self.write(":FORM:DATA ASC")
         I_data = self.manager.query_ascii_values(":DATA? 'ID' ")
         V_data = self.manager.query_ascii_values(":DATA? 'VD' ")
         return V_data, I_data
+
+    def setup_display(self, start, end):
+        self.write(":PAGE:DISP:GRAP:X:MIN %f" % float(start))
+        self.write(":PAGE:DISP:GRAP:X:MAX %f" % float(end))
 
     ### These are wrappers for common use with Keithley 2400
     def get_mode(self, key):
@@ -106,6 +108,7 @@ if __name__ == '__main__':
     an = Agilent4155c('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+    an.setup_display(-5,5)
     sweep = an.sweep(-5,5,0.1)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     pass
