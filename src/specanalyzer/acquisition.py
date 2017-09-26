@@ -345,32 +345,46 @@ class acqThread(QThread):
         if v_max - v_min < v_step:
             self.Msg.emit('  Voc appears to be close to V=0. Aborting') 
             return False, None, None, None, None
-
+        
         # measure
         v_list = np.arange(v_min, v_max+1e-9, v_step)
-        
-        i_list_forw = list(range(0, len(v_list)))
-        i_list_back = i_list_forw[::-1]
         
         JV = np.zeros((len(v_list),3))
         JV[:, 0] = v_list
         JVtemp = np.zeros((len(v_list),3))
         JVtemp[:, 0] = v_list
         
-        self.Msg.emit('  Device '+deviceID+': acquiring JV forward for analsys') 
-        for n in range(scans):
-            self.Msg.emit('  Device '+deviceID+': acquiring JV forward for analsys, scan: '+str(n)+'/'+str(scans)) 
-            for i in i_list_forw:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                JVtemp[i,1]= self.parent().source_meter.read_values()[1]
+        self.Msg.emit('  Device '+deviceID+': acquiring JV forward for analsys')
+        #self.testflag = False
+        #if self.testflag == True:
+        if self.parent().useAnalyzer == True:
+            for n in range(scans):
+                self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
+                self.parent().source_meter.sweep(v_min, v_max, v_step)
+                JVtemp[:, 1] = self.parent().source_meter.read_sweep_values()[1]
 
-            self.Msg.emit('  Device '+deviceID+': acquiring JV backward for analsys, scan: '+str(n)+'/'+str(scans)) 
-            for i in i_list_back:
-                self.parent().source_meter.set_output(voltage = v_list[i])
-                time.sleep(hold_time)
-                JVtemp[i,2]= self.parent().source_meter.read_values()[1]
+                self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
+                self.parent().source_meter.sweep(v_max, v_min, - v_step)
+                JVtemp[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
+            
+            JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
+            JV[:,2] = (JVtemp[:,2] + JV[:,2]*n)/(n+1)
 
+        else:
+            i_list_forw = list(range(0, len(v_list)))
+            i_list_back = i_list_forw[::-1]
+            for n in range(scans):
+                self.Msg.emit('  Device '+deviceID+': acquiring JV forward for analsys, scan: '+str(n)+'/'+str(scans))
+                for i in i_list_forw:
+                    self.parent().source_meter.set_output(voltage = v_list[i])
+                    time.sleep(hold_time)
+                    JVtemp[i,1]= self.parent().source_meter.read_values()[1]
+
+                self.Msg.emit('  Device '+deviceID+': acquiring JV backward for analsys, scan: '+str(n)+'/'+str(scans))
+                for i in i_list_back:
+                    self.parent().source_meter.set_output(voltage = v_list[i])
+                    time.sleep(hold_time)
+                    JVtemp[i,2]= self.parent().source_meter.read_values()[1]
 
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
             JV[:,2] = (JVtemp[:,2] + JV[:,2]*n)/(n+1)

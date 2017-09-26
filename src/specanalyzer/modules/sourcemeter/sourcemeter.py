@@ -84,7 +84,7 @@ class SourceMeter(object):
         if voltage != None:
             self.write('SENS:VOLT:PROT {}'.format(voltage))
             if voltage == 'MAX':
-                self.voltage_limit = 210.
+                self.voltage_limit = 10.
             else:
                 self.voltage_limit = voltage
         if current != None:

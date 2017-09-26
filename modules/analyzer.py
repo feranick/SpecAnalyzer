@@ -96,8 +96,11 @@ class Analyzer(object):
         pass
 
     def set_limit(self, voltage = None, current = None):
-        pass
-
+        if voltage != None:
+            self.voltage_limit = 10.
+        else:
+            self.voltage_limit = voltage
+        
     def set_output(self, voltage = None, current = None):
         if voltage != None:
             self.sweep(voltage,voltage,0)
@@ -111,8 +114,8 @@ if __name__ == '__main__':
     # test
     an = Analyzer('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
-    print("REverse Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
-    sweep = an.sweep(1,-1,-0.1)
+    print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+    sweep = an.sweep(0,5,0.1)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     
     pass

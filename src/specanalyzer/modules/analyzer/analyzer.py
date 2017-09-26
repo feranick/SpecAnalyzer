@@ -96,8 +96,11 @@ class Analyzer(object):
         pass
 
     def set_limit(self, voltage = None, current = None):
-        pass
-
+        if voltage != None:
+            self.voltage_limit = 10.
+        else:
+            self.voltage_limit = voltage
+        
     def set_output(self, voltage = None, current = None):
         if voltage != None:
             self.sweep(voltage,voltage,0)
