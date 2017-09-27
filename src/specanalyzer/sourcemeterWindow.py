@@ -28,7 +28,7 @@ class SourcemeterWindow(QMainWindow):
     
     # Setup UI elements
     def initUI(self, SourcemeterWindow):
-        self.setGeometry(10, 250, 320, 180)
+        self.setGeometry(10, 290, 340, 190)
         SourcemeterWindow.setWindowTitle("Sourcemeter controls")
 
         self.sourcemeterVoltageLabel = QLabel(SourcemeterWindow)
@@ -47,12 +47,12 @@ class SourcemeterWindow(QMainWindow):
         self.sourcemeterCurrentReadLabel.setText("Ready")
         
         self.startSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.startSourcemeterButton.setGeometry(QRect(10, 130, 150, 40))
+        self.startSourcemeterButton.setGeometry(QRect(10, 140, 150, 40))
         self.startSourcemeterButton.setText("Start")
         self.startSourcemeterButton.clicked.connect(self.startSourcemeter)
     
         self.stopSourcemeterButton = QPushButton(SourcemeterWindow)
-        self.stopSourcemeterButton.setGeometry(QRect(160, 130, 150, 40))
+        self.stopSourcemeterButton.setGeometry(QRect(180, 140, 150, 40))
         self.stopSourcemeterButton.setText("Stop")
         self.stopSourcemeterButton.clicked.connect(self.stopSourcemeter)
         self.stopSourcemeterButton.setEnabled(False)
