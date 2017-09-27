@@ -415,7 +415,7 @@ class ResultsWindow(QMainWindow):
                         'FF': perfData[:,7], 'effic': perfData[:,8],
                         'Acq Date': perfData[:,0], 'Acq Time': perfData[:,1]})
         dfPerfData = dfPerfData[['Acq Date','Acq Time','Time step', 'Voc',
-                                     'Jsc', 'MPP','FF','effic']]
+                                     'Jsc', 'VPP','MPP','FF','effic']]
         return dfPerfData
     
     def makeDFJV(self,JV):
@@ -495,20 +495,20 @@ class ResultsWindow(QMainWindow):
     def read_csv(self):
         filenames = QFileDialog.getOpenFileNames(self,
                         "Open csv data", "","*.csv")
-        try:
-            for filename in filenames[0]:
-                print("Open saved device data from: ", filename)
-                dftot = pd.read_csv(filename, na_filter=False)
-                deviceID = dftot.get_value(0,'Device')
-                perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Voc']))][:,range(1,9)]
-                JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(9,11)]
-                dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
-                self.plotData(deviceID, perfData, JV, False)
-                self.setupResultTable()
-                self.fillTableData(deviceID, perfData)
-                self.makeInternalDataFrames(self.lastRowInd, deviceID, perfData, dfAcqParams, np.array([JV]))
-        except:
-            print("Loading files failed")
+        #try:
+        for filename in filenames[0]:
+            print("Open saved device data from: ", filename)
+            dftot = pd.read_csv(filename, na_filter=False)
+            deviceID = dftot.get_value(0,'Device')
+            perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Voc']))][:,range(1,9)]
+            JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(9,11)]
+            dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
+            self.plotData(deviceID, perfData, JV, False)
+            self.setupResultTable()
+            self.fillTableData(deviceID, perfData)
+            self.makeInternalDataFrames(self.lastRowInd, deviceID, perfData, dfAcqParams, np.array([JV]))
+        #except:
+        #    print("Loading files failed")
 
     # Populate result table.
     def fillTableData(self, deviceID, obj):

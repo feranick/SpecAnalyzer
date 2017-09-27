@@ -30,7 +30,7 @@ class Acquisition(QObject):
     def getAcqParameters(self):
         self.numRow = self.parent().config.numSubsHolderRow
         self.numCol = self.parent().config.numSubsHolderCol
-        pdframe = pd.DataFrame({'Device': [self.parent().deviceText.text()],
+        pdframe = pd.DataFrame({
                 'Acq Min Voltage': [self.parent().acquisitionwind.minVText.text()],
                 'Acq Max Voltage': [self.parent().acquisitionwind.maxVText.text()],
                 'Acq Start Voltage': [self.parent().acquisitionwind.startVText.text()],
@@ -40,7 +40,7 @@ class Acquisition(QObject):
                 'Num Track Points': [int(self.parent().acquisitionwind.numPointsText.value())],
                 'Track Interval': [self.parent().acquisitionwind.IntervalText.text()],
                 'Comments': [self.parent().commentsText.text()]})
-        return pdframe[['Device','Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
+        return pdframe[['Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
                 'Acq Step Voltage','Acq Num Aver Scans','Delay Before Meas',
                 'Num Track Points','Track Interval','Comments']]
                 
