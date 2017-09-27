@@ -115,29 +115,32 @@ class sourcemeterThread(QThread):
         time.sleep(0.5)
         self.sc.set_output(voltage = 0)
         self.sc.off()
-        del self.sc
+        #del self.sc
         self.terminate()
 
     def run(self):
-        #try:
-        if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
-            self.sc = Agilent4155c(self.parent().parent().config.agilent4155cID)
-        else:
-            self.sc = Keithley2400(self.parent().parent().config.keithley2400ID)
-        
-        self.sc.set_limit(voltage=self.maxV, current=0.12)
-        self.runningFlag = True
-        while self.runningFlag is True:
-            voltageText = self.parent().sourcemeterVoltageText.text()
-            if voltageText == "" or voltageText == "-":
-                pass
+        try:
+            if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
+                self.sc = Agilent4155c(self.parent().parent().config.agilent4155cID)
             else:
-                self.sc.on()
-                voltage = float(voltageText)
-                self.sc.set_output(voltage = voltage)
-                self.smResponse.emit("Voltage [V]: "+str(self.sc.read_values()[0]), \
-                    " Current [A]: "+str(self.sc.read_values()[1]), True)
-                self.sc.off()
-            time.sleep(0.2)
-        #except:
-        #    self.smResponse.emit("","Cannot connect to sourcemeter", False)
+                self.sc = Keithley2400(self.parent().parent().config.keithley2400ID)
+        
+            self.sc.set_limit(voltage=self.maxV, current=0.12)
+            self.runningFlag = True
+            while True:
+                voltageText = self.parent().sourcemeterVoltageText.text()
+                if voltageText == "" or voltageText == "-":
+                    pass
+                else:
+                    self.sc.on()
+                    voltage = float(voltageText)
+                    self.sc.set_output(voltage = voltage)
+                    if self.runningFlag is True:
+                        self.smResponse.emit("Voltage [V]: "+\
+                            str(self.sc.read_values()[0]), \
+                            " Current [A]: "+\
+                            str(self.sc.read_values()[1]), True)
+                    self.sc.off()
+                time.sleep(0.5)
+        except:
+            self.smResponse.emit("","Cannot connect to sourcemeter", False)
