@@ -221,18 +221,19 @@ class ResultsWindow(QMainWindow):
         self.plotSettings(self.axJVresp)
         self.axJVresp.set_xlabel('Voltage [V]',fontsize=8)
         self.axJVresp.set_ylabel('Current density [mA/cm$^2$]',fontsize=8)
-        #self.axJVresp.axvline(x=0, linewidth=0.5)
-        #self.axJVresp.axhline(y=0, linewidth=0.5)
+        self.axJVresp.axvline(x=0, linewidth=0.5)
+        self.axJVresp.axhline(y=0, linewidth=0.5)
         
         self.axPVresp = self.figurePVresp.add_subplot(111)
         self.plotSettings(self.axPVresp)
         self.axPVresp.set_xlabel('Voltage [V]',fontsize=8)
         self.axPVresp.set_ylabel('Power density [mW/cm$^2$]',fontsize=8)
+        self.axPVresp.axvline(x=0, linewidth=0.5)
+        self.axPVresp.axhline(y=0, linewidth=0.5)
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
         self.figureJVresp.tight_layout()
         self.figurePVresp.tight_layout()
-
 
     # Plot Transient Jsc
     def plotTJsc(self, data):
@@ -294,8 +295,8 @@ class ResultsWindow(QMainWindow):
             line.set_linewidth(0.5)
         for line in self.axPVresp.get_lines():
             line.set_linewidth(0.5)
-        self.axJVresp.get_lines()[row].set_linewidth(2)
-        self.axPVresp.get_lines()[row].set_linewidth(2)
+        self.axJVresp.get_lines()[row+2].set_linewidth(2)
+        self.axPVresp.get_lines()[row+2].set_linewidth(2)
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
 
