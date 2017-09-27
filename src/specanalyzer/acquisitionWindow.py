@@ -41,7 +41,6 @@ class AcquisitionWindow(QMainWindow):
         self.gridLayoutWidget.setGeometry(QRect(10, 30, 330, 236))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QGridLayout(self.gridLayoutWidget)
-        #self.gridLayout.setContentsMargins(10, 1, 10, 1)
         self.gridLayout.setHorizontalSpacing(10)
         self.gridLayout.setObjectName("gridLayout")
 
@@ -68,12 +67,12 @@ class AcquisitionWindow(QMainWindow):
         self.gridLayout.addWidget(self.stepVLabel, 3, 0, 1, 1)
         self.stepVText = QLineEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.stepVText, 3, 1, 1, 1)
-
+        '''
         self.gateVLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.gateVLabel, 4, 0, 1, 1)
-        self.dateVText = QLineEdit(self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.dateVText, 4, 1, 1, 1)
-
+        self.gateVText = QLineEdit(self.gridLayoutWidget)
+        self.gridLayout.addWidget(self.gateVText, 4, 1, 1, 1)
+        '''
         self.numAverScansLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.numAverScansLabel, 5, 0, 1, 1)
         self.numAverScansText = QLineEdit(self)
@@ -131,7 +130,7 @@ class AcquisitionWindow(QMainWindow):
         self.maxVLabel.setText("Max Voltage [V]")
         self.startVLabel.setText("Start Voltage [V]")
         self.stepVLabel.setText("Step Voltage [V]")
-        self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
+        #self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
         self.numAverScansLabel.setText("Number of averaged scans ")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")
