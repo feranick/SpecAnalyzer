@@ -27,8 +27,8 @@ class Agilent4155c(object):
         self.manager = visa.ResourceManager().open_resource(visa_string)
         #self.manager = visa.ResourceManager('@py').open_resource(visa_string)
         print(self.ask("*IDN?"))
-        self.write("*RST")
-        
+        del self.manager.timeout
+        self.write("*RST")        
         self.write(":PAGE:CHAN:MODE SWEEP")
         self.write(":PAGE:CHAN:SMU3:DIS")
         self.write(":PAGE:CHAN:SMU4:DIS")
@@ -45,6 +45,7 @@ class Agilent4155c(object):
         self.write(":PAGE:CHAN:SMU1:FUNC VAR1")
         self.write(":PAGE:CHAN:SMU2:MODE COMM")
         self.write(":PAGE:CHAN:SMU2:FUNC CONS")
+        time.sleep(1)
 
     def __del__(self):
         try:
@@ -64,22 +65,27 @@ class Agilent4155c(object):
         return self.manager.query(command)
         
     def sweep(self, start, end, step):
+        self.write("*CLS")
+        self.ask(":PAGE:DISP:GRAP:X:MIN?")
+        self.ask(":PAGE:DISP:GRAP:X:MAX?")
+        time.sleep(1)
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:SSTOP COMP")
+        self.write("*OPC")
         self.write(":PAGE:SCON:SING")
+        self.write("*WAI")
 
     def read_sweep_values(self):
-        self.write("*WAI")
         self.write(":FORM:DATA ASC")
+        self.write(":PAGE:GLIS")
+        self.write(":PAGE:GLIS:SCAL:AUTO ONCE")
         I_data = self.manager.query_ascii_values(":DATA? 'ID' ")
         V_data = self.manager.query_ascii_values(":DATA? 'VD' ")
+        self.write(":PAGE:GLIS")
+        self.write(":PAGE:GLIS:SCAL:AUTO ONCE")
         return V_data, I_data
-
-    def setup_display(self, start, end):
-        self.write(":PAGE:DISP:GRAP:X:MIN %f" % float(start))
-        self.write(":PAGE:DISP:GRAP:X:MAX %f" % float(end))
 
     ### These are wrappers for common use with Keithley 2400
     def get_mode(self, key):
@@ -104,7 +110,10 @@ class Agilent4155c(object):
 
     def on(self):
         pass
+    
     def off(self):
+        self.write("*OPC")
+        self.write("*WAI")
         pass
 
 ### This is only for testing - to be removed ###
@@ -113,7 +122,6 @@ if __name__ == '__main__':
     an = Agilent4155c('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
-    an.setup_display(-5,5)
-    sweep = an.sweep(-5,5,0.1)
+    sweep = an.sweep(-5,5,0.01)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     pass
