@@ -30,7 +30,6 @@ class Agilent4155c(object):
         del self.manager.timeout
         self.write("*RST")        
         self.write(":PAGE:CHAN:MODE SWEEP")
-        self.write(":PAGE:CHAN:SMU3:DIS")
         self.write(":PAGE:CHAN:SMU4:DIS")
         self.write(":PAGE:CHAN:VSU1:DIS")
         self.write(":PAGE:CHAN:VSU2:DIS")
@@ -39,12 +38,16 @@ class Agilent4155c(object):
         
         self.write(":PAGE:CHAN:SMU1:VNAME 'VD'")
         self.write(":PAGE:CHAN:SMU2:VNAME 'VS'")
+        self.write(":PAGE:CHAN:SMU3:VNAME 'VG'")
         self.write(":PAGE:CHAN:SMU1:INAME 'ID'")
         self.write(":PAGE:CHAN:SMU2:INAME 'IS'")
+        self.write(":PAGE:CHAN:SMU3:INAME 'IG'")
         self.write(":PAGE:CHAN:SMU1:MODE V")
         self.write(":PAGE:CHAN:SMU1:FUNC VAR1")
         self.write(":PAGE:CHAN:SMU2:MODE COMM")
         self.write(":PAGE:CHAN:SMU2:FUNC CONS")
+        self.write(":PAGE:CHAN:SMU3:MODE V")
+        self.write(":PAGE:CHAN:SMU3:FUNC CONS")
         time.sleep(0.5)
         self.voltage_limit = 100.
         self.current_limit = 1.
@@ -66,11 +69,13 @@ class Agilent4155c(object):
     def ask(self, command):
         return self.manager.query(command)
         
-    def sweep(self, start, end, step):
+    def sweep(self, start, end, step, gate):
         self.write("*CLS")
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
+        self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
+        self.write(":PAGE:MEAS:CONS:SMU3 %f" % float(gate))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write("*OPC")
         #print(" Acquisition in progress...")
@@ -112,15 +117,15 @@ class Agilent4155c(object):
         if voltage != None:
             self.set_mode('VOLT')
             if voltage <= self.voltage_limit:
-                self.sweep(voltage,voltage,0)
+                self.sweep(voltage,voltage,0,0)
             else:
-                self.sweep(self.voltage_limit,self.voltage_limit,0)
+                self.sweep(self.voltage_limit,self.voltage_limit,0,0)
         elif current != None:
             self.set_mode('CURR')
             if current <= self.current_limit:
-                self.sweep(current,current,0)
+                self.sweep(current,current,0,0)
             else:
-                self.sweep(self.current_limit,self.current_limit,0)
+                self.sweep(self.current_limit,self.current_limit,0,0)
     
     def read_values(self):
         data = self.read_sweep_values()
@@ -144,6 +149,6 @@ if __name__ == '__main__':
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
 
     an.set_mode('VOLT')
-    sweep = an.sweep(-5,5,0.01)
+    sweep = an.sweep(-5,5,0.01,0)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     pass
