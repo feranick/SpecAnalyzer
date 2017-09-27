@@ -42,6 +42,7 @@ class Configuration():
             'acqMaxVoltage' : 1,
             'acqStartVoltage' : 0,
             'acqStepVoltage' : 0.5,
+            'acqGateVoltage' : 0,
             'acqNumAvScans' : 1,
             'acqDelBeforeMeas' : 1,
             'acqTrackNumPoints' : 5,
@@ -80,6 +81,7 @@ class Configuration():
         self.acqMaxVoltage = eval(self.acqConfig['acqMaxVoltage'])
         self.acqStartVoltage = eval(self.acqConfig['acqStartVoltage'])
         self.acqStepVoltage = eval(self.acqConfig['acqStepVoltage'])
+        self.acqGateVoltage = eval(self.acqConfig['acqGateVoltage'])
         self.acqNumAvScans = eval(self.acqConfig['acqNumAvScans'])
         self.acqDelBeforeMeas = eval(self.acqConfig['acqDelBeforeMeas'])
         self.acqTrackNumPoints = eval(self.acqConfig['acqTrackNumPoints'])

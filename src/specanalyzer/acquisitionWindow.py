@@ -67,12 +67,12 @@ class AcquisitionWindow(QMainWindow):
         self.gridLayout.addWidget(self.stepVLabel, 3, 0, 1, 1)
         self.stepVText = QLineEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.stepVText, 3, 1, 1, 1)
-        '''
+        
         self.gateVLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.gateVLabel, 4, 0, 1, 1)
         self.gateVText = QLineEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.gateVText, 4, 1, 1, 1)
-        '''
+        
         self.numAverScansLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.numAverScansLabel, 5, 0, 1, 1)
         self.numAverScansText = QLineEdit(self)
@@ -130,7 +130,7 @@ class AcquisitionWindow(QMainWindow):
         self.maxVLabel.setText("Max Voltage [V]")
         self.startVLabel.setText("Start Voltage [V]")
         self.stepVLabel.setText("Step Voltage [V]")
-        #self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
+        self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
         self.numAverScansLabel.setText("Number of averaged scans ")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")
@@ -155,6 +155,7 @@ class AcquisitionWindow(QMainWindow):
         self.parent().config.conf['Acquisition']['acqMaxVoltage'] = str(self.maxVText.text())
         self.parent().config.conf['Acquisition']['acqStartVoltage'] = str(self.startVText.text())
         self.parent().config.conf['Acquisition']['acqStepVoltage'] = str(self.stepVText.text())
+        self.parent().config.conf['Acquisition']['acqGateVoltage'] = str(self.gateVText.text())
         self.parent().config.conf['Acquisition']['acqNumAvScans'] = str(self.numAverScansText.text())
         self.parent().config.conf['Acquisition']['acqDelBeforeMeas'] = str(self.delayBeforeMeasText.text())
         self.parent().config.conf['Acquisition']['acqTrackNumPoints'] = str(self.numPointsText.value())
@@ -181,6 +182,7 @@ class AcquisitionWindow(QMainWindow):
         self.maxVText.setText(str(self.parent().config.acqMaxVoltage))
         self.startVText.setText(str(self.parent().config.acqStartVoltage))
         self.stepVText.setText(str(self.parent().config.acqStepVoltage))
+        self.gateVText.setText(str(self.parent().config.acqGateVoltage))
         self.numAverScansText.setText(str(self.parent().config.acqNumAvScans))
         self.delayBeforeMeasText.setText(str(self.parent().config.acqDelBeforeMeas))
         self.numPointsText.setValue(int(self.parent().config.acqTrackNumPoints))
