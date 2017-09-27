@@ -71,7 +71,7 @@ class Agilent4155c(object):
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write("*OPC")
-        print(" Acquisition in progress...")
+        #print(" Acquisition in progress...")
         self.write(":PAGE:SCON:SING")
         self.write("*WAI")
 
