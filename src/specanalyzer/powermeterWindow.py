@@ -26,7 +26,8 @@ class PowermeterWindow(QMainWindow):
     # Define UI elements
     def initUI(self, PowermeterWindow):
         PowermeterWindow.setWindowTitle("Powermeter Settings")
-        self.setGeometry(10, 200, 320, 110)
+        self.setGeometry(10, 290, 340, 110)
+        self.setFixedSize(self.size())
         self.powerMeterRefreshLabel = QLabel(PowermeterWindow)
         self.powerMeterRefreshLabel.setGeometry(QRect(20, 10, 120, 20))
         self.powerMeterRefreshLabel.setText("Refresh every [s]:")
@@ -37,11 +38,11 @@ class PowermeterWindow(QMainWindow):
         self.powerMeterLabel = QLabel(PowermeterWindow)
         self.powerMeterLabel.setGeometry(QRect(20, 40, 300, 20))        
         self.powermeterStartButton = QPushButton(PowermeterWindow)
-        self.powermeterStartButton.setGeometry(QRect(10, 70, 140, 30))
+        self.powermeterStartButton.setGeometry(QRect(10, 70, 150, 30))
         self.powermeterStartButton.clicked.connect(self.startPMAcq)
         self.powermeterStartButton.setText("Start")
         self.powermeterStopButton = QPushButton(PowermeterWindow)
-        self.powermeterStopButton.setGeometry(QRect(170, 70, 140, 30))
+        self.powermeterStopButton.setGeometry(QRect(180, 70, 150, 30))
         self.powermeterStopButton.clicked.connect(self.stopPMAcq)
         self.powermeterStopButton.setText("Stop")
 

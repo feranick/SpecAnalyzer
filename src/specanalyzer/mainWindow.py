@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
         logger.info("SpecAnalyzer v."+__version__)
         self.setWindowTitle("SpecAnalyzer %s" % __version__)
         self.setGeometry(10,30,340,220)
+        self.setFixedSize(self.size())
         self.aboutwid = AboutWidget()
         self.resultswind = ResultsWindow(parent=self)
         self.camerawind = CameraWindow(parent=self)

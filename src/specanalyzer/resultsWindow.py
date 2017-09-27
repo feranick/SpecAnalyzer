@@ -50,6 +50,7 @@ class ResultsWindow(QMainWindow):
     def initUI(self):
         self.setGeometry(380, 30, 1150, 950)
         self.setWindowTitle('Results Panel')
+        self.setFixedSize(self.size())
         
         # A figure instance to plot on
         self.figureTJsc = plt.figure()
