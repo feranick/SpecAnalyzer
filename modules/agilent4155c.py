@@ -66,14 +66,12 @@ class Agilent4155c(object):
         
     def sweep(self, start, end, step):
         self.write("*CLS")
-        self.ask(":PAGE:DISP:GRAP:X:MIN?")
-        self.ask(":PAGE:DISP:GRAP:X:MAX?")
-        time.sleep(1)
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write("*OPC")
+        print(" Acquisition in progress...")
         self.write(":PAGE:SCON:SING")
         self.write("*WAI")
 
@@ -83,8 +81,6 @@ class Agilent4155c(object):
         self.write(":PAGE:GLIS:SCAL:AUTO ONCE")
         I_data = self.manager.query_ascii_values(":DATA? 'ID' ")
         V_data = self.manager.query_ascii_values(":DATA? 'VD' ")
-        self.write(":PAGE:GLIS")
-        self.write(":PAGE:GLIS:SCAL:AUTO ONCE")
         return V_data, I_data
 
     ### These are wrappers for common use with Keithley 2400
