@@ -244,9 +244,10 @@ class acqThread(QThread):
         # create data array
         data = np.zeros((N, 3))
         data[:, 0] = v_list
-
+        
         if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
+            self.parent().source_meter.set_mode('VOLT')
             self.parent().source_meter.sweep(v_start, v_max, v_step)
             data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values()[1]
 
@@ -356,6 +357,7 @@ class acqThread(QThread):
         if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
             for n in range(scans):
                 self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
+                self.parent().source_meter.set_mode('VOLT')
                 self.parent().source_meter.sweep(v_min, v_max, v_step)
                 JVtemp[:, 1] = self.parent().source_meter.read_sweep_values()[1]
 

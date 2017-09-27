@@ -4,7 +4,7 @@ agilent4155c.py
 Class for providing a hardware support for 
 for the Agilent 4155C
 
-Version: 20170926
+Version: 20170927
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 
@@ -45,7 +45,9 @@ class Agilent4155c(object):
         self.write(":PAGE:CHAN:SMU1:FUNC VAR1")
         self.write(":PAGE:CHAN:SMU2:MODE COMM")
         self.write(":PAGE:CHAN:SMU2:FUNC CONS")
-        time.sleep(1)
+        time.sleep(0.5)
+        self.voltage_limit = 100.
+        self.current_limit = 1.
 
     def __del__(self):
         try:
@@ -88,17 +90,37 @@ class Agilent4155c(object):
         pass
 
     def set_mode(self, mode):
-        pass
+        if mode == 'VOLT':
+            self.write(":PAGE:CHAN:SMU1:MODE V")
+        elif mode == 'CURR':
+            self.write(":PAGE:CHAN:SMU1:MODE I")
 
     def set_limit(self, voltage = None, current = None):
         if voltage != None:
-            self.voltage_limit = 10.
-        else:
-            self.voltage_limit = voltage
+            if voltage == 'MAX':
+                pass
+            else:
+                self.voltage_limit = voltage
+                
+        if current != None:
+            if current == 'MAX':
+                pass
+            else:
+                self.current_limit = current
         
     def set_output(self, voltage = None, current = None):
         if voltage != None:
-            self.sweep(voltage,voltage,0)
+            self.set_mode('VOLT')
+            if voltage <= self.voltage_limit:
+                self.sweep(voltage,voltage,0)
+            else:
+                self.sweep(self.voltage_limit,self.voltage_limit,0)
+        elif current != None:
+            self.set_mode('CURR')
+            if current <= self.current_limit:
+                self.sweep(current,current,0)
+            else:
+                self.sweep(self.current_limit,self.current_limit,0)
     
     def read_values(self):
         data = self.read_sweep_values()
@@ -118,6 +140,10 @@ if __name__ == '__main__':
     an = Agilent4155c('GPIB0::17::INSTR')
     an.set_output(voltage = 1)
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+    an.set_output(current = 0)
+    print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+
+    an.set_mode('VOLT')
     sweep = an.sweep(-5,5,0.01)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     pass
