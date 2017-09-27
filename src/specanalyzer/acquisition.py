@@ -35,13 +35,14 @@ class Acquisition(QObject):
                 'Acq Max Voltage': [self.parent().acquisitionwind.maxVText.text()],
                 'Acq Start Voltage': [self.parent().acquisitionwind.startVText.text()],
                 'Acq Step Voltage': [self.parent().acquisitionwind.stepVText.text()],
+                'Acq Gate Voltage': [self.parent().acquisitionwind.gateVText.text()],
                 'Acq Num Aver Scans': [int(self.parent().acquisitionwind.numAverScansText.text())],
                 'Delay Before Meas': [self.parent().acquisitionwind.delayBeforeMeasText.text()],
                 'Num Track Points': [int(self.parent().acquisitionwind.numPointsText.value())],
                 'Track Interval': [self.parent().acquisitionwind.IntervalText.text()],
                 'Comments': [self.parent().commentsText.text()]})
         return pdframe[['Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
-                'Acq Step Voltage','Acq Num Aver Scans','Delay Before Meas',
+                'Acq Step Voltage','Acq Gate Voltage','Acq Num Aver Scans','Delay Before Meas',
                 'Num Track Points','Track Interval','Comments']]
                 
     def start(self):
@@ -220,6 +221,7 @@ class acqThread(QThread):
         v_max = float(dfAcqParams.get_value(0,'Acq Max Voltage'))
         v_start = float(dfAcqParams.get_value(0,'Acq Start Voltage'))
         v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
+        v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
         scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
         hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         time.sleep(hold_time)
@@ -248,17 +250,17 @@ class acqThread(QThread):
         if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
             self.parent().source_meter.set_mode('VOLT')
-            self.parent().source_meter.sweep(v_start, v_max, v_step,float(self.parent().parent().acquisitionwind.IntervalText.text()))
+            self.parent().source_meter.sweep(v_start, v_max, v_step, v_gate)
             data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values()[1]
 
             self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-            self.parent().source_meter.sweep(v_max, v_min, - v_step,float(self.parent().parent().acquisitionwind.IntervalText.text()))
+            self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate)
             data[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
             perfDataB = self.analyseJV(data[:, (0,2)])
             self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
 
             self.Msg.emit('  Device '+deviceID+': completing forward sweep')
-            self.parent().source_meter.sweep(v_min, v_start-v_step, v_step,float(self.parent().parent().acquisitionwind.IntervalText.text()))
+            self.parent().source_meter.sweep(v_min, v_start-v_step, v_step, v_gate)
             try:
                 data[i_list_forw2, 1] = self.parent().source_meter.read_sweep_values()[1]
             except:
@@ -329,6 +331,7 @@ class acqThread(QThread):
         v_max = float(dfAcqParams.get_value(0,'Acq Max Voltage'))
         v_start = float(dfAcqParams.get_value(0,'Acq Start Voltage'))
         v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
+        v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
         scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
         hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
 
@@ -358,7 +361,7 @@ class acqThread(QThread):
             for n in range(scans):
                 self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
                 self.parent().source_meter.set_mode('VOLT')
-                self.parent().source_meter.sweep(v_min, v_max, v_step,float(self.parent().parent().acquisitionwind.IntervalText.text()))
+                self.parent().source_meter.sweep(v_min, v_max, v_step, v_gate)
                 JVtemp[:, 1] = self.parent().source_meter.read_sweep_values()[1]
 
                 self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
