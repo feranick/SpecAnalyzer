@@ -72,6 +72,7 @@ class AcquisitionWindow(QMainWindow):
         self.gridLayout.addWidget(self.gateVLabel, 4, 0, 1, 1)
         self.gateVText = QLineEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.gateVText, 4, 1, 1, 1)
+        self.gateVText.setEnabled(False)
         
         self.numAverScansLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.numAverScansLabel, 5, 0, 1, 1)
