@@ -500,8 +500,8 @@ class ResultsWindow(QMainWindow):
             print("Open saved device data from: ", filename)
             dftot = pd.read_csv(filename, na_filter=False)
             deviceID = dftot.get_value(0,'Device')
-            perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Voc']))][:,range(1,9)]
-            JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(9,11)]
+            perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Voc']))][:,range(1,10)]
+            JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)]
             dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
             self.plotData(deviceID, perfData, JV, False)
             self.setupResultTable()
