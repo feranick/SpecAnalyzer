@@ -482,12 +482,12 @@ class ResultsWindow(QMainWindow):
         dfTot = pd.concat([dfTot,dfJV], axis = 1)
         dfTot = pd.concat([dfTot,dfAcqParams], axis = 1)
         
-        dateTimeTag = str(datetime.now().strftime('%Y%m%d-%H%M%S'))
+        dateTimeTag = str(datetime.now().strftime('%Y%m%d-%H%M%S_'))
         
         if dfPerfData['MPP'].count() < 2:
-            csvFilename = str(dfDeviceID.get_value(0,'Device'))+dateTimeTag+".csv"
+            csvFilename = dateTimeTag+str(dfDeviceID.get_value(0,'Device'))+".csv"
         else:
-            csvFilename = str(dfDeviceID.get_value(0,'Device'))+dateTimeTag+"_tracking.csv"
+            csvFilename = dateTimeTag+str(dfDeviceID.get_value(0,'Device'))+"_tracking.csv"
         try:
             dfTot.to_csv(self.csvFolder+"/"+csvFilename, sep=',', index=False)
         except:
