@@ -29,7 +29,7 @@ class Agilent4155c(object):
         print(self.ask("*IDN?"))
         del self.manager.timeout
         self.write("*RST")
-        self.write(":DISP:ALL INS")
+        self.write(":SYST:SSAV 0")
         self.write(":PAGE:CHAN:MODE SWEEP")
         self.write(":PAGE:CHAN:SMU4:DIS")
         self.write(":PAGE:CHAN:VSU1:DIS")
@@ -55,6 +55,7 @@ class Agilent4155c(object):
 
     def __del__(self):
         try:
+            self.write(":SYST:SSAV 5")
             self.manager.close()
         except:
             pass
