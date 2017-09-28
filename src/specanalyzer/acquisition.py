@@ -90,7 +90,7 @@ class Acquisition(QObject):
 
     # Process JV Acquisition to result page
     def JVDeviceProcess(self, JV, perfData, deviceID, dfAcqParams):
-        self.parent().resultswind.clearPlots(False,False)
+        #self.parent().resultswind.clearPlots(False,False)
         self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, True)
         QApplication.processEvents()
@@ -98,7 +98,7 @@ class Acquisition(QObject):
             
     # Plot temporary data from tracking
     def plotTempTracking(self, JV, perfData, deviceID, dfAcqParams, setupTable, saveData):
-        self.parent().resultswind.clearPlots(False,False)
+        #self.parent().resultswind.clearPlots(False,False)
         if setupTable is True:
             self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, saveData)

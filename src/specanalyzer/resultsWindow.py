@@ -274,8 +274,10 @@ class ResultsWindow(QMainWindow):
         if includeJVplot is True:
             self.figureJVresp.clf()
             self.figurePVresp.clf()
+            self.canvasJVresp.draw()
+            self.canvasPVresp.draw()
+            self.initJVPlot()
         self.initPlots(self.perfData)
-        self.initJVPlot()
         if includeTable is True:
             self.resTableWidget.setRowCount(0)
             self.setupDataFrame()

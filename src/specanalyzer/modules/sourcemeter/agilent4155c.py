@@ -28,7 +28,8 @@ class Agilent4155c(object):
         #self.manager = visa.ResourceManager('@py').open_resource(visa_string)
         print(self.ask("*IDN?"))
         del self.manager.timeout
-        self.write("*RST")        
+        self.write("*RST")
+        self.write(":DISP:ALL INS")
         self.write(":PAGE:CHAN:MODE SWEEP")
         self.write(":PAGE:CHAN:SMU4:DIS")
         self.write(":PAGE:CHAN:VSU1:DIS")
