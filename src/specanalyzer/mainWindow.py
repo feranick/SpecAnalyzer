@@ -323,26 +323,26 @@ class AboutWidget(QWidget):
     # Define UI elements
     def initUI(self):
         self.setGeometry(100, 200, 400, 300)
-        self.setWindowTitle('About SpecAnalyzer-Tracking')
+        self.setWindowTitle('About SpecAnalyzer')
     
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
         
-        self.logo = QLabel(self)
-        self.logo.setGeometry(QRect(30, 30, 311, 61))
-        self.logo.setText("GridEdge Solar @ MIT")
-        self.logo.setPixmap(QPixmap("gridedgeat/rsrc/logo_about.png"))
-        self.logo.setObjectName("logo")
+        #self.logo = QLabel(self)
+        #self.logo.setGeometry(QRect(30, 30, 311, 61))
+        #self.logo.setText("SpcAnalyzer")
+        #self.logo.setPixmap(QPixmap("specanalyzer/rsrc/logo_about.png"))
+        #self.logo.setObjectName("logo")
 
         self.labelTitle = QLabel("<qt><b><big><a href = https://github.com/feranick/SpecAnalyzer>SpecAnalyzer %s</a></b></big></qt>" % __version__, self)
         self.labelBy = QLabel("by: %s" % __author__, self)
         self.labelContact = QLabel("<qt>Contact: <a href = mailto:ferralis@mit.edu> ferralis@mit.edu</a></qt>", self)
-        self.labelDetails = QLabel("This is a homebrew project at MIT", self)
+        self.labelDetails = QLabel("Acquisition of JV curves from solar cells", self)
         self.labelLicense = QLabel("This software is licensed under the GNU GPL v.2.0 or later", self)
         
-        for label in [self.logo, self.labelTitle, self.labelBy,
+        for label in [self.labelTitle, self.labelBy,
                 self.labelContact, self.labelDetails, self.labelLicense]:
             label.setWordWrap(True)
             label.setOpenExternalLinks(True);
