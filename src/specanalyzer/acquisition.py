@@ -365,7 +365,7 @@ class acqThread(QThread):
                 JVtemp[:, 1] = self.parent().source_meter.read_sweep_values()[1]
 
                 self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-                self.parent().source_meter.sweep(v_max, v_min, - v_step)
+                self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate)
                 JVtemp[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
             
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
