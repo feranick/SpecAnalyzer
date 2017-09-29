@@ -4,7 +4,6 @@ powermeter.py
 Class for providing a hardware support for 
 for the powermeter Thorlabs PM100
 
-Copyright (C) 2017 Michel Nasilowski <micheln@mit.edu>
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
@@ -15,7 +14,7 @@ the Free Software Foundation; either version 2 of the License, or
 '''
 
 import time
-from specanalyzer import configuration
+#from specanalyzer import configuration
 try:
     from ThorlabsPM100 import ThorlabsPM100
     import visa
