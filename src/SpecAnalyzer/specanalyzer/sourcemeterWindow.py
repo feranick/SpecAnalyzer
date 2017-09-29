@@ -17,9 +17,8 @@ import time
 from PyQt5.QtCore import (QRect,QObject, QThread, pyqtSlot, pyqtSignal)
 from PyQt5.QtWidgets import (QLabel, QLineEdit, QCheckBox, QWidget,
                              QMainWindow,QPushButton,QComboBox)
-from .modules.sourcemeter.keithley2400 import *
-from .modules.sourcemeter.agilent4155c import *
-
+from modules.sourcemeter.keithley2400 import *
+from modules.sourcemeter.agilent4155c import *
 
 class SourcemeterWindow(QMainWindow):
     def __init__(self, parent=None):

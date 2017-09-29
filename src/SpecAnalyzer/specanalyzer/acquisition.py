@@ -18,9 +18,9 @@ import time, random, math
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication,QAbstractItemView)
 from PyQt5.QtCore import (Qt,QObject, QThread, pyqtSlot, pyqtSignal)
-from .acquisitionWindow import *
-from .modules.sourcemeter.keithley2400 import *
-from .modules.sourcemeter.agilent4155c import *
+from acquisitionWindow import *
+from modules.sourcemeter.keithley2400 import *
+from modules.sourcemeter.agilent4155c import *
 
 class Acquisition(QObject):
     def __init__(self, parent=None):

@@ -20,8 +20,8 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QAction,
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter)
 from PyQt5.QtCore import (pyqtSlot,QRectF)
 
-from .modules.camera.camera import *
-from . import logger
+from modules.camera.camera import *
+from __init__ import logger
 
 '''
    Camera Window
