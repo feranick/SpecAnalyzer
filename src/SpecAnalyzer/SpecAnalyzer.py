@@ -13,12 +13,12 @@ the Free Software Foundation; either version 2 of the License, or
 '''
 import sys
 from PyQt5.QtWidgets import QApplication
-from mainWindow import MainWindow
+import specanalyzer
 
 def main():
     try:
         app = QApplication(sys.argv)
-        form = MainWindow()
+        form = specanalyzer.mainWindow.MainWindow()
         form.show()
         app.exec_()
     finally:

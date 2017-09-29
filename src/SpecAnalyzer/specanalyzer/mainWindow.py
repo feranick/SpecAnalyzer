@@ -22,16 +22,16 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton,
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter)
 from PyQt5.QtCore import (pyqtSlot,QRectF)
 
-from __init__ import __version__
-from __init__ import __author__
-#from __init__ import logger
-from configuration import *
-from cameraWindow import *
-from resultsWindow import *
-from acquisition import *
-from acquisitionWindow import *
-from powermeterWindow import *
-from sourcemeterWindow import *
+from . import __version__
+from . import __author__
+from . import logger
+from .configuration import *
+from .cameraWindow import *
+from .resultsWindow import *
+from .acquisition import *
+from .acquisitionWindow import *
+from .powermeterWindow import *
+from .sourcemeterWindow import *
 
 '''
    Main Window

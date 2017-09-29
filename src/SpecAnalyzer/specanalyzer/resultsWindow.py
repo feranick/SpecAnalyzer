@@ -29,7 +29,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt
 
 #from .dataManagement import *
-from __init__ import logger
+from . import logger
 
 '''
    Results Window

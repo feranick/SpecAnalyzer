@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QA
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter,QDoubleValidator)
 from PyQt5.QtCore import (pyqtSlot,QRectF,QRect)
 
-from __init__ import logger
+from . import logger
 
 '''
    Acquisition Window

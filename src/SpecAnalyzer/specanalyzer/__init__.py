@@ -14,7 +14,7 @@ the Free Software Foundation; either version 2 of the License, or
 __version__ = "0.4"
 __author__ = "<qt><a href = mailto:ferralis@mit.edu> Nicola Ferralis</a></qt>"
 
-from configuration import *
+from .configuration import *
 import os.path
 
 config = Configuration()
@@ -27,8 +27,8 @@ import logging
 logging.basicConfig(filename=config.loggingFilename, level=int(config.loggingLevel))
 logger = logging.getLogger()
 
-import configuration
-import mainWindow
+from . import configuration
+from . import mainWindow
 
 
 
