@@ -88,15 +88,15 @@ class CameraWindow(QMainWindow):
             self.cam.grab_image()
             self.image, self.image_data = self.cam.get_image()
             self.imageLabel.setPixmap(QPixmap.fromImage(self.image))
-            self.statusBar().showMessage(self.cam.color_image_name() + \
-               str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
+            self.statusBar().showMessage('Camera-feed' + \
+                str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
             self.alignPerc, self.iMax = self.cam.check_alignment( \
-                    self.image_data,
-                    self.parent().config.alignmentIntThreshold)
+                self.image_data,
+                self.parent().config.alignmentIntThreshold)
 
             self.checkAlignText.setText(str(self.alignPerc))
             if float(self.alignPerc) > self.parent().config.alignmentContrastDefault \
-                   and float(self.iMax) > self.parent().config.alignmentIntMax:
+                    and float(self.iMax) > self.parent().config.alignmentIntMax:
                 self.checkAlignText.setStyleSheet("color: rgb(255, 0, 255);")
                 self.outAlignmentMessageBox()
             else:
@@ -132,9 +132,9 @@ class CameraWindow(QMainWindow):
             with open(self.parent().config.configFile, 'w') as configfile:
                 self.parent().config.conf.write(configfile)
             self.parent().config.readConfig(self.parent().config.configFile)
-            print(" New alignment settings saved as default. Image saved in", self.filename)
-            logger.info(" New camera alignment settings saved as default. Image saved in"+self.filename)
-            self.cam.save_image(self.filename)
+            print(" New alignment settings saved as default. Image saved in: ", self.filename)
+            logger.info(" New camera alignment settings saved as default. Image saved in: "+self.filename)
+            self.cam.save_image(self.parent().config.imagesFolder+self.filename)
             return True
         else:
             print( " Alignment settings not saved as default" )

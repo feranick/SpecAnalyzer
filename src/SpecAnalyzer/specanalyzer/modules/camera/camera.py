@@ -26,8 +26,6 @@ class CameraFeed():
     def __init__(self):
         self.camera_port = 0
         self.ramp_frames = 2
-        self.image_folder = "images/"
-        self.filename = "imagecolor.png"
         self.camera = cv2.VideoCapture(self.camera_port)
         #time.sleep(2)
         self.camera.set(10, -200)
@@ -49,7 +47,7 @@ class CameraFeed():
 
     # Save image
     def save_image(self, filename):
-        cv2.imwrite(self.image_folder + filename,self.img)
+        cv2.imwrite(filename,self.img)
 
     # Logic for checking alignment
     def check_alignment(self, img_data, threshold):
@@ -72,10 +70,6 @@ class CameraFeed():
         else :
             print ('Devices and mask are properly aligned')
     '''
-
-    # Define folder+filename
-    def color_image_name(self):
-        return self.image_folder + self.filename
 
     # Close connection to camera
     def close_cam(self):
