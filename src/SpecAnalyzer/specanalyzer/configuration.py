@@ -17,7 +17,14 @@ from pathlib import Path
 class Configuration():
     def __init__(self):
         self.home = str(Path.home())+"/"
-        self.configFile = self.home+"SpecAnalyzer.ini"
+        self.configFile = str(self.home+"SpecAnalyzer.ini")
+        self.generalFolder = str(self.home+"/SpecAnalyzer/")
+        Path(self.generalFolder).mkdir(parents=True, exist_ok=True)
+        self.logFile = str(self.generalFolder+"SpecAnalyzer.log")
+        self.dataFolder = str(self.generalFolder + '/data')
+        Path(self.dataFolder).mkdir(parents=True, exist_ok=True)
+        #self.imagesFolder = str(self.generalFolder + '/images')
+        #Path(self.imagesFolder).mkdir(parents=True, exist_ok=True)
         self.conf = configparser.ConfigParser()
     
     # Create configuration file
@@ -63,8 +70,8 @@ class Configuration():
     def defineConfSystem(self):
         self.conf['System'] = {
             'loggingLevel' : logging.INFO,
-            'loggingFilename' : self.home+"SpecAnalyzer.log",
-            'csvSavingFolder' : "./data",
+            'loggingFilename' : self.logFile,
+            'csvSavingFolder' : self.dataFolder,
             'saveLocalCsv' : True,
             }
 
