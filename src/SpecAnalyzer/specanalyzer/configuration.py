@@ -26,6 +26,7 @@ class Configuration():
         self.imagesFolder = str(self.generalFolder + '/images/')
         Path(self.imagesFolder).mkdir(parents=True, exist_ok=True)
         self.conf = configparser.ConfigParser()
+        self.conf.optionxform = str
     
     # Create configuration file
     def createConfig(self):
