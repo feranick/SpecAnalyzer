@@ -337,6 +337,7 @@ class acqThread(QThread):
         scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
         hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
         delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
+        time.sleep(delay_before_meas)
 
         # measurements: voc, jsc
         voc, jsc = self.measure_voc_jsc()
@@ -405,6 +406,8 @@ class acqThread(QThread):
         delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
         trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
+        time.sleep(delay_before_meas)
+
         startTime = time.time()
 
         self.Msg.emit("Tracking device: "+deviceID+" (time-step: 0)")
