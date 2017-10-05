@@ -22,13 +22,12 @@ class Configuration():
         self.generalFolder = str(self.home+"SpecAnalyzer/")
         Path(self.generalFolder).mkdir(parents=True, exist_ok=True)
         self.logFile = str(self.generalFolder+"SpecAnalyzer.log")
-        self.dataFolder = str(self.generalFolder + 'data')
+        self.dataFolder = str(self.generalFolder + 'data/')
         Path(self.dataFolder).mkdir(parents=True, exist_ok=True)
         self.imagesFolder = str(self.generalFolder + 'images/')
         Path(self.imagesFolder).mkdir(parents=True, exist_ok=True)
         self.conf = configparser.ConfigParser()
         self.conf.optionxform = str
-        print(self.dataFolder)
     
     # Create configuration file
     def createConfig(self):
