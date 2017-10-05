@@ -15,6 +15,7 @@ the Free Software Foundation; either version 2 of the License, or
 
 import sys
 from datetime import datetime
+import numpy as np
 from PyQt5.QtWidgets import (QMainWindow, QApplication, QPushButton, QWidget, QAction,
     QVBoxLayout,QGridLayout,QLabel,QGraphicsView,QFileDialog,QStatusBar,QSpinBox,
     QGraphicsScene,QLineEdit,QMessageBox,QDialog,QDialogButtonBox,QMenuBar,QCheckBox)
@@ -151,6 +152,12 @@ class AcquisitionWindow(QMainWindow):
         
         self.initParameters()
 
+        self.minVText.editingFinished.connect(self.timePerDevice)
+        self.maxVText.editingFinished.connect(self.timePerDevice)
+        self.stepVText.editingFinished.connect(self.timePerDevice)
+        self.numAverScansText.editingFinished.connect(self.timePerDevice)
+        self.delayBeforeMeasText.editingFinished.connect(self.timePerDevice)
+
     # Save acquisition parameters in configuration ini
     def saveParameters(self):
         self.parent().config.conf['Acquisition']['acqMinVoltage'] = str(self.minVText.text())
@@ -212,13 +219,17 @@ class AcquisitionWindow(QMainWindow):
 
     # Calculate the measurement time per device
     def timePerDevice(self):
-        timePerDevice = (int(self.parent().config.acqNumAvScans) * \
-                         (0.1+float(self.parent().config.acqDelBeforeMeas)) + \
-                         float(self.parent().config.acqTrackInterval)) * \
-                         int(self.parent().config.acqTrackNumPoints)
+        try:
+            timePerDevice = (len(np.arange(float(self.minVText.text())-1e-9,
+                                      float(self.maxVText.text())+1e-9,
+                                      float(self.stepVText.text())))+ \
+                                      float(self.delayBeforeMeasText.text())) * \
+                                      float(self.numAverScansText.text())
+        except:
+            timePerDevice = 0
         self.totTimePerDeviceLabel.setText(\
                 "Total time per device: <qt><b>{0:0.1f}s</b></qt>".format(timePerDevice))
-
+        
     # Enable and disable fields (flag is either True or False) during acquisition.
     def enableAcqPanel(self, flag):
         self.minVText.setEnabled(flag)
