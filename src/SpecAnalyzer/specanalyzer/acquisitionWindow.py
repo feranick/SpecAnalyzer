@@ -51,16 +51,18 @@ class AcquisitionWindow(QMainWindow):
         self.gridLayout.addWidget(self.minVLabel, 0, 0, 1, 1)
         self.minVText = QLineEdit(self)
         self.gridLayout.addWidget(self.minVText, 0, 1, 1, 1)
+        self.minVText.editingFinished.connect(self.validateVoltages)
 
         self.maxVLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.maxVLabel, 1, 0, 1, 1)
         self.maxVText = QLineEdit(self)
         self.gridLayout.addWidget(self.maxVText, 1, 1, 1, 1)
+        self.maxVText.editingFinished.connect(self.validateVoltages)
         
         self.startVLabel = QLabel(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.startVLabel, 2, 0, 1, 1)
         self.startVText = QLineEdit(self)
-        self.startVText.textEdited.connect(self.validateStartVoltage)
+        self.startVText.editingFinished.connect(self.validateVoltages)
         self.gridLayout.addWidget(self.startVText, 2, 1, 1, 1)
 
         self.stepVLabel = QLabel(self.gridLayoutWidget)
@@ -190,13 +192,21 @@ class AcquisitionWindow(QMainWindow):
         self.timePerDevice()
 
     # Field validator for VStart
-    def validateStartVoltage(self):
-        self.validateStartVoltage = QDoubleValidator(float(self.minVText.text()),
+    def validateVoltages(self):
+        maxV = 100
+        minV = -100
+        validateStartVoltage = QDoubleValidator(float(self.minVText.text()),
                                     float(self.maxVText.text()),1,self.startVText)
-        if self.validateStartVoltage.validate(self.startVText.text(),1)[0] != 2:
-            msg = "Start Voltage needs to be between\n Vmin="+self.minVText.text()+ \
-                  " and Vmax="+self.maxVText.text()+ \
-                  "\n\nPlease change \"Start Voltage\" in the Acquisition panel"
+        validateMaxVoltage = QDoubleValidator(float(self.minVText.text()),
+                                    maxV,1,self.maxVText)
+        validateMinVoltage = QDoubleValidator(minV,
+                                    float(self.maxVText.text()),1,self.minVText)
+                                    
+        if validateStartVoltage.validate(self.startVText.text(),1)[0] != 2 or \
+            validateMaxVoltage.validate(self.maxVText.text(),1)[0] != 2 or \
+            validateMinVoltage.validate(self.minVText.text(),1)[0] != 2:
+            msg = "Sweep voltages (including Start) need to be \n between Vmin and Vmax"+\
+                "\n\nPlease change Voltages in the Acquisition panel"
             reply = QMessageBox.question(self, 'Critical', msg, QMessageBox.Ok)
             self.show()
 
