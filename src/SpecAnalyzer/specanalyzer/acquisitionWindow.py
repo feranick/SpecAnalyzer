@@ -76,29 +76,32 @@ class AcquisitionWindow(QMainWindow):
         self.gateVText = QLineEdit(self.gridLayoutWidget)
         self.gridLayout.addWidget(self.gateVText, 4, 1, 1, 1)
         
+        self.holdTLabel = QLabel(self.gridLayoutWidget)
+        self.gridLayout.addWidget(self.holdTLabel, 5, 0, 1, 1)
+        self.holdTText = QLineEdit(self.gridLayoutWidget)
+        self.gridLayout.addWidget(self.holdTText, 5, 1, 1, 1)
+        
         self.numAverScansLabel = QLabel(self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.numAverScansLabel, 5, 0, 1, 1)
+        self.gridLayout.addWidget(self.numAverScansLabel, 6, 0, 1, 1)
         self.numAverScansText = QLineEdit(self)
-        self.gridLayout.addWidget(self.numAverScansText, 5, 1, 1, 1)
+        self.gridLayout.addWidget(self.numAverScansText, 6, 1, 1, 1)
 
         self.delayBeforeMeasLabel = QLabel(self.gridLayoutWidget)
-        self.gridLayout.addWidget(self.delayBeforeMeasLabel, 6, 0, 1, 1)
+        self.gridLayout.addWidget(self.delayBeforeMeasLabel, 7, 0, 1, 1)
         self.delayBeforeMeasText = QLineEdit(self)
-        self.gridLayout.addWidget(self.delayBeforeMeasText, 6, 1, 1, 1)
+        self.gridLayout.addWidget(self.delayBeforeMeasText, 7, 1, 1, 1)
         
         self.trackingLabel = QLabel(self.centralwidget)
         self.trackingLabel.setGeometry(QRect(10, 280, 160, 16))
         self.trackingLabel.setObjectName("trackingLabel")
         
         self.enableTrackingBox = QCheckBox(self.centralwidget)
-        self.enableTrackingBox.setGeometry(QRect(140, 280, 87, 20))
+        self.enableTrackingBox.setGeometry(QRect(160, 280, 87, 20))
         
         self.gridLayoutWidget_2 = QWidget(self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QRect(10, 310, 330, 181))
-        self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
+        self.gridLayoutWidget_2.setGeometry(QRect(10, 300, 330, 181))
         self.gridLayout_2 = QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setHorizontalSpacing(10)
-        self.gridLayout_2.setObjectName("gridLayout_2")
 
         self.numPointsLabel = QLabel(self.gridLayoutWidget_2)
         self.gridLayout_2.addWidget(self.numPointsLabel, 0, 0, 1, 1)
@@ -134,6 +137,7 @@ class AcquisitionWindow(QMainWindow):
         self.startVLabel.setText("Start Voltage [V]")
         self.stepVLabel.setText("Step Voltage [V]")
         self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
+        self.holdTLabel.setText("Hold time [s]")
         self.numAverScansLabel.setText("Number of averaged scans ")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")
@@ -157,6 +161,8 @@ class AcquisitionWindow(QMainWindow):
         self.stepVText.editingFinished.connect(self.timePerDevice)
         self.numAverScansText.editingFinished.connect(self.timePerDevice)
         self.delayBeforeMeasText.editingFinished.connect(self.timePerDevice)
+        self.holdTText.editingFinished.connect(self.timePerDevice)
+
 
     # Save acquisition parameters in configuration ini
     def saveParameters(self):
@@ -165,6 +171,7 @@ class AcquisitionWindow(QMainWindow):
         self.parent().config.conf['Acquisition']['acqStartVoltage'] = str(self.startVText.text())
         self.parent().config.conf['Acquisition']['acqStepVoltage'] = str(self.stepVText.text())
         self.parent().config.conf['Acquisition']['acqGateVoltage'] = str(self.gateVText.text())
+        self.parent().config.conf['Acquisition']['acqHoldTime'] = str(self.holdTText.text())
         self.parent().config.conf['Acquisition']['acqNumAvScans'] = str(self.numAverScansText.text())
         self.parent().config.conf['Acquisition']['acqDelBeforeMeas'] = str(self.delayBeforeMeasText.text())
         self.parent().config.conf['Acquisition']['acqTrackNumPoints'] = str(self.numPointsText.value())
@@ -192,6 +199,7 @@ class AcquisitionWindow(QMainWindow):
         self.startVText.setText(str(self.parent().config.acqStartVoltage))
         self.stepVText.setText(str(self.parent().config.acqStepVoltage))
         self.gateVText.setText(str(self.parent().config.acqGateVoltage))
+        self.holdTText.setText(str(self.parent().config.acqHoldTime))
         self.numAverScansText.setText(str(self.parent().config.acqNumAvScans))
         self.delayBeforeMeasText.setText(str(self.parent().config.acqDelBeforeMeas))
         self.numPointsText.setValue(int(self.parent().config.acqTrackNumPoints))
@@ -222,7 +230,8 @@ class AcquisitionWindow(QMainWindow):
         try:
             timePerDevice = (len(np.arange(float(self.minVText.text())-1e-9,
                                       float(self.maxVText.text())+1e-9,
-                                      float(self.stepVText.text())))+ \
+                                      float(self.stepVText.text()))) * \
+                                      float(self.holdTText.text()) + \
                                       float(self.delayBeforeMeasText.text())) * \
                                       float(self.numAverScansText.text())
         except:
@@ -237,6 +246,7 @@ class AcquisitionWindow(QMainWindow):
         self.startVText.setEnabled(flag)
         self.stepVText.setEnabled(flag)
         self.gateVText.setEnabled(flag)
+        self.holdTText.setEnabled(flag)
         self.numAverScansText.setEnabled(flag)
         self.delayBeforeMeasText.setEnabled(flag)
         self.numPointsText.setEnabled(flag)

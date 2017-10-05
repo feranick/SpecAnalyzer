@@ -36,14 +36,15 @@ class Acquisition(QObject):
                 'Acq Start Voltage': [self.parent().acquisitionwind.startVText.text()],
                 'Acq Step Voltage': [self.parent().acquisitionwind.stepVText.text()],
                 'Acq Gate Voltage': [self.parent().acquisitionwind.gateVText.text()],
+                'Acq Hold Time': [self.parent().acquisitionwind.holdTText.text()],
                 'Acq Num Aver Scans': [int(self.parent().acquisitionwind.numAverScansText.text())],
                 'Delay Before Meas': [self.parent().acquisitionwind.delayBeforeMeasText.text()],
                 'Num Track Points': [int(self.parent().acquisitionwind.numPointsText.value())],
                 'Track Interval': [self.parent().acquisitionwind.IntervalText.text()],
                 'Comments': [self.parent().commentsText.text()]})
         return pdframe[['Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
-                'Acq Step Voltage','Acq Gate Voltage','Acq Num Aver Scans','Delay Before Meas',
-                'Num Track Points','Track Interval','Comments']]
+                'Acq Step Voltage','Acq Gate Voltage','Acq Hold Time', 'Acq Num Aver Scans',
+                'Delay Before Meas','Num Track Points','Track Interval','Comments']]
                 
     def start(self):
         # Using ALT with Start Acquisition button:
@@ -223,8 +224,9 @@ class acqThread(QThread):
         v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
         v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
         scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
-        hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
-        time.sleep(hold_time)
+        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
+        time.sleep(delay_before_meas)
         
         # enforce
         if v_start < v_min and v_start > v_max and v_min > v_max:
@@ -333,7 +335,8 @@ class acqThread(QThread):
         v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
         v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
         scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
-        hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
+        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
 
         # measurements: voc, jsc
         voc, jsc = self.measure_voc_jsc()
@@ -398,7 +401,8 @@ class acqThread(QThread):
     # Tracking (take JV once and track Vpmax)
     # dfAcqParams : self.dfAcqParams
     def tracking(self, deviceID, dfAcqParams, JV, perfData):
-        hold_time = float(dfAcqParams.get_value(0,'Delay Before Meas'))
+        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
         trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
         startTime = time.time()

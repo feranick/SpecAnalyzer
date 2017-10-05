@@ -53,6 +53,7 @@ class Configuration():
             'acqStartVoltage' : 0,
             'acqStepVoltage' : 0.5,
             'acqGateVoltage' : 0,
+            'acqHoldTime' : 0.1,
             'acqNumAvScans' : 1,
             'acqDelBeforeMeas' : 1,
             'acqTrackNumPoints' : 5,
@@ -92,6 +93,7 @@ class Configuration():
         self.acqStartVoltage = eval(self.acqConfig['acqStartVoltage'])
         self.acqStepVoltage = eval(self.acqConfig['acqStepVoltage'])
         self.acqGateVoltage = eval(self.acqConfig['acqGateVoltage'])
+        self.acqHoldTime = eval(self.acqConfig['acqHoldTime'])
         self.acqNumAvScans = eval(self.acqConfig['acqNumAvScans'])
         self.acqDelBeforeMeas = eval(self.acqConfig['acqDelBeforeMeas'])
         self.acqTrackNumPoints = eval(self.acqConfig['acqTrackNumPoints'])
@@ -109,7 +111,6 @@ class Configuration():
         self.loggingFilename = self.sysConfig['loggingFilename']
         self.csvSavingFolder = self.sysConfig['csvSavingFolder']
         self.saveLocalCsv = eval(self.sysConfig['saveLocalCsv'])
-
 
     # Save current parameters in configuration file
     def saveConfig(self, configFile):
