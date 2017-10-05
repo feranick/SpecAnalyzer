@@ -334,10 +334,10 @@ class ResultsWindow(QMainWindow):
 
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
-        self.save_csv(self.dfTotDeviceID.get_value(0,row,takeable=True)[0][0],
+        self.save_csv(self.dfTotDeviceID.get_value(0,row,takeable=True),
             self.dfTotAcqParams.iloc[[row]],
             self.dfTotPerfData.get_value(0,row,takeable=True),
-            self.dfTotJV.get_value(0,row,takeable=True))
+            self.dfTotJV.get_value(0,row,takeable=True)[0])
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
@@ -426,53 +426,6 @@ class ResultsWindow(QMainWindow):
         dfJV = pd.DataFrame({'V':JV[:,0], 'J':JV[:,1]})
         dfJV = dfJV[['V', 'J']]
         return dfJV
-    '''
-    ### Submit json for device data to Data-Management
-    def submit_DM(self,deviceID, dfAcqParams, perfData, JV):
-        
-        dfPerfData = self.makeDFPerfData(perfData)
-        dfJV = self.makeDFJV(JV[JV.shape[0]-1])
-        
-        # Prepare json-data
-        dfDeviceID = pd.DataFrame({'Device':[deviceID]})
-        jsonData = dict(dfDeviceID.to_dict(orient='list'))
-        listAcqParams = dict(dfAcqParams.to_dict(orient='list'))
-        listPerfData = dict(dfPerfData.to_dict(orient='list'))
-        listJV = dict(dfJV.to_dict(orient='list'))
-        jsonData.update(listPerfData)
-        jsonData.update(listJV)
-        jsonData.update(listAcqParams)
-
-        self.dbConnectInfo = self.parent().dbconnectionwind.getDbConnectionInfo()
-        try:
-            #This is for using POST HTTP
-            url = "http://"+self.dbConnectInfo[0]+":"+self.dbConnectInfo[5]+self.dbConnectInfo[6]
-            req = requests.post(url, json=jsonData)
-            if req.status_code == 200:
-                msg = " Device " + deviceID + \
-                      ", submission to DM via HTTP POST successful\n  (ETag: " + \
-                      str(req.headers['ETag'])+")"
-            else:
-                req.raise_for_status()
-        except:
-            try:
-                # This is for direct submission via pymongo
-                conn = DataManagement(self.dbConnectInfo)
-                client, _ = conn.connectDB()
-                db = client[self.dbConnectInfo[2]]
-                try:
-                    db_entry = db.EnvTrack.insert_one(json.loads(json.dumps(jsonData)))
-                    msg = " Device " + deviceID + \
-                          ": submission to DM via Mongo successful\n  (id: " + \
-                          str(db_entry.inserted_id)+")"
-                except:
-                    msg = " Submission to DM via Mongo: failed."
-            except:
-                msg = " Connection to DM server: failed. Saving local file"
-                self.save_csv(deviceID, dfAcqParams, perfData, JV)
-        print(msg)
-        logger.info(msg)
-    '''
     
     ### Save device acquisition as csv
     def save_csv(self,deviceID, dfAcqParams, perfData, JV):
