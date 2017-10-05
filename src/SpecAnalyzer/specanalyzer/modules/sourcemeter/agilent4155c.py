@@ -126,7 +126,7 @@ class Agilent4155c(object):
         elif current != None:
             self.set_mode('CURR')
             if current <= self.current_limit:
-                self.sweep(current,current,0,0)
+                self.sweep(current,current,0,0,0)
             else:
                 self.sweep(self.current_limit,self.current_limit,0,0,0)
     

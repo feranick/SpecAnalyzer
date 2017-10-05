@@ -28,6 +28,7 @@ class Configuration():
         Path(self.imagesFolder).mkdir(parents=True, exist_ok=True)
         self.conf = configparser.ConfigParser()
         self.conf.optionxform = str
+        print(self.dataFolder)
     
     # Create configuration file
     def createConfig(self):
@@ -54,7 +55,7 @@ class Configuration():
             'acqStartVoltage' : 0,
             'acqStepVoltage' : 0.5,
             'acqGateVoltage' : 0,
-            'acqHoldTime' : 100,
+            'acqHoldTime' : 0.1,
             'acqNumAvScans' : 1,
             'acqDelBeforeMeas' : 1,
             'acqTrackNumPoints' : 5,
