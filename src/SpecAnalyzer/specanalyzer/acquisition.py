@@ -252,17 +252,17 @@ class acqThread(QThread):
         if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
             self.parent().source_meter.set_mode('VOLT')
-            self.parent().source_meter.sweep(v_start, v_max, v_step, v_gate)
+            self.parent().source_meter.sweep(v_start, v_max, v_step, v_gate, hold_time)
             data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values()[1]
 
             self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-            self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate)
+            self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate, hold_time)
             data[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
             perfDataB = self.analyseJV(data[:, (0,2)])
             self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
 
             self.Msg.emit('  Device '+deviceID+': completing forward sweep')
-            self.parent().source_meter.sweep(v_min, v_start-v_step, v_step, v_gate)
+            self.parent().source_meter.sweep(v_min, v_start-v_step, v_step, v_gate, hold_time)
             try:
                 data[i_list_forw2, 1] = self.parent().source_meter.read_sweep_values()[1]
             except:
@@ -364,11 +364,11 @@ class acqThread(QThread):
             for n in range(scans):
                 self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
                 self.parent().source_meter.set_mode('VOLT')
-                self.parent().source_meter.sweep(v_min, v_max, v_step, v_gate)
+                self.parent().source_meter.sweep(v_min, v_max, v_step, v_gate, hold_time)
                 JVtemp[:, 1] = self.parent().source_meter.read_sweep_values()[1]
 
                 self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
-                self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate)
+                self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate, hold_time)
                 JVtemp[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values()[1])
             
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)

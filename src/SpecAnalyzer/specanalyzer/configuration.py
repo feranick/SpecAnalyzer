@@ -53,7 +53,7 @@ class Configuration():
             'acqStartVoltage' : 0,
             'acqStepVoltage' : 0.5,
             'acqGateVoltage' : 0,
-            'acqHoldTime' : 0.1,
+            'acqHoldTime' : 100,
             'acqNumAvScans' : 1,
             'acqDelBeforeMeas' : 1,
             'acqTrackNumPoints' : 5,

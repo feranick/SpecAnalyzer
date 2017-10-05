@@ -137,7 +137,7 @@ class AcquisitionWindow(QMainWindow):
         self.startVLabel.setText("Start Voltage [V]")
         self.stepVLabel.setText("Step Voltage [V]")
         self.gateVLabel.setText("Gate Voltage - SMU3 [V]")
-        self.holdTLabel.setText("Hold time [s]")
+        self.holdTLabel.setText("Hold time [ms]")
         self.numAverScansLabel.setText("Number of averaged scans ")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")

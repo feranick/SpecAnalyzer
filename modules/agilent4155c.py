@@ -4,7 +4,7 @@ agilent4155c.py
 Class for providing a hardware support for 
 for the Agilent 4155C
 
-Version: 20170927
+Version: 20171005
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 
@@ -71,12 +71,13 @@ class Agilent4155c(object):
     def ask(self, command):
         return self.manager.query(command)
         
-    def sweep(self, start, end, step, gate):
+    def sweep(self, start, end, step, gate, hold_time):
         self.write("*CLS")
         self.write(":PAGE:MEAS:VAR1:START %f" % float(start))
         self.write(":PAGE:MEAS:VAR1:STOP %f" % float(end))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
         self.write(":PAGE:MEAS:VAR1:STEP %f" % float(step))
+        self.write(":PAGE:MEAS:HTIM %f" % float(hold_time))
         self.write(":PAGE:MEAS:CONS:SMU3 %f" % float(gate))
         self.write(":PAGE:MEAS:SSTOP COMP")
         self.write("*OPC")
@@ -119,15 +120,15 @@ class Agilent4155c(object):
         if voltage != None:
             self.set_mode('VOLT')
             if voltage <= self.voltage_limit:
-                self.sweep(voltage,voltage,0,0)
+                self.sweep(voltage,voltage,0,0,0)
             else:
-                self.sweep(self.voltage_limit,self.voltage_limit,0,0)
+                self.sweep(self.voltage_limit,self.voltage_limit,0,0,0)
         elif current != None:
             self.set_mode('CURR')
             if current <= self.current_limit:
                 self.sweep(current,current,0,0)
             else:
-                self.sweep(self.current_limit,self.current_limit,0,0)
+                self.sweep(self.current_limit,self.current_limit,0,0,0)
     
     def read_values(self):
         data = self.read_sweep_values()
@@ -151,6 +152,6 @@ if __name__ == '__main__':
     print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
 
     an.set_mode('VOLT')
-    sweep = an.sweep(-5,5,0.01,0)
+    sweep = an.sweep(-5,5,0.01,0,0)
     print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
     pass
