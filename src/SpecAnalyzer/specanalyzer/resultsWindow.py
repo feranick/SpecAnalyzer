@@ -334,10 +334,12 @@ class ResultsWindow(QMainWindow):
 
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
+        folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save " +\
+                                  self.dfTotDeviceID.get_value(0,row,takeable=True)))
         self.save_csv(self.dfTotDeviceID.get_value(0,row,takeable=True),
             self.dfTotAcqParams.iloc[[row]],
             self.dfTotPerfData.get_value(0,row,takeable=True),
-            self.dfTotJV.get_value(0,row,takeable=True)[0])
+            self.dfTotJV.get_value(0,row,takeable=True)[0], folder)
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
@@ -393,7 +395,7 @@ class ResultsWindow(QMainWindow):
             # Using ALT with Start Acquisition button overrides the config settings.
             if self.parent().config.saveLocalCsv == True or \
                     self.parent().acquisition.modifiers == Qt.AltModifier:
-                self.save_csv(deviceID, dfAcqParams, self.perfData, self.JV)
+                self.save_csv(deviceID, dfAcqParams, self.perfData, self.JV,self.csvFolder)
             #if self.parent().config.submitToDb == True:
             #    self.submit_DM(deviceID, dfAcqParams, self.perfData, self.JV)
 
@@ -428,7 +430,7 @@ class ResultsWindow(QMainWindow):
         return dfJV
     
     ### Save device acquisition as csv
-    def save_csv(self,deviceID, dfAcqParams, perfData, JV):
+    def save_csv(self,deviceID, dfAcqParams, perfData, JV, folder):
         dfPerfData = self.makeDFPerfData(perfData)
         dfJV = self.makeDFJV(JV)
     
@@ -444,11 +446,11 @@ class ResultsWindow(QMainWindow):
         else:
             csvFilename = dateTimeTag+str(dfDeviceID.get_value(0,'Device'))+"_tracking.csv"
         try:
-            dfTot.to_csv(self.csvFolder+"/"+csvFilename, sep=',', index=False)
+            dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
         except:
             self.set_dir_saved()
-            dfTot.to_csv(self.csvFolder+"/"+csvFilename, sep=',', index=False)
-        msg=" Device data saved on: "+self.csvFolder+"/"+csvFilename
+            dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
+        msg=" Device data saved on: "+folder+"/"+csvFilename
         print(msg)
         logger.info(msg)
 
