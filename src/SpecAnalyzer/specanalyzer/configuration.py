@@ -11,8 +11,9 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 '''
-import configparser, logging
+import configparser, logging, os
 from pathlib import Path
+from . import __version__
 
 class Configuration():
     def __init__(self):
@@ -71,6 +72,7 @@ class Configuration():
             }
     def defineConfSystem(self):
         self.conf['System'] = {
+            'appVersion' : __version__,
             'loggingLevel' : logging.INFO,
             'loggingFilename' : self.logFile,
             'csvSavingFolder' : self.dataFolder,
@@ -80,6 +82,16 @@ class Configuration():
     # Read configuration file into usable variables
     def readConfig(self, configFile):
         self.conf.read(configFile)
+        self.sysConfig = self.conf['System']
+        self.appVersion = self.sysConfig['appVersion']
+        if str(self.appVersion) != __version__:
+            print("Configuration file is for an earlier version of the software")
+            oldConfigFile = str(os.path.splitext(configFile)[0]+"_"+str(self.appVersion)+".ini")
+            print("Old config file backup: ",oldConfigFile)
+            os.rename(configFile, oldConfigFile )
+            print("Creating a new config file.")
+            self.createConfig()
+        
         self.devConfig = self.conf['Devices']
         self.acqConfig = self.conf['Acquisition']
         self.instrConfig = self.conf['Instruments']
@@ -107,6 +119,7 @@ class Configuration():
         self.keithley2400ID = self.instrConfig['keithley2400ID']
         self.agilent4155cID = self.instrConfig['agilent4155cID']
 
+        self.appVersion = self.sysConfig['appVersion']
         self.loggingLevel = self.sysConfig['loggingLevel']
         self.loggingFilename = self.sysConfig['loggingFilename']
         self.csvSavingFolder = self.sysConfig['csvSavingFolder']
