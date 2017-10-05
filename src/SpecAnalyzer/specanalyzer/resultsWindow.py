@@ -482,9 +482,13 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.setItem(self.lastRowInd, 4,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,6].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 5,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,7].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 6,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,8].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,2].astype(float)))))
+        #self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,2].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 8,QTableWidgetItem(obj[0,0]))
         self.resTableWidget.setItem(self.lastRowInd, 9,QTableWidgetItem(obj[0,1]))
+        if float(obj[0,2]) == 0.:
+            self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("None")) #track_time
+        else:
+            self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(float(obj[0,2])))) #track_time
 
     # Redirect to DM page for substrate/device
     def redirectToDM(self, deviceID):
