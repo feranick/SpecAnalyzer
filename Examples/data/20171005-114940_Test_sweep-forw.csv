@@ -1,0 +1,4 @@
+Device,Acq Date,Acq Time,Time step,Voc,Jsc,VPP,MPP,FF,effic,V,J,Acq Min Voltage,Acq Max Voltage,Acq Start Voltage,Acq Step Voltage,Acq Gate Voltage,Acq Num Aver Scans,Delay Before Meas,Num Track Points,Track Interval,Comments
+Test_sweep-forw,2017-10-05,11-49-40,0.0,-0.13412,1.4928e-09,1.0,1.4022e-09,-700.3494495019577,5.902809198339743e-10,0.0,5e-12,0,1,0,0.5,0,1.0,1,5.0,2,
+,,,,,,,,,,0.5,2.2112e-09,,,,,,,,,,
+,,,,,,,,,,1.0,1.4022e-09,,,,,,,,,,
