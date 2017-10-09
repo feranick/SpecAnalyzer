@@ -237,21 +237,21 @@ class ResultsWindow(QMainWindow):
 
     # Plot Transient Jsc
     def plotTJsc(self, data):
-        self.lineTJsc.set_data(data[:,2], data[:,4])
+        self.lineTJsc.set_data(data[:,2].astype(float), data[:,4].astype(float))
         self.axTJsc.relim()
         self.axTJsc.autoscale_view(True,True,True)
         self.canvasTJsc.draw()
     
     # Plot Transient Voc
     def plotTVoc(self, data):
-        self.lineTVoc.set_data(data[:,2], data[:,3])
+        self.lineTVoc.set_data(data[:,2].astype(float), data[:,3].astype(float))
         self.axTVoc.relim()
         self.axTVoc.autoscale_view(True,True,True)
         self.canvasTVoc.draw()
 
     # Plot MPP with tracking
     def plotMPP(self, data):
-        self.lineMPP.set_data(data[:,2], data[:,5])
+        self.lineMPP.set_data(data[:,2].astype(float), data[:,5].astype(float))
         self.axMPP.relim()
         self.axMPP.autoscale_view(True,True,True)
         self.canvasMPP.draw()
