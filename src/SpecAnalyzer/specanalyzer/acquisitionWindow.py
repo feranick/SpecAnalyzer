@@ -35,7 +35,7 @@ class AcquisitionWindow(QMainWindow):
     # Setup UI elements
     def initUI(self,MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(10, 290, 340, 490)
+        MainWindow.setGeometry(10, 290, 340, 500)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayoutWidget = QWidget(self.centralwidget)
@@ -93,13 +93,18 @@ class AcquisitionWindow(QMainWindow):
         
         self.trackingLabel = QLabel(self.centralwidget)
         self.trackingLabel.setGeometry(QRect(10, 280, 160, 16))
-        self.trackingLabel.setObjectName("trackingLabel")
         
         self.enableTrackingBox = QCheckBox(self.centralwidget)
         self.enableTrackingBox.setGeometry(QRect(160, 280, 87, 20))
+
+        self.pvModeLabel = QLabel(self.centralwidget)
+        self.pvModeLabel.setGeometry(QRect(10, 300, 160, 16))
+
+        self.pvModeBox = QCheckBox(self.centralwidget)
+        self.pvModeBox.setGeometry(QRect(160, 300, 87, 20))
         
         self.gridLayoutWidget_2 = QWidget(self.centralwidget)
-        self.gridLayoutWidget_2.setGeometry(QRect(10, 300, 330, 181))
+        self.gridLayoutWidget_2.setGeometry(QRect(10, 320, 330, 181))
         self.gridLayout_2 = QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setHorizontalSpacing(10)
 
@@ -141,6 +146,7 @@ class AcquisitionWindow(QMainWindow):
         self.numAverScansLabel.setText("Number of averaged scans ")
         self.delayBeforeMeasLabel.setText("Delays before measurements [sec]")
         self.trackingLabel.setText("<qt><b>Track Voc, Jsc, MPP: </b></qt>")
+        self.pvModeLabel.setText("<qt><b>PV mode: </b></qt>")
         self.numPointsLabel.setText("Number of points")
         self.intervalLabel.setText("Interval")
         self.totTimePerDeviceLabel.setText("Total time per device")
@@ -162,8 +168,7 @@ class AcquisitionWindow(QMainWindow):
         self.numAverScansText.editingFinished.connect(self.timePerDevice)
         self.delayBeforeMeasText.editingFinished.connect(self.timePerDevice)
         self.holdTText.editingFinished.connect(self.timePerDevice)
-
-
+        
     # Save acquisition parameters in configuration ini
     def saveParameters(self):
         self.parent().config.conf['Acquisition']['acqMinVoltage'] = str(self.minVText.text())
@@ -176,6 +181,7 @@ class AcquisitionWindow(QMainWindow):
         self.parent().config.conf['Acquisition']['acqDelBeforeMeas'] = str(self.delayBeforeMeasText.text())
         self.parent().config.conf['Acquisition']['acqTrackNumPoints'] = str(self.numPointsText.value())
         self.parent().config.conf['Acquisition']['acqTrackInterval'] = str(self.IntervalText.text())
+        self.parent().config.conf['Acquisition']['acqPVmode'] = str(self.pvModeBox.isChecked())
 
         self.parent().config.saveConfig(self.parent().config.configFile)
         self.parent().config.readConfig(self.parent().config.configFile)
@@ -204,6 +210,7 @@ class AcquisitionWindow(QMainWindow):
         self.delayBeforeMeasText.setText(str(self.parent().config.acqDelBeforeMeas))
         self.numPointsText.setValue(int(self.parent().config.acqTrackNumPoints))
         self.IntervalText.setText(str(self.parent().config.acqTrackInterval))
+        self.pvModeBox.setChecked(eval(self.parent().config.conf['Acquisition']['acqPVmode']))
         self.timePerDevice()
 
     # Field validator for VStart

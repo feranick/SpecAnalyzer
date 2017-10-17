@@ -59,6 +59,7 @@ class Configuration():
             'acqDelBeforeMeas' : 1,
             'acqTrackNumPoints' : 5,
             'acqTrackInterval' : 2,
+            'acqPVmode' : True,
             }
     def defineConfInstr(self):
         self.conf['Instruments'] = {
@@ -110,6 +111,7 @@ class Configuration():
         self.acqDelBeforeMeas = eval(self.acqConfig['acqDelBeforeMeas'])
         self.acqTrackNumPoints = eval(self.acqConfig['acqTrackNumPoints'])
         self.acqTrackInterval = eval(self.acqConfig['acqTrackInterval'])
+        self.acqPVmode = eval(self.acqConfig['acqPVmode'])
 
         self.alignmentIntThreshold = eval(self.instrConfig['alignmentIntThreshold'])
         self.alignmentContrastDefault = eval(self.instrConfig['alignmentContrastDefault'])
