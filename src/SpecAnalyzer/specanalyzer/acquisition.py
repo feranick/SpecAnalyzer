@@ -457,6 +457,7 @@ class acqThread(QThread):
         #Jsc = JV[0,1]
         Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
+        print(Vpmax,Jpmax,Voc,Jsc)
         if Voc != 0. and Jsc != 0.:
             FF = Vpmax*Jpmax*100/(Voc*Jsc)
             effic = Vpmax*Jpmax/self.powerIn
