@@ -84,8 +84,8 @@ class Configuration():
         self.conf.read(configFile)
         self.sysConfig = self.conf['System']
         self.appVersion = self.sysConfig['appVersion']
-        if str(self.appVersion) != __version__:
-            print("Configuration file is for an earlier version of the software")
+        if str(self.appVersion).rsplit('.',1)[0] != __version__.rsplit('.',1)[0] :
+            print("Configuration file is for an earlier major version of the software")
             oldConfigFile = str(os.path.splitext(configFile)[0]+"_"+str(self.appVersion)+".ini")
             print("Old config file backup: ",oldConfigFile)
             os.rename(configFile, oldConfigFile )
