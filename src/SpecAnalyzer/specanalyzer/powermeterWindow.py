@@ -37,16 +37,16 @@ class PowermeterWindow(QMainWindow):
         self.powerMeterRefreshText.setText("0.5")
 
         self.powerMeterDefaultLabel = QLabel(PowermeterWindow)
-        self.powerMeterDefaultLabel.setGeometry(QRect(20, 40, 140, 20))
+        self.powerMeterDefaultLabel.setGeometry(QRect(20, 40, 180, 20))
         self.powerMeterDefaultLabel.setText("Default irradiance [mW/cm\u00B2]: ")
         self.powerMeterDefaultText = QLineEdit(PowermeterWindow)
-        self.powerMeterDefaultText.setGeometry(QRect(190, 40, 50, 20))
+        self.powerMeterDefaultText.setGeometry(QRect(220, 40, 60, 20))
         self.powerMeterDefaultText.setText(str(self.parent().config.irradiance1Sun))
         self.powerMeterSensorAreaLabel = QLabel(PowermeterWindow)
-        self.powerMeterSensorAreaLabel.setGeometry(QRect(20, 70, 170, 20))
+        self.powerMeterSensorAreaLabel.setGeometry(QRect(20, 70, 200, 20))
         self.powerMeterSensorAreaLabel.setText("Area power meter sensor [cm\u00B2]: ")
         self.powerMeterSensorAreaText = QLineEdit(PowermeterWindow)
-        self.powerMeterSensorAreaText.setGeometry(QRect(190, 70, 50, 20))
+        self.powerMeterSensorAreaText.setGeometry(QRect(220, 70, 50, 20))
         self.powerMeterSensorAreaText.setText(str(self.parent().config.irradianceSensorArea))
 
         self.powerMeterLabel = QLabel(PowermeterWindow)
@@ -101,15 +101,19 @@ class PowermeterWindow(QMainWindow):
         self.stopPMAcq()
 
     def printMsg(self, curr, av, flag):
-        self.irradiance = av/float(self.powerMeterSensorAreaText.text())
-        msg1 = "Power levels [mW]: {0:0.4f}".format(curr)
-        msg2 = "Average irradiance [mW/cm\u00B2]: {0:0.4f}".format(self.irradiance)
+        if flag is True:
+            self.irradiance = av/float(self.powerMeterSensorAreaText.text())
+            msg1 = "Power levels [mW]: {0:0.4f}".format(curr)
+            msg2 = "Average irradiance [mW/cm\u00B2]: {0:0.4f}".format(self.irradiance)
+        if flag is False:
+            msg1 = "Powermeter libraries or connection failed"
+            msg2 = ""
+            self.powermeterStartButton.setEnabled(True)
+            self.powermeterStopButton.setEnabled(False)
+        
         self.powerMeterLabel.setText(msg1)
         self.powerMeterLabel2.setText(msg2)
         print(msg1+" - "+msg2)
-        if flag is False:
-            self.powermeterStartButton.setEnabled(True)
-            self.powermeterStopButton.setEnabled(False)
 
     # Dialog box and logic to set new alignment parameters.
     def setIrradianceMessageBox(self):
@@ -166,5 +170,5 @@ class powermeterThread(QThread):
                 numAver += 1
                 time.sleep(float(self.parent_obj.powerMeterRefreshText.text()))
         except:
-            self.pmResponse.emit("Powermeter libraries or connection failed", False)
+            self.pmResponse.emit(0, 0, False)
 
