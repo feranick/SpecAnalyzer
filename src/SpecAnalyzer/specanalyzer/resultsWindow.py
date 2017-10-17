@@ -323,7 +323,9 @@ class ResultsWindow(QMainWindow):
         
             selectCellSaveAction = QAction('Save as...', self)
             selectCellRemoveAction = QAction('Remove...', self)
+            selectRemoveAllAction = QAction('Remove All...', self)
             self.menu.addAction(selectCellRemoveAction)
+            self.menu.addAction(selectRemoveAllAction)
             self.menu.addAction(selectCellSaveAction)
             self.menu.popup(QCursor.pos())
             QApplication.processEvents()
@@ -331,6 +333,7 @@ class ResultsWindow(QMainWindow):
             row = self.resTableWidget.currentRow()
             selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
             selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
+            selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
 
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
