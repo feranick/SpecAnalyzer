@@ -4,7 +4,7 @@ agilent4155c.py
 Class for providing a hardware support for 
 for the Agilent 4155C
 
-Version: 20171005
+Version: 20171017
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
 
@@ -85,12 +85,18 @@ class Agilent4155c(object):
         self.write(":PAGE:SCON:SING")
         self.write("*WAI")
 
-    def read_sweep_values(self):
+    def read_sweep_values(self, pv):
         self.write(":FORM:DATA ASC")
         self.write(":PAGE:GLIS")
         self.write(":PAGE:GLIS:SCAL:AUTO ONCE")
+
         I_data = self.manager.query_ascii_values(":DATA? 'ID' ")
         V_data = self.manager.query_ascii_values(":DATA? 'VD' ")
+        I_data = [1e4*i for i in I_data]
+        if pv == True:
+            I_data = [-1*i for i in I_data]
+        else:
+            pass
         return V_data, I_data
 
     ### These are wrappers for common use with Keithley 2400
@@ -130,8 +136,8 @@ class Agilent4155c(object):
             else:
                 self.sweep(self.current_limit,self.current_limit,0,0,0)
     
-    def read_values(self):
-        data = self.read_sweep_values()
+    def read_values(self, pv):
+        data = self.read_sweep_values(pv)
         return data[0][0], data[1][0]
 
     def on(self):
@@ -146,12 +152,15 @@ class Agilent4155c(object):
 if __name__ == '__main__':
     # test
     an = Agilent4155c('GPIB0::17::INSTR')
-    an.set_output(voltage = 1)
-    print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
+    
+    an.set_output(voltage = 0)
+    print("Voltage:",an.read_values(True)[0]," Current:",an.read_values(True)[1])
     an.set_output(current = 0)
-    print("Voltage:",an.read_values()[0]," Current:",an.read_values()[1])
-
+    print("Voltage:",an.read_values(True)[0]," Current:",an.read_values(True)[1])
+    
     an.set_mode('VOLT')
     sweep = an.sweep(-5,5,0.01,0,0)
-    print(an.read_sweep_values()[0], an.read_sweep_values()[1])    
+    print(an.read_sweep_values(True)[0], an.read_sweep_values(True)[1],True)
+    
+ 
     pass
