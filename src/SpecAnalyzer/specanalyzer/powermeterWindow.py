@@ -26,9 +26,8 @@ class PowermeterWindow(QMainWindow):
     
     # Define UI elements
     def initUI(self, PowermeterWindow):
-        self.avPower = self.parent().config.irradiance1Sun
         PowermeterWindow.setWindowTitle("Powermeter Settings")
-        self.setGeometry(10, 290, 340, 180)
+        self.setGeometry(10, 290, 340, 240)
         self.setFixedSize(self.size())
         self.powerMeterRefreshLabel = QLabel(PowermeterWindow)
         self.powerMeterRefreshLabel.setGeometry(QRect(20, 10, 120, 20))
@@ -38,25 +37,34 @@ class PowermeterWindow(QMainWindow):
         self.powerMeterRefreshText.setText("0.5")
 
         self.powerMeterDefaultLabel = QLabel(PowermeterWindow)
-        self.powerMeterDefaultLabel.setGeometry(QRect(20, 40, 120, 20))
-        self.powerMeterDefaultLabel.setText("Default irradiance: ")
+        self.powerMeterDefaultLabel.setGeometry(QRect(20, 40, 140, 20))
+        self.powerMeterDefaultLabel.setText("Default irradiance [mW/cm\u00B2]: ")
         self.powerMeterDefaultText = QLineEdit(PowermeterWindow)
-        self.powerMeterDefaultText.setGeometry(QRect(140, 40, 50, 20))
-        self.powerMeterDefaultText.setText(str(self.avPower))
+        self.powerMeterDefaultText.setGeometry(QRect(190, 40, 50, 20))
+        self.powerMeterDefaultText.setText(str(self.parent().config.irradiance1Sun))
+        self.powerMeterSensorAreaLabel = QLabel(PowermeterWindow)
+        self.powerMeterSensorAreaLabel.setGeometry(QRect(20, 70, 170, 20))
+        self.powerMeterSensorAreaLabel.setText("Area power meter sensor [cm\u00B2]: ")
+        self.powerMeterSensorAreaText = QLineEdit(PowermeterWindow)
+        self.powerMeterSensorAreaText.setGeometry(QRect(190, 70, 50, 20))
+        self.powerMeterSensorAreaText.setText(str(self.parent().config.irradianceSensorArea))
 
         self.powerMeterLabel = QLabel(PowermeterWindow)
-        self.powerMeterLabel.setGeometry(QRect(20, 70, 300, 20))        
+        self.powerMeterLabel.setGeometry(QRect(20, 100, 300, 20))
+        self.powerMeterLabel2 = QLabel(PowermeterWindow)
+        self.powerMeterLabel2.setGeometry(QRect(20, 130, 300, 20))
+        
         self.powermeterStartButton = QPushButton(PowermeterWindow)
-        self.powermeterStartButton.setGeometry(QRect(10, 100, 150, 30))
+        self.powermeterStartButton.setGeometry(QRect(10, 160, 150, 30))
         self.powermeterStartButton.clicked.connect(self.startPMAcq)
         self.powermeterStartButton.setText("Start")
         self.powermeterStopButton = QPushButton(PowermeterWindow)
-        self.powermeterStopButton.setGeometry(QRect(180, 100, 150, 30))
+        self.powermeterStopButton.setGeometry(QRect(180, 160, 150, 30))
         self.powermeterStopButton.clicked.connect(self.stopPMAcq)
         self.powermeterStopButton.setText("Stop")
       
         self.powermeterSaveButton = QPushButton(PowermeterWindow)
-        self.powermeterSaveButton.setGeometry(QRect(10, 140, 320, 30))
+        self.powermeterSaveButton.setGeometry(QRect(10, 200, 320, 30))
         self.powermeterSaveButton.clicked.connect(self.setIrradianceMessageBox)
         self.powermeterSaveButton.setText("Save to Config")
 
@@ -64,12 +72,13 @@ class PowermeterWindow(QMainWindow):
         self.powermeterStartButton.setEnabled(True)
         self.powermeterSaveButton.setEnabled(False)
 
+        self.irradiance = self.parent().config.irradiance1Sun
+
     # Logic to stop powermeter acquisition
     def stopPMAcq(self):
         self.powermeterStopButton.setEnabled(False)
         self.powermeterStartButton.setEnabled(True)
         self.powermeterSaveButton.setEnabled(True)
-        self.powerMeterLabel.setText("")
         try:
             if self.pmThread.isRunning():
                 self.pmThread.stop()
@@ -82,21 +91,22 @@ class PowermeterWindow(QMainWindow):
         self.powermeterStopButton.setEnabled(True)
         self.powermeterSaveButton.setEnabled(False)
         self.powerMeterLabel.setText("Activating powermeter...")
+        self.powerMeterLabel2.setText("")
         self.pmThread = powermeterThread(self, self.parent().config.powermeterID)
-        self.pmThread.pmResponse.connect(lambda msg, flag: self.printMsg(msg, flag))
-        self.pmThread.avPowerResponse.connect(lambda avPower: self.getAvPower(avPower))
+        self.pmThread.pmResponse.connect(lambda curr, av, flag: self.printMsg(curr, av, flag))
         self.pmThread.start()
-
-    def getAvPower(self, av):
-        self.avPower = av
 
     # Stop acquisition upon closing the powermeter window
     def closeEvent(self, event):
         self.stopPMAcq()
 
-    def printMsg(self, msg, flag):
-        self.powerMeterLabel.setText(msg)
-        print(msg)
+    def printMsg(self, curr, av, flag):
+        self.irradiance = av/float(self.powerMeterSensorAreaText.text())
+        msg1 = "Power levels [mW]: {0:0.4f}".format(curr)
+        msg2 = "Average irradiance [mW/cm\u00B2]: {0:0.4f}".format(self.irradiance)
+        self.powerMeterLabel.setText(msg1)
+        self.powerMeterLabel2.setText(msg2)
+        print(msg1+" - "+msg2)
         if flag is False:
             self.powermeterStartButton.setEnabled(True)
             self.powermeterStopButton.setEnabled(False)
@@ -105,9 +115,9 @@ class PowermeterWindow(QMainWindow):
     def setIrradianceMessageBox(self):
         msgBox = QMessageBox( self )
         msgBox.setIcon( QMessageBox.Information )
-        msgBox.setText( "By changing the default value, you will erase the previous value" )
+        msgBox.setText( "By changing the irradiance default value, you will erase the previous value" )
 
-        msgBox.setInformativeText( "Would you like to set " + str(self.avPower) +  " as default?" )
+        msgBox.setInformativeText( "Would you like to set {0:0.4f}".format(self.irradiance) +  " as default irradiance?" )
         msgBox.addButton( QMessageBox.Yes )
         msgBox.addButton( QMessageBox.No )
 
@@ -115,11 +125,12 @@ class PowermeterWindow(QMainWindow):
         ret = msgBox.exec_()
 
         if ret == QMessageBox.Yes:
-            self.parent().config.conf['Instruments']['irradiance1Sun'] = str(self.avPower)
+            self.parent().config.conf['Instruments']['irradiance1Sun'] = "{0:0.4f}".format(self.irradiance)
+            self.parent().config.conf['Instruments']['irradianceSensorArea'] = self.powerMeterSensorAreaText.text()
             with open(self.parent().config.configFile, 'w') as configfile:
                 self.parent().config.conf.write(configfile)
             self.parent().config.readConfig(self.parent().config.configFile)
-            self.powerMeterDefaultText.setText(str(self.avPower))
+            self.powerMeterDefaultText.setText("{0:0.4f}".format(self.irradiance))
             print(" New irradiance settings saved as default.")
             logger.info(" New irradiance settings saved as default.")
             return True
@@ -129,8 +140,7 @@ class PowermeterWindow(QMainWindow):
         
 # Acquisition takes place in a separate thread
 class powermeterThread(QThread):
-    pmResponse = pyqtSignal(str, bool)
-    avPowerResponse = pyqtSignal(str)
+    pmResponse = pyqtSignal(float, float, bool)
     
     def __init__(self, parent_obj, powermeterID):
         QThread.__init__(self)
@@ -145,18 +155,16 @@ class powermeterThread(QThread):
         self.terminate()
 
     def run(self):
-        #try:
-        self.pm = PowerMeter(self.powermeterID)
-        self.avPower = 1000*self.pm.get_power().read
-        numAver = 1
-        while True:
-            curPower = 1000*self.pm.get_power().read
-            self.avPower = (self.avPower*numAver + curPower)/(numAver+1)
-            self.pmResponse.emit("Power levels [mW]: {0:0.4f}".format(curPower)+\
-                                     "; average [mW]: {0:0.4f}".format(self.avPower), True)
-            self.avPowerResponse.emit("{0:0.4f}".format(self.avPower))
-            numAver += 1
-            time.sleep(float(self.parent_obj.powerMeterRefreshText.text()))
-        #except:
-        #    self.pmResponse.emit("Powermeter libraries or connection failed", False)
+        try:
+            self.pm = PowerMeter(self.powermeterID)
+            self.avPower = 1000*self.pm.get_power().read
+            numAver = 1
+            while True:
+                curPower = 1000*self.pm.get_power().read
+                self.avPower = (self.avPower*numAver + curPower)/(numAver+1)
+                self.pmResponse.emit(curPower,self.avPower,True)
+                numAver += 1
+                time.sleep(float(self.parent_obj.powerMeterRefreshText.text()))
+        except:
+            self.pmResponse.emit("Powermeter libraries or connection failed", False)
 
