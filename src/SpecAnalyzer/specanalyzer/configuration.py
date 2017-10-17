@@ -49,10 +49,10 @@ class Configuration():
             }
     def defineConfAcq(self):
         self.conf['Acquisition'] = {
-            'acqMinVoltage' : 0,
-            'acqMaxVoltage' : 1,
+            'acqMinVoltage' : -4,
+            'acqMaxVoltage' : 4,
             'acqStartVoltage' : 0,
-            'acqStepVoltage' : 0.5,
+            'acqStepVoltage' : 0.1,
             'acqGateVoltage' : 0,
             'acqHoldTime' : 0.1,
             'acqNumAvScans' : 1,
