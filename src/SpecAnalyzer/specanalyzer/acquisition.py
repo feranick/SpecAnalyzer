@@ -318,7 +318,6 @@ class acqThread(QThread):
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(current = 0.)
         voc = self.parent().source_meter.read_values(pvMode)[0]
-        print(voc)
 
         # jsc
         self.parent().source_meter.set_mode('VOLT')
@@ -457,7 +456,7 @@ class acqThread(QThread):
         #Jsc = JV[0,1]
         Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
-        print(Vpmax,Jpmax,Voc,Jsc)
+
         if Voc != 0. and Jsc != 0.:
             FF = Vpmax*Jpmax*100/(Voc*Jsc)
             effic = Vpmax*Jpmax/self.powerIn
