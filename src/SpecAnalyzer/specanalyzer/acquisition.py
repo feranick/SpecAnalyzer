@@ -318,12 +318,14 @@ class acqThread(QThread):
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(current = 0.)
         voc = self.parent().source_meter.read_values(pvMode)[0]
+        print(voc)
 
         # jsc
         self.parent().source_meter.set_mode('VOLT')
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(voltage = 0.)
         jsc = self.parent().source_meter.read_values(pvMode)[1]
+        print(jsc)
         return voc, jsc
 
     ## measurements: voc, jsc, mpp
