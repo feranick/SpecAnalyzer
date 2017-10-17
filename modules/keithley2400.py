@@ -120,7 +120,8 @@ class Keithley2400(object):
                 self.write('SOUR:CURR {:f}'.format(self.current_limit))
 
     def read_values(self):
-        return list(map(float, self.ask(':READ?').split(',')))
+        data = list(map(float, self.ask(':READ?').split(',')))
+        return data
 
     def on(self):
         "Turn Keithley on"
@@ -134,7 +135,7 @@ class Keithley2400(object):
 if __name__ == '__main__':
     import time
     # test
-    sc = Keithley2400()
+    sc = Keithley2400('GPIB0::24::INSTR')
     sc.set_limit(voltage=10, current=0.12)
     sc.on()
 
