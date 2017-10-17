@@ -324,7 +324,6 @@ class acqThread(QThread):
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(voltage = 0.)
         jsc = self.parent().source_meter.read_values(pvMode)[1]
-        print(jsc)
         return voc, jsc
 
     ## measurements: voc, jsc, mpp
@@ -446,7 +445,7 @@ class acqThread(QThread):
 
     # Extract parameters from JV
     def analyseJV(self, JV):
-        powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun'])*0.00064516
+        powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun'])
         PV = np.zeros(JV.shape)
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
@@ -456,13 +455,13 @@ class acqThread(QThread):
         #Jsc = JV[0,1]
         Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
         Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
-
         if Voc != 0. and Jsc != 0.:
-            FF = Vpmax*Jpmax*100/(Voc*Jsc)
-            effic = Vpmax*Jpmax/self.powerIn
+            FF = Vpmax*Jpmax/(Voc*Jsc)
+            effic = Vpmax*Jpmax/powerIn
         else:
             FF = 0.
             effic = 0.
+        print(Vpmax,Jpmax,Voc,Jsc,FF,effic,powerIn)
         data = np.array([Voc, Jsc, Vpmax, Vpmax*Jpmax,FF,effic])
         data = np.hstack((0., data))
         data = np.hstack((self.getDateTimeNow()[1], data))
