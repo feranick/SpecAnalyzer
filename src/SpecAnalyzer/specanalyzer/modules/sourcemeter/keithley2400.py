@@ -125,7 +125,6 @@ class Keithley2400(object):
             data = [-1*i/float(area) for i in data]
         else:
             pass
-        print(data)
         return data
 
     def on(self):
