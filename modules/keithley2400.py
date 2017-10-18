@@ -122,9 +122,9 @@ class Keithley2400(object):
     def read_values(self, area, pv):
         data = list(map(float, self.ask(':READ?').split(',')))
         if pv == True:
-            data = [-1*i/float(area) for i in data]
+            data[1] = -1*data[1]/float(area)
         else:
-            data = [i/float(area) for i in data]
+            data[1] = data[1]/float(area)
         return data
 
     def on(self):
