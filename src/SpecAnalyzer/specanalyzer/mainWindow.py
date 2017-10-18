@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
         self.stopAcqButton.setEnabled(not flag)
         self.deviceText.setEnabled(flag)
         self.commentsText.setEnabled(flag)
-        self.deviceSizeText.setEnabled(flag)
+        self.deviceAreaText.setEnabled(flag)
 
     # Adds Menus to expose other Windows.
     def viewWindowMenus(self, menuObj, obj):

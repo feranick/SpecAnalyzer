@@ -27,8 +27,6 @@ class Acquisition(QObject):
     
     # Collect acquisition parameters into a DataFrame to be used for storing (as csv or json)
     def getAcqParameters(self):
-        self.numRow = self.parent().config.numSubsHolderRow
-        self.numCol = self.parent().config.numSubsHolderCol
         pdframe = pd.DataFrame({
                 'Acq Min Voltage': [self.parent().acquisitionwind.minVText.text()],
                 'Acq Max Voltage': [self.parent().acquisitionwind.maxVText.text()],
@@ -121,7 +119,7 @@ class acqThread(QThread):
         super(acqThread, self).__init__(parent)
         self.dfAcqParams = dfAcqParams
         self.powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun']) * \
-            float(self.parent().parent().deviceSizeText.text()) * 0.00064516
+            float(self.parent().parent().deviceAreaText.text()) * 0.00064516
 
     def __del__(self):
         self.wait()
