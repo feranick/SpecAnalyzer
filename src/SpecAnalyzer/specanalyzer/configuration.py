@@ -44,8 +44,7 @@ class Configuration():
     # Hadrcoded default definitions for the confoguration file
     def defineConfDevices(self):
         self.conf['Devices'] = {
-            'numSubsHolderRow' : 4,
-            'numSubsHolderCol' : 4,
+            'deviceArea' : 1,
             }
     def defineConfAcq(self):
         self.conf['Acquisition'] = {
@@ -99,8 +98,7 @@ class Configuration():
         self.instrConfig = self.conf['Instruments']
         self.sysConfig = self.conf['System']
 
-        self.numSubsHolderRow = eval(self.devConfig['numSubsHolderRow'])
-        self.numSubsHolderCol = eval(self.devConfig['numSubsHolderCol'])
+        self.deviceArea = eval(self.devConfig['deviceArea'])
         
         self.acqMinVoltage = eval(self.acqConfig['acqMinVoltage'])
         self.acqMaxVoltage = eval(self.acqConfig['acqMaxVoltage'])

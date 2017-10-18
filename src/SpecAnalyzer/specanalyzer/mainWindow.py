@@ -77,7 +77,8 @@ class MainWindow(QMainWindow):
         self.deviceSizeLabel.setGeometry(QRect(10, 90, 120, 20))
         self.deviceSizeLabel.setText("Device area [cm\u00B2]:")
         self.deviceSizeText = QLineEdit(self)
-        self.deviceSizeText.setText("1")
+        self.deviceSizeText.setText(str(self.config.deviceArea))
+        self.deviceSizeText.editingFinished.connect(self.setDeviceArea)
         self.deviceSizeText.setGeometry(QRect(130, 90, 100, 20))
 
         # Create menu and toolbar
@@ -227,6 +228,12 @@ class MainWindow(QMainWindow):
         self.config.saveConfig(filename[0])
         print("Confguration parameters saved to:",filename[0])
         logger.info("Confguration parameters saved to:"+filename[0])
+    
+    # Logic to save deviceArea on config when done editing the corresponding field
+    def setDeviceArea(self):
+        self.config.conf['Devices']['deviceArea'] = str(self.deviceSizeText.text())
+        self.config.saveConfig(self.config.configFile)
+        self.config.readConfig(self.config.configFile)
 
     # When closing the MainWindow, all windows need to close as we..
     def fileQuit(self):
