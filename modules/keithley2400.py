@@ -124,7 +124,7 @@ class Keithley2400(object):
         if pv == True:
             data = [-1*i/float(area) for i in data]
         else:
-            pass
+            data = [i/float(area) for i in data]
         return data
 
     def on(self):
