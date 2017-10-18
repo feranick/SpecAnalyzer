@@ -4,7 +4,7 @@ keithley2400.py
 Class for providing a hardware support for 
 for the Keithley 2400 sourcemeter
 
-Version: 20171017
+Version: 20171018
 
 Copyright (C) 2017 Tony Wu <tonyw@mit.edu>
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
@@ -119,10 +119,10 @@ class Keithley2400(object):
                 print('Warning: Compliance Reached!!')
                 self.write('SOUR:CURR {:f}'.format(self.current_limit))
 
-    def read_values(self, pv):
+    def read_values(self, area, pv):
         data = list(map(float, self.ask(':READ?').split(',')))
         if pv == True:
-            data = [-1*i for i in data]
+            data = [-1*i/float(area) for i in data]
         else:
             pass
         print(data)
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     #while sc.busy:
     #    time.sleep(0.5)
     #print(sc.read_buffer()[-1])
-    print("Voltage:",sc.read_values(True)[0]," Current:",sc.read_values(True)[1])
+    print("Voltage:",sc.read_values(1,True)[0]," Current:",sc.read_values(1,True)[1])
     pass
 
 
