@@ -120,6 +120,7 @@ class sourcemeterThread(QThread):
 
     def run(self):
         pvMode = self.parent().parent().acquisitionwind.pvModeBox.isChecked()
+        deviceArea = float(self.parent().parent().deviceAreaText.text())
         try:
             if self.parent().parent().sourcemeterwind.instrumentCBox.currentIndex() == 0:
                 self.sc = Agilent4155c(self.parent().parent().config.agilent4155cID)
@@ -138,9 +139,9 @@ class sourcemeterThread(QThread):
                     self.sc.set_output(voltage = voltage)
                     if self.runningFlag is True:
                         self.smResponse.emit("Voltage [V]: "+\
-                            str(self.sc.read_values(pvMode)[0]), \
+                            str(self.sc.read_values(deviceArea, pvMode)[0]), \
                             " Current [mA]: "+\
-                            str(self.sc.read_values(pvMode)[1]), True)
+                            str(self.sc.read_values(deviceArea,pvMode)[1]), True)
                     self.sc.off()
                 time.sleep(0.5)
         except:
