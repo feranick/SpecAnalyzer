@@ -118,8 +118,7 @@ class acqThread(QThread):
     def __init__(self, dfAcqParams, parent=None):
         super(acqThread, self).__init__(parent)
         self.dfAcqParams = dfAcqParams
-        self.powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun']) * \
-            float(self.parent().parent().deviceAreaText.text()) * 0.00064516
+        self.powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun'])
 
     def __del__(self):
         self.wait()
@@ -448,7 +447,6 @@ class acqThread(QThread):
 
     # Extract parameters from JV
     def analyseJV(self, JV):
-        powerIn = float(self.parent().parent().config.conf['Instruments']['irradiance1Sun'])
         PV = np.zeros(JV.shape)
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
@@ -460,7 +458,7 @@ class acqThread(QThread):
 
         if Voc != 0. and Jsc != 0.:
             FF = Vpmax*Jpmax/(Voc*Jsc)
-            effic = Vpmax*Jpmax/powerIn
+            effic = Vpmax*Jpmax/self.powerIn
         else:
             FF = 0.
             effic = 0.
