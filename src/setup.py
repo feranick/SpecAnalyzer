@@ -5,7 +5,7 @@ setup(
     packages=find_packages(),
     install_requires=['numpy', 'matplotlib', 'pillow', 'PyQt5', 'ThorlabsPM100', 'pyvisa', 'opencv-python', 'pandas'],
     entry_points={'gui_scripts' : ['specanalyzer=SpecAnalyzer.__main__:main']},
-    version='0.8.2',
+    version='0.8.3',
     description='Measurements of Current/Voltage profiles for photovoltaic solar cells',
     long_description= """ Measurements of Current/Voltage profiles for photovoltaic solar cells """,
     author='Nicola Ferralis',
