@@ -64,21 +64,21 @@ class MainWindow(QMainWindow):
         self.deviceLabel.setText("Name:")
         self.deviceText = QLineEdit(self)
         self.deviceText.setText("")
-        self.deviceText.setGeometry(QRect(120, 30, 200, 20))
+        self.deviceText.setGeometry(QRect(130, 30, 200, 20))
         
         self.commentsLabel = QLabel(self)
         self.commentsLabel.setGeometry(QRect(10, 60, 100, 20))
         self.commentsLabel.setText("Comments:")
         self.commentsText = QLineEdit(self)
         self.commentsText.setText("")
-        self.commentsText.setGeometry(QRect(120, 60, 200, 20))
+        self.commentsText.setGeometry(QRect(130, 60, 200, 20))
         
         self.deviceSizeLabel = QLabel(self)
-        self.deviceSizeLabel.setGeometry(QRect(10, 90, 100, 20))
-        self.deviceSizeLabel.setText("Device size (in):")
+        self.deviceSizeLabel.setGeometry(QRect(10, 90, 120, 20))
+        self.deviceSizeLabel.setText("Device area [cm\u00B2]:")
         self.deviceSizeText = QLineEdit(self)
         self.deviceSizeText.setText("1")
-        self.deviceSizeText.setGeometry(QRect(120, 90, 100, 20))
+        self.deviceSizeText.setGeometry(QRect(130, 90, 100, 20))
 
         # Create menu and toolbar
         self.menuBar = QMenuBar(self)
