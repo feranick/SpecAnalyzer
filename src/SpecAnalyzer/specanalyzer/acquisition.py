@@ -464,7 +464,7 @@ class acqThread(QThread):
         else:
             FF = 0.
             effic = 0.
-        print(Vpmax,Jpmax,Voc,Jsc,FF,effic,powerIn)
+        #print(Vpmax,Jpmax,Voc,Jsc,FF,effic,powerIn)
         data = np.array([Voc, Jsc, Vpmax, Vpmax*Jpmax,FF,effic])
         data = np.hstack((0., data))
         data = np.hstack((self.getDateTimeNow()[1], data))
