@@ -4,7 +4,6 @@ acquisition.py
 Class for providing a procedural support for data acquisition
 
 Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
-Copyright (C) 2017 Tony Wu <tonyw@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,10 +41,12 @@ class Acquisition(QObject):
                 'Num Track Points': [int(self.parent().acquisitionwind.numPointsText.value())],
                 'PV mode': [bool(self.parent().acquisitionwind.pvModeBox.isChecked())],
                 'Track Interval': [self.parent().acquisitionwind.IntervalText.text()],
+                'Device Area': [self.parent().deviceAreaText.text()],
                 'Comments': [self.parent().commentsText.text()]})
         return pdframe[['Acq Min Voltage','Acq Max Voltage','Acq Start Voltage',
                 'Acq Step Voltage','Acq Gate Voltage','Acq Hold Time', 'Acq Num Aver Scans',
-                'Delay Before Meas','Num Track Points','PV mode', 'Track Interval','Comments']]
+                'Delay Before Meas','Num Track Points','PV mode', 'Track Interval',
+                'Device Area', 'Comments']]
                 
     def start(self):
         # Using ALT with Start Acquisition button:
@@ -228,6 +229,7 @@ class acqThread(QThread):
         hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
         delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
         
         # enforce
@@ -255,18 +257,18 @@ class acqThread(QThread):
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
             self.parent().source_meter.set_mode('VOLT')
             self.parent().source_meter.sweep(v_start, v_max, v_step, v_gate, hold_time)
-            data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values(pvMode)[1]
+            data[i_list_forw1, 1] = self.parent().source_meter.read_sweep_values(deviceArea, pvMode)[1]
 
             self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
             self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate, hold_time)
-            data[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values(pvMode)[1])
+            data[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values(deviceArea, pvMode)[1])
             perfDataB = self.analyseJV(data[:, (0,2)])
             self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
 
             self.Msg.emit('  Device '+deviceID+': completing forward sweep')
             self.parent().source_meter.sweep(v_min, v_start-v_step, v_step, v_gate, hold_time)
             try:
-                data[i_list_forw2, 1] = self.parent().source_meter.read_sweep_values(pvMode)[1]
+                data[i_list_forw2, 1] = self.parent().source_meter.read_sweep_values(deviceArea, pvMode)[1]
             except:
                 pass
             perfDataF = self.analyseJV(data[:, (0,1)])
@@ -281,7 +283,7 @@ class acqThread(QThread):
             for i in i_list_forw1:
                 self.parent().source_meter.set_output(voltage = v_list[i])
                 time.sleep(hold_time)
-                data[i,1] = self.parent().source_meter.read_values(pvMode)[1]
+                data[i,1] = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
                 #print(data[start_i:i, 0:2])
             #self.tempTracking.emit(data[start_i:N, 0:2], np.zeros((1,8)),
             #    self.parent().parent().deviceText.text(), False, False)
@@ -290,7 +292,7 @@ class acqThread(QThread):
             for i in i_list_back:
                 self.parent().source_meter.set_output(voltage = v_list[i])
                 time.sleep(hold_time)
-                data[i,2] = self.parent().source_meter.read_values(pvMode)[1]
+                data[i,2] = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
 
             perfDataB = self.analyseJV(data[:, (0,2)])
             self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
@@ -301,7 +303,7 @@ class acqThread(QThread):
             for i in i_list_forw2:
                 self.parent().source_meter.set_output(voltage = v_list[i])
                 time.sleep(hold_time)
-                data[i,1] = self.parent().source_meter.read_values(pvMode)[1]
+                data[i,1] = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
                 #print(data[0:i, 0:2])
             #self.tempTracking.emit(data[:, 0:2], np.zeros((1,8)),
             #    self.parent().parent().deviceText.text()+"_forw", True, False)
@@ -313,17 +315,19 @@ class acqThread(QThread):
     ## measurements: voc, jsc
     def measure_voc_jsc(self,dfAcqParams):
         pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
+
         # voc
         self.parent().source_meter.set_mode('CURR')
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(current = 0.)
-        voc = self.parent().source_meter.read_values(pvMode)[0]
+        voc = self.parent().source_meter.read_values(deviceArea, pvMode)[0]
 
         # jsc
         self.parent().source_meter.set_mode('VOLT')
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(voltage = 0.)
-        jsc = self.parent().source_meter.read_values(pvMode)[1]
+        jsc = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
         return voc, jsc
 
     ## measurements: voc, jsc, mpp
@@ -341,6 +345,7 @@ class acqThread(QThread):
         hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
         delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
 
         # measurements: voc, jsc
@@ -370,11 +375,11 @@ class acqThread(QThread):
                 self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
                 self.parent().source_meter.set_mode('VOLT')
                 self.parent().source_meter.sweep(v_min, v_max, v_step, v_gate, hold_time)
-                JVtemp[:, 1] = self.parent().source_meter.read_sweep_values(pvMode)[1]
+                JVtemp[:, 1] = self.parent().source_meter.read_sweep_values(deviceArea, pvMode)[1]
 
                 self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
                 self.parent().source_meter.sweep(v_max, v_min, - v_step, v_gate, hold_time)
-                JVtemp[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values(pvMode)[1])
+                JVtemp[:, 2] = np.flipud(self.parent().source_meter.read_sweep_values(deviceArea, pvMode)[1])
             
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
             JV[:,2] = (JVtemp[:,2] + JV[:,2]*n)/(n+1)
@@ -387,13 +392,13 @@ class acqThread(QThread):
                 for i in i_list_forw:
                     self.parent().source_meter.set_output(voltage = v_list[i])
                     time.sleep(hold_time)
-                    JVtemp[i,1]= self.parent().source_meter.read_values(pvMode)[1]
+                    JVtemp[i,1]= self.parent().source_meter.read_values(deviceArea, pvMode)[1]
 
                 self.Msg.emit('  Device '+deviceID+': acquiring JV backward for analsys, scan: '+str(n)+'/'+str(scans))
                 for i in i_list_back:
                     self.parent().source_meter.set_output(voltage = v_list[i])
                     time.sleep(hold_time)
-                    JVtemp[i,2]= self.parent().source_meter.read_values(pvMode)[1]
+                    JVtemp[i,2]= self.parent().source_meter.read_values(deviceArea, pvMode)[1]
 
             JV[:,1] = (JVtemp[:,1] + JV[:,1]*n)/(n+1)
             JV[:,2] = (JVtemp[:,2] + JV[:,2]*n)/(n+1)
@@ -410,7 +415,8 @@ class acqThread(QThread):
         delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
         numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
         trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
-        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))        
+        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
 
         startTime = time.time()
@@ -428,7 +434,7 @@ class acqThread(QThread):
             
             self.parent().source_meter.set_output(voltage = Vpmax)
             time.sleep(hold_time)
-            Jpmax = self.parent().source_meter.read_values(pvMode)[1]
+            Jpmax = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
             try:
                 FF = Vpmax*Jpmax*100/(voc*jsc)
                 effic = Vpmax*Jpmax/self.powerIn

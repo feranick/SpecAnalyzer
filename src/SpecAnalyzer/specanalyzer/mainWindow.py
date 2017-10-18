@@ -73,13 +73,13 @@ class MainWindow(QMainWindow):
         self.commentsText.setText("")
         self.commentsText.setGeometry(QRect(130, 60, 200, 20))
         
-        self.deviceSizeLabel = QLabel(self)
-        self.deviceSizeLabel.setGeometry(QRect(10, 90, 120, 20))
-        self.deviceSizeLabel.setText("Device area [cm\u00B2]:")
-        self.deviceSizeText = QLineEdit(self)
-        self.deviceSizeText.setText(str(self.config.deviceArea))
-        self.deviceSizeText.editingFinished.connect(self.setDeviceArea)
-        self.deviceSizeText.setGeometry(QRect(130, 90, 100, 20))
+        self.deviceAreaLabel = QLabel(self)
+        self.deviceAreaLabel.setGeometry(QRect(10, 90, 120, 20))
+        self.deviceAreaLabel.setText("Device area [cm\u00B2]:")
+        self.deviceAreaText = QLineEdit(self)
+        self.deviceAreaText.setText(str(self.config.deviceArea))
+        self.deviceAreaText.editingFinished.connect(self.setDeviceArea)
+        self.deviceAreaText.setGeometry(QRect(130, 90, 100, 20))
 
         # Create menu and toolbar
         self.menuBar = QMenuBar(self)
@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
     
     # Logic to save deviceArea on config when done editing the corresponding field
     def setDeviceArea(self):
-        self.config.conf['Devices']['deviceArea'] = str(self.deviceSizeText.text())
+        self.config.conf['Devices']['deviceArea'] = str(self.deviceAreaText.text())
         self.config.saveConfig(self.config.configFile)
         self.config.readConfig(self.config.configFile)
 
