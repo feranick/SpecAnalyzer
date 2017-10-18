@@ -320,7 +320,6 @@ class acqThread(QThread):
         self.parent().source_meter.on()
         self.parent().source_meter.set_output(current = 0.)
         voc = self.parent().source_meter.read_values(deviceArea, pvMode)[0]
-
         # jsc
         self.parent().source_meter.set_mode('VOLT')
         self.parent().source_meter.on()
@@ -455,10 +454,8 @@ class acqThread(QThread):
         PV[:,1] = JV[:,0]*JV[:,1]
         # measurements: voc, jsc
         Voc, Jsc = self.measure_voc_jsc(self.dfAcqParams)
-        #Voc = JV[JV.shape[0]-1,0]
-        #Jsc = JV[0,1]
-        Vpmax = PV[np.where(PV == np.amax(PV)),0][0][0]
-        Jpmax = JV[np.where(PV == np.amax(PV)),1][0][0]
+        Vpmax = PV[np.where(PV == np.amax(PV))[0][0],0]
+        Jpmax = JV[np.where(PV == np.amax(PV))[1][0],1]
         if Voc != 0. and Jsc != 0.:
             FF = Vpmax*Jpmax/(Voc*Jsc)
             effic = Vpmax*Jpmax/powerIn
