@@ -11,7 +11,7 @@ the Free Software Foundation; either version 2 of the License, or
 
 '''
 
-__version__ = "0.8.3"
+__version__ = "0.8.4"
 __author__ = "<qt><a href = mailto:ferralis@mit.edu> Nicola Ferralis</a></qt>"
 
 from .configuration import *
