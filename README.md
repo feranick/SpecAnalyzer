@@ -1,5 +1,5 @@
 # SpecAnalyzer
-SpecAnalyzer connects to sourcementers (supported keythley 2400) and/or parameter analyzers (supported Agilent 4155c) for collection of current-voltage profiles. It is specifically tailored for testing photovoltaic devices.
+SpecAnalyzer connects to sourcemeters (supported keythley 2400) and/or parameter analyzers (supported Agilent 4155c) for collection of current-voltage profiles. It is specifically tailored for testing photovoltaic devices.
 
 ## Installation:
 The software can be run "offline", meaning without being connected to the hardware, for example to load data, etc. The dependencies needed for running the "online" version (i.e. to be able to control the acquisition hardware) are listed as such below. These are not needed for running the "offline" version. If you are planning to use this software for "offline" use on your computer, do not install the "online" dependencies. The software automatically recognizes the presence (or lack thereof) of the required dependencies for online/offline use.
@@ -35,7 +35,7 @@ All required packages can be obtained through [MacPorts](<http://www.macports.or
     (optional) sudo apt-get install opencv-data
     
 ### Installing dependencies on Microsoft Windows
-The simplest way to get all the required python packages at once is to install the Python 3 distribution [Anaconda](<https://www.continuum.io/downloads/>) or from [python.org](<http://www.python.org/>). You will use pip for installing most of the dependencies.
+The simplest way to get all the required python packages at once is to install the Python 3 distribution from [python.org](<http://www.python.org/>) (recommended) or from [Anaconda](<https://www.continuum.io/downloads/>). You will use ```pip``` for installing most of the dependencies.
 
     pip install numpy scipy matplotlib pillow pandas
     pip install QtPy5 opencv-python
@@ -45,11 +45,29 @@ Install Qt5 from the [qt.io](https://www.qt.io/download/) directly.
 ### "Online" dependencies for hardware control:
     pip install pyvisa ThorlabsPM100 requests
     
+### Creating a wheel package for redistribution
+In order to satisfy all dependency and at the same time have a seamless experience, assuming ```python 3```, ```pip``` and ```wheel``` are installed, one can create a wheel package that can be used for seamless installation. To create the wheel package:
+
+    cd /UI
+    python3 setup.py bdist_wheel
+    
+A wheel package is created inside a new folder ```dist```. On UNIX-systems the package can be installed simply as user by:
+
+    pip install --user <package.whl>
+    
+or system-wide:
+
+    sudo pip install <package.whl>
+    
+On MS Windows:
+
+    pip install <package.whl>
+    
 ## Run
 After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go.
 
 ### Linux/Mac OSX
-From the terminal, run: ```python specanalyzer    ```
+From the terminal, run: ```python specanalyzer```
     
 ### Windows
 Launch by double clicking the file ```specanalyzer-windows.bat```
