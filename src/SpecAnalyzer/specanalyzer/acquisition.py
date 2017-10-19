@@ -63,9 +63,9 @@ class Acquisition(QObject):
         self.acq_thread = acqThread(self.dfAcqParams, self)
         self.acq_thread.Msg.connect(self.printMsg)
         self.acq_thread.acqJVComplete.connect(lambda JV,perfData,deviceID: \
-                self.JVDeviceProcess(JV,perfData,deviceID,self.dfAcqParams))
+                self.JVDeviceProcess(JV,perfData,deviceID))
         self.acq_thread.tempTracking.connect(lambda JV,perfData,deviceID,setupTable,saveData: \
-                self.plotTempTracking(JV,perfData,deviceID,self.dfAcqParams,setupTable,saveData))
+                self.plotTempTracking(JV,perfData,deviceID,setupTable,saveData))
         self.acq_thread.maxPowerDev.connect(self.printMsg)
         self.acq_thread.start()
 
@@ -90,19 +90,19 @@ class Acquisition(QObject):
         self.parent().statusBarLabel.setText(msg)
 
     # Process JV Acquisition to result page
-    def JVDeviceProcess(self, JV, perfData, deviceID, dfAcqParams):
+    def JVDeviceProcess(self, JV, deviceID, dfAcqParams):
         #self.parent().resultswind.clearPlots(False,False)
         self.parent().resultswind.setupResultTable()
-        self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, True)
+        self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, True)
         QApplication.processEvents()
         time.sleep(1)
             
     # Plot temporary data from tracking
-    def plotTempTracking(self, JV, perfData, deviceID, dfAcqParams, setupTable, saveData):
+    def plotTempTracking(self, JV, perfData, deviceID, setupTable, saveData):
         #self.parent().resultswind.clearPlots(False,False)
         if setupTable is True:
             self.parent().resultswind.setupResultTable()
-        self.parent().resultswind.processDeviceData(deviceID, dfAcqParams, perfData, JV, saveData)
+        self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, saveData)
         QApplication.processEvents()
         time.sleep(1)
 
@@ -159,9 +159,9 @@ class acqThread(QThread):
             self.Msg.emit("  Acquiring JV from device: " + deviceID)
 
             # Acquire forward and backward sweeps
-            sweepF, sweepB = self.measure_sweep(self.dfAcqParams)
+            sweepF, sweepB = self.measure_sweep()
             # Acquire JV for performance parameters
-            JVOKflag, JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp(self.dfAcqParams)            
+            JVOKflag, JVF, JVB, perfDataF, perfDataB = self. measure_voc_jsc_mpp()
             if JVOKflag:
                 self.acqJVComplete.emit(JVF, perfDataF, deviceID+"_JV-forward")
                 self.acqJVComplete.emit(JVB, perfDataB, deviceID+"_JV-backward")
@@ -177,7 +177,7 @@ class acqThread(QThread):
                     time.sleep(1)
 
                     # Use this to get the simple JV used for detecting Vpmax
-                    perfData, JV = self.tracking(deviceID, self.dfAcqParams, JVF, perfDataF)
+                    perfData, JV = self.tracking(deviceID, JVF, perfDataF)
                     # Alternatively use this for a complete JV sweep
                     #JV = self.devAcqJV()
 
@@ -208,7 +208,7 @@ class acqThread(QThread):
 
     ## measurements: JV
     # dfAcqParams : self.dfAcqParams
-    def measure_sweep(self, dfAcqParams):
+    def measure_sweep(self):
         deviceID = self.parent().parent().deviceText.text()
         #perfData = np.zeros((0,8))
         
@@ -217,16 +217,16 @@ class acqThread(QThread):
         self.parent().source_meter.on()
 
         # measurement parameters
-        v_min = float(dfAcqParams.get_value(0,'Acq Min Voltage'))
-        v_max = float(dfAcqParams.get_value(0,'Acq Max Voltage'))
-        v_start = float(dfAcqParams.get_value(0,'Acq Start Voltage'))
-        v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
-        v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
-        scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
-        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
-        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
-        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
-        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
+        v_min = float(self.dfAcqParams.get_value(0,'Acq Min Voltage'))
+        v_max = float(self.dfAcqParams.get_value(0,'Acq Max Voltage'))
+        v_start = float(self.dfAcqParams.get_value(0,'Acq Start Voltage'))
+        v_step = float(self.dfAcqParams.get_value(0,'Acq Step Voltage'))
+        v_gate = float(self.dfAcqParams.get_value(0,'Acq Gate Voltage'))
+        scans = int(self.dfAcqParams.get_value(0,'Acq Num Aver Scans'))
+        hold_time = float(self.dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(self.dfAcqParams.get_value(0,'Delay Before Meas'))
+        pvMode = bool(self.dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(self.dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
         
         # enforce
@@ -310,9 +310,9 @@ class acqThread(QThread):
         return data[:, 0:2], data[:,(0,2)]
 
     ## measurements: voc, jsc
-    def measure_voc_jsc(self,dfAcqParams):
-        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
-        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
+    def measure_voc_jsc(self):
+        pvMode = bool(self.dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(self.dfAcqParams.get_value(0,'Device Area'))
 
         # voc
         self.parent().source_meter.set_mode('CURR')
@@ -327,25 +327,25 @@ class acqThread(QThread):
         return voc, jsc
 
     ## measurements: voc, jsc, mpp
-    def measure_voc_jsc_mpp(self, dfAcqParams):
+    def measure_voc_jsc_mpp(self):
         deviceID = self.parent().parent().deviceText.text()
         #perfData = np.zeros((0,8))
 
         # measurement parameters
-        v_min = float(dfAcqParams.get_value(0,'Acq Min Voltage'))
-        v_max = float(dfAcqParams.get_value(0,'Acq Max Voltage'))
-        v_start = float(dfAcqParams.get_value(0,'Acq Start Voltage'))
-        v_step = float(dfAcqParams.get_value(0,'Acq Step Voltage'))
-        v_gate = float(dfAcqParams.get_value(0,'Acq Gate Voltage'))
-        scans = int(dfAcqParams.get_value(0,'Acq Num Aver Scans'))
-        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
-        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
-        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
-        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
+        v_min = float(self.dfAcqParams.get_value(0,'Acq Min Voltage'))
+        v_max = float(self.dfAcqParams.get_value(0,'Acq Max Voltage'))
+        v_start = float(self.dfAcqParams.get_value(0,'Acq Start Voltage'))
+        v_step = float(self.dfAcqParams.get_value(0,'Acq Step Voltage'))
+        v_gate = float(self.dfAcqParams.get_value(0,'Acq Gate Voltage'))
+        scans = int(self.dfAcqParams.get_value(0,'Acq Num Aver Scans'))
+        hold_time = float(self.dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(self.dfAcqParams.get_value(0,'Delay Before Meas'))
+        pvMode = bool(self.dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(self.dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
 
         # measurements: voc, jsc
-        voc, jsc = self.measure_voc_jsc(self.dfAcqParams)
+        voc, jsc = self.measure_voc_jsc()
 
         # measurement parameters
         v_min = 0.
@@ -405,14 +405,13 @@ class acqThread(QThread):
         return True, JV[:, 0:2], JV[:,(0,2)], perfDataF, perfDataB
 
     # Tracking (take JV once and track Vpmax)
-    # dfAcqParams : self.dfAcqParams
-    def tracking(self, deviceID, dfAcqParams, JV, perfData):
-        hold_time = float(dfAcqParams.get_value(0,'Acq Hold Time'))
-        delay_before_meas = float(dfAcqParams.get_value(0,'Delay Before Meas'))
-        numPoints = int(dfAcqParams.get_value(0,'Num Track Points'))
-        trackTime = float(dfAcqParams.get_value(0,'Track Interval'))
-        pvMode = bool(dfAcqParams.get_value(0,'PV mode'))
-        deviceArea = float(dfAcqParams.get_value(0,'Device Area'))
+    def tracking(self, deviceID, JV, perfData):
+        hold_time = float(self.dfAcqParams.get_value(0,'Acq Hold Time'))
+        delay_before_meas = float(self.dfAcqParams.get_value(0,'Delay Before Meas'))
+        numPoints = int(self.dfAcqParams.get_value(0,'Num Track Points'))
+        trackTime = float(self.dfAcqParams.get_value(0,'Track Interval'))
+        pvMode = bool(self.dfAcqParams.get_value(0,'PV mode'))
+        deviceArea = float(self.dfAcqParams.get_value(0,'Device Area'))
         time.sleep(delay_before_meas)
 
         startTime = time.time()
@@ -426,7 +425,7 @@ class acqThread(QThread):
             timeStep = time.time()-startTime
             self.Msg.emit("Tracking device: "+deviceID+" (time-step: "+str(n)+"/"+\
                           str(numPoints)+" - {0:0.1f}s)".format(timeStep))
-            voc, jsc = self.measure_voc_jsc(self.dfAcqParams)
+            voc, jsc = self.measure_voc_jsc()
             
             self.parent().source_meter.set_output(voltage = Vpmax)
             time.sleep(hold_time)
@@ -451,7 +450,7 @@ class acqThread(QThread):
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
         # measurements: voc, jsc
-        Voc, Jsc = self.measure_voc_jsc(self.dfAcqParams)
+        Voc, Jsc = self.measure_voc_jsc()
 
         Vpmax = PV[np.where(PV == np.amax(PV[:,1]))[0][0],0]
         Jpmax = JV[np.where(PV == np.amax(PV[:,1]))[0][0],1]
