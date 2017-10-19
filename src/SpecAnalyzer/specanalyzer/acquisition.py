@@ -90,7 +90,7 @@ class Acquisition(QObject):
         self.parent().statusBarLabel.setText(msg)
 
     # Process JV Acquisition to result page
-    def JVDeviceProcess(self, JV, deviceID, dfAcqParams):
+    def JVDeviceProcess(self, JV, perfData, deviceID):
         #self.parent().resultswind.clearPlots(False,False)
         self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, True)
