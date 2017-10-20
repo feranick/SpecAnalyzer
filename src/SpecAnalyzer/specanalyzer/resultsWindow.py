@@ -44,6 +44,7 @@ class ResultsWindow(QMainWindow):
         self.initUI()
         self.initPlots(self.perfData)
         self.initJVPlot()
+        self.show()
     
     # Define UI elements
     def initUI(self):
@@ -230,8 +231,6 @@ class ResultsWindow(QMainWindow):
         self.axPVresp.axhline(y=0, linewidth=0.5)
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
-        self.figureJVresp.tight_layout()
-        self.figurePVresp.tight_layout()
 
     # Plot Transient Jsc
     def plotTJsc(self, data):
@@ -261,6 +260,8 @@ class ResultsWindow(QMainWindow):
         self.axJVresp.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
         self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
             color='orange')
+        self.figureJVresp.tight_layout()
+        self.figurePVresp.tight_layout()
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
 
@@ -393,8 +394,6 @@ class ResultsWindow(QMainWindow):
         self.plotTVoc(perfData)
         self.plotMPP(perfData)
         self.plotTJsc(perfData)
-        self.figureJVresp.tight_layout()
-        self.figurePVresp.tight_layout()
         self.show()
     
     # Create internal dataframe with all the data. This is needed for plotting data after acquisition
