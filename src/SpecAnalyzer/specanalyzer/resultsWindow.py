@@ -386,8 +386,6 @@ class ResultsWindow(QMainWindow):
             if self.parent().config.saveLocalCsv == True or \
                     self.parent().acquisition.modifiers == Qt.AltModifier:
                 self.save_csv(deviceID, dfAcqParams, self.perfData, self.JV,self.csvFolder)
-            #if self.parent().config.submitToDb == True:
-            #    self.submit_DM(deviceID, dfAcqParams, self.perfData, self.JV)
 
     # Plot data from devices
     def plotData(self, deviceID, perfData, JV, init):
