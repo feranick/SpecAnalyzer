@@ -28,7 +28,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-#from .dataManagement import *
 from . import logger
 
 '''
@@ -135,7 +134,6 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.resTableWidget.itemClicked.connect(self.onCellClick)
-        #self.resTableWidget.itemDoubleClicked.connect(self.onCellDoubleClick)
         self.setCentralWidget(self.centralwidget)
 
         # Make Menu for plot related calls
@@ -305,13 +303,6 @@ class ResultsWindow(QMainWindow):
         #self.plotData(self.dfTotDeviceID.get_value(0,row,takeable=True),
         #        self.dfTotPerfData.get_value(0,row,takeable=True),
         #        self.dfTotJV.get_value(0,row,takeable=True),False)
-    '''
-    # Action upon selecting a row in the table.
-    @pyqtSlot()
-    def onCellDoubleClick(self):
-        row = self.resTableWidget.selectedItems()[0].row()
-        self.redirectToDM(self.dfTotDeviceID.get_value(0,row,takeable=True)[0][0][:-1])
-    '''
 
     # Enable right click on substrates for saving locally
     def contextMenuEvent(self, event):
@@ -461,20 +452,20 @@ class ResultsWindow(QMainWindow):
     def read_csv(self):
         filenames = QFileDialog.getOpenFileNames(self,
                         "Open csv data", "","*.csv")
-        #try:
-        for filename in filenames[0]:
-            print("Open saved device data from: ", filename)
-            dftot = pd.read_csv(filename, na_filter=False)
-            deviceID = dftot.get_value(0,'Device')
-            perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Acq Date']))][:,range(1,10)]
-            JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)].astype(float)
-            dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
-            self.plotData(deviceID, perfData, JV, False)
-            self.setupResultTable()
-            self.fillTableData(deviceID, perfData)
-            self.makeInternalDataFrames(self.lastRowInd, deviceID, perfData, dfAcqParams, np.array([JV]))
-        #except:
-        #    print("Loading files failed")
+        try:
+            for filename in filenames[0]:
+                print("Open saved device data from: ", filename)
+                dftot = pd.read_csv(filename, na_filter=False)
+                deviceID = dftot.get_value(0,'Device')
+                perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Acq Date']))][:,range(1,10)]
+                JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)].astype(float)
+                dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
+                self.plotData(deviceID, perfData, JV, False)
+                self.setupResultTable()
+                self.fillTableData(deviceID, perfData)
+                self.makeInternalDataFrames(self.lastRowInd, deviceID, perfData, dfAcqParams, np.array([JV]))
+        except:
+            print("Loading files failed")
 
     # Populate result table.
     def fillTableData(self, deviceID, obj):
@@ -493,7 +484,3 @@ class ResultsWindow(QMainWindow):
         else:
             self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(float(obj[0,2])))) #track_time
 
-    # Redirect to DM page for substrate/device
-    def redirectToDM(self, deviceID):
-        print("Selected substrate:",deviceID)
-        # webbrowser.open("https://gridedgedm.mit.edu/dm/"+deviceID)

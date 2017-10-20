@@ -147,9 +147,8 @@ class Agilent4155c(object):
         self.write("*WAI")
         pass
 
-### This is only for testing - to be removed ###
+### This is only for testing ###
 if __name__ == '__main__':
-    # test
     an = Agilent4155c('GPIB0::17::INSTR')
     
     an.set_output(voltage = 0)
@@ -160,6 +159,4 @@ if __name__ == '__main__':
     an.set_mode('VOLT')
     sweep = an.sweep(-5,5,0.01,0,0)
     print(an.read_sweep_values(1,True)[0], an.read_sweep_values(1,True)[1],True)
-    
- 
     pass

@@ -91,7 +91,6 @@ class Acquisition(QObject):
 
     # Process JV Acquisition to result page
     def JVDeviceProcess(self, JV, perfData, deviceID):
-        #self.parent().resultswind.clearPlots(False,False)
         self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, True)
         QApplication.processEvents()
@@ -99,7 +98,6 @@ class Acquisition(QObject):
             
     # Plot temporary data from tracking
     def plotTempTracking(self, JV, perfData, deviceID, setupTable, saveData):
-        #self.parent().resultswind.clearPlots(False,False)
         if setupTable is True:
             self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, saveData)
@@ -181,7 +179,6 @@ class acqThread(QThread):
                     # Alternatively use this for a complete JV sweep
                     #JV = self.devAcqJV()
 
-                    #self.acqJVComplete.emit(JV, perfData, substrateID+str(self.devMaxPower), i, j)
                     self.Msg.emit(' Device '+deviceID+' tracking: complete')
 
                 self.Msg.emit("Acquisition Completed: "+ self.getDateTimeNow()[0] + \
@@ -272,18 +269,11 @@ class acqThread(QThread):
             self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
 
         else:
-            
-            #self.tempTracking.emit(np.array([data[start_i-1, 0:2]]), np.zeros((1,8)),
-            #            self.parent().parent().deviceText.text(), True, False)
-
             self.Msg.emit('  Device '+deviceID+': acquiring forward sweep')
             for i in i_list_forw1:
                 self.parent().source_meter.set_output(voltage = v_list[i])
                 time.sleep(hold_time)
                 data[i,1] = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
-                #print(data[start_i:i, 0:2])
-            #self.tempTracking.emit(data[start_i:N, 0:2], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text(), False, False)
 
             self.Msg.emit('  Device '+deviceID+': acquiring backward sweep')
             for i in i_list_back:
@@ -293,17 +283,13 @@ class acqThread(QThread):
 
             perfDataB = self.analyseJV(data[:, (0,2)])
             self.acqJVComplete.emit(data[:, (0,2)], perfDataB, deviceID+"_sweep-back")
-            #self.tempTracking.emit(data[:, (0,2)], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text()+"_back", False, False)
 
             self.Msg.emit('  Device '+deviceID+': completing forward sweep') 
             for i in i_list_forw2:
                 self.parent().source_meter.set_output(voltage = v_list[i])
                 time.sleep(hold_time)
                 data[i,1] = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
-                #print(data[0:i, 0:2])
-            #self.tempTracking.emit(data[:, 0:2], np.zeros((1,8)),
-            #    self.parent().parent().deviceText.text()+"_forw", True, False)
+
             perfDataF = self.analyseJV(data[:, (0,1)])
             self.acqJVComplete.emit(data[:, (0,1)], perfDataF, deviceID+"_sweep-forw")
             print(data)
@@ -440,7 +426,6 @@ class acqThread(QThread):
             data = np.hstack(([self.getDateTimeNow()[0],
                                    self.getDateTimeNow()[1],timeStep], data))
             perfData = np.vstack((data, perfData))
-            #self.tempTracking.emit(JV, perfData, deviceID, False, False)
         self.tempTracking.emit(JV, perfData, deviceID+"_tracking", True, True)
         return perfData, JV
 

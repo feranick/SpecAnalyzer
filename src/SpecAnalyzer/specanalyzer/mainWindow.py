@@ -98,6 +98,16 @@ class MainWindow(QMainWindow):
         self.saveConfigMenu.setStatusTip('Quit')
         self.saveConfigMenu.triggered.connect(self.saveConfig)
         
+        self.loadMenu = QAction("&Load Data", self)
+        self.loadMenu.setShortcut("Ctrl+o")
+        self.loadMenu.setStatusTip('Load csv data from saved file')
+        self.loadMenu.triggered.connect(self.resultswind.read_csv)
+        
+        self.directoryMenu = QAction("&Set directory for saved files", self)
+        self.directoryMenu.setShortcut("Ctrl+s")
+        self.directoryMenu.setStatusTip('Set directory for saved files')
+        self.directoryMenu.triggered.connect(self.resultswind.set_dir_saved)
+        
         self.quitMenu = QAction("&Quit", self)
         self.quitMenu.setShortcut("Ctrl+q")
         self.quitMenu.setStatusTip('Quit')
@@ -108,11 +118,10 @@ class MainWindow(QMainWindow):
         fileMenu.addSeparator()
         fileMenu.addAction(self.loadConfigMenu)
         fileMenu.addAction(self.saveConfigMenu)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.loadMenu)
+        fileMenu.addAction(self.directoryMenu)
         
-        #self.stageMenu = QAction("&Stage", self)
-        #self.stageMenu.setShortcut("Ctrl+x")
-        #self.stageMenu.setStatusTip('Stage controls')
-        #self.stageMenu.triggered.connect(self.stagewind.show)
         self.powermeterMenu = QAction("&Powermeter", self)
         self.powermeterMenu.setShortcut("Ctrl+p")
         self.powermeterMenu.setStatusTip('Powermeter controls')
@@ -121,22 +130,16 @@ class MainWindow(QMainWindow):
         self.sourcemeterMenu.setShortcut("Ctrl+k")
         self.sourcemeterMenu.setStatusTip('Sourcemeter controls')
         self.sourcemeterMenu.triggered.connect(self.sourcemeterwind.show)
-        #self.switchboxMenu = QAction("&Switchbox", self)
-        #self.switchboxMenu.setShortcut("Ctrl+b")
-        #self.switchboxMenu.setStatusTip('Switchbox controls')
-        #self.switchboxMenu.triggered.connect(self.switchboxwind.show)
         self.cameraMenu = QAction("&Camera", self)
         self.cameraMenu.setShortcut("Ctrl+c")
         self.cameraMenu.setStatusTip('Camera controls')
         self.cameraMenu.triggered.connect(self.camerawind.show)
 
         instrumentsMenu = self.menuBar.addMenu('&Instruments')
-        #instrumentsMenu.addAction(self.stageMenu)
         instrumentsMenu.addAction(self.sourcemeterMenu)
         instrumentsMenu.addSeparator()
         instrumentsMenu.addAction(self.powermeterMenu)
         instrumentsMenu.addAction(self.cameraMenu)
-        #instrumentsMenu.addAction(self.switchboxMenu)
         
         self.viewWindowMenus(self.menuBar, self)
 
@@ -148,10 +151,6 @@ class MainWindow(QMainWindow):
         self.devBugsMenu.setShortcut("Ctrl+b")
         self.devBugsMenu.setStatusTip('Development and bugs')
         self.devBugsMenu.triggered.connect(self.weblinks.help)
-        #self.dataManagMenu = QAction("&Data management", self)
-        #self.dataManagMenu.setShortcut("Ctrl+m")
-        #self.dataManagMenu.setStatusTip('Data Management')
-        #self.dataManagMenu.triggered.connect(self.weblinks.dm)
         self.aboutMenu = QAction("&About", self)
         self.aboutMenu = QAction("&About", self)
         self.aboutMenu.setShortcut("Ctrl+a")
@@ -161,18 +160,10 @@ class MainWindow(QMainWindow):
         aboutMenu = self.menuBar.addMenu('&Help')
         aboutMenu.addAction(self.helpMenu)
         aboutMenu.addAction(self.devBugsMenu)
-        #aboutMenu.addAction(self.dataManagMenu)
         aboutMenu.addSeparator()
         aboutMenu.addAction(self.aboutMenu)
         
         # Toolbar Entries #
-        '''
-        self.sampleToolbar = QAction("&Substrates", self)
-        self.sampleToolbar.setShortcut("Ctrl+s")
-        self.sampleToolbar.setStatusTip('Device Configuration')
-        self.sampleToolbar.triggered.connect(self.samplewind.show)
-        '''
-        
         self.acquisitionToolbar = QAction("&Acquisition", self)
         self.acquisitionToolbar.setShortcut("Ctrl+a")
         self.acquisitionToolbar.setStatusTip('Acquisition paramenters')
@@ -184,8 +175,6 @@ class MainWindow(QMainWindow):
         self.resultsToolbar.triggered.connect(self.resultswind.show)
         
         #toolBar = self.addToolBar("&Toolbar")
-        #self.toolBar.addAction(self.sampleToolbar)
-        #self.toolBar.addSeparator()
         self.toolBar.addAction(self.acquisitionToolbar)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.resultsToolbar)
@@ -257,10 +246,6 @@ class MainWindow(QMainWindow):
         viewMainWindowMenu.setShortcut("Ctrl+w")
         viewMainWindowMenu.setStatusTip('Display Main Window')
         viewMainWindowMenu.triggered.connect(lambda: self.displayMainWindow(obj))
-        #viewSampleMenu = QAction("&Substrates Window", self)
-        #viewSampleMenu.setShortcut("Ctrl+d")
-        #viewSampleMenu.setStatusTip('Display Substrates Window')
-        #viewSampleMenu.triggered.connect(lambda: self.displayMainWindow(obj.samplewind))
         viewAcquisitionMenu = QAction("&Acquisition Window", self)
         viewAcquisitionMenu.setShortcut("Ctrl+a")
         viewAcquisitionMenu.setStatusTip('Display Acquisition Window')
@@ -272,7 +257,6 @@ class MainWindow(QMainWindow):
 
         windowMenu = menuObj.addMenu('&Window')
         windowMenu.addAction(viewMainWindowMenu)
-        #windowMenu.addAction(viewSampleMenu)
         windowMenu.addAction(viewAcquisitionMenu)
         windowMenu.addAction(viewResultsMenu)
 
@@ -291,8 +275,6 @@ class MainWindow(QMainWindow):
                      quit_msg, QMessageBox.No, QMessageBox.Yes)
 
         if reply == QMessageBox.Yes:
-            #if self.stagewind.activeStage == True:
-            #    self.stagewind.activateStage()
             try:
                 self.acquisition.acq_thread.stop()
             except:
@@ -313,8 +295,6 @@ class WebLinksWidget():
         webbrowser.open("https://github.com/feranick/SpecAnalyzer")
     def dev(self):
         webbrowser.open("https://github.com/feranick/SpecAnalyzer")
-    #def dm(self):
-    #    webbrowser.open("http://gridedgedm.mit.edu")
 
 '''
    About Widget
@@ -336,18 +316,12 @@ class AboutWidget(QWidget):
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        
-        #self.logo = QLabel(self)
-        #self.logo.setGeometry(QRect(30, 30, 311, 61))
-        #self.logo.setText("SpcAnalyzer")
-        #self.logo.setPixmap(QPixmap("specanalyzer/rsrc/logo_about.png"))
-        #self.logo.setObjectName("logo")
 
         self.labelTitle = QLabel("<qt><b><big><a href = https://github.com/feranick/SpecAnalyzer>SpecAnalyzer %s</a></b></big></qt>" % __version__, self)
         self.labelBy = QLabel("by: %s" % __author__, self)
         self.labelContact = QLabel("<qt>Contact: <a href = mailto:ferralis@mit.edu> ferralis@mit.edu</a></qt>", self)
         self.labelDetails = QLabel("Acquisition of JV curves from solar cells", self)
-        self.labelLicense = QLabel("This software is licensed under the GNU GPL v.2.0 or later", self)
+        self.labelLicense = QLabel("This software is licensed under the <a href = https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html> GNU GPL v.2.0 or later</a>", self)
         
         for label in [self.labelTitle, self.labelBy,
                 self.labelContact, self.labelDetails, self.labelLicense]:
