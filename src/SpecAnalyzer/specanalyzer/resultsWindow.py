@@ -300,10 +300,6 @@ class ResultsWindow(QMainWindow):
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
 
-        #self.plotData(self.dfTotDeviceID.get_value(0,row,takeable=True),
-        #        self.dfTotPerfData.get_value(0,row,takeable=True),
-        #        self.dfTotJV.get_value(0,row,takeable=True),False)
-
     # Enable right click on substrates for saving locally
     def contextMenuEvent(self, event):
         self.menu = QMenu(self)
@@ -399,6 +395,8 @@ class ResultsWindow(QMainWindow):
         self.plotTVoc(perfData)
         self.plotMPP(perfData)
         self.plotTJsc(perfData)
+        self.figureJVresp.tight_layout()
+        self.figurePVresp.tight_layout()
         self.show()
     
     # Create internal dataframe with all the data. This is needed for plotting data after acquisition

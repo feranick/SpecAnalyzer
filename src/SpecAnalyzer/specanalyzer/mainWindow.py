@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
         self.loadMenu.triggered.connect(self.resultswind.read_csv)
         
         self.directoryMenu = QAction("&Set directory for saved files", self)
-        self.directoryMenu.setShortcut("Ctrl+s")
+        self.directoryMenu.setShortcut("Ctrl+d")
         self.directoryMenu.setStatusTip('Set directory for saved files')
         self.directoryMenu.triggered.connect(self.resultswind.set_dir_saved)
         
