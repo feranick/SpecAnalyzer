@@ -298,7 +298,7 @@ class acqThread(QThread):
     ## measurements: voc, jsc
     def measure_voc_jsc(self):
         pvMode = bool(self.dfAcqParams.at[0,'PV mode'])
-        deviceArea = float(self.dfAcqParams.at[0,'Device Area')
+        deviceArea = float(self.dfAcqParams.at[0,'Device Area'])
 
         # voc
         self.parent().source_meter.set_mode('CURR')
