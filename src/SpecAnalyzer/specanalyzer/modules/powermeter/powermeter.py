@@ -36,4 +36,13 @@ class PowerMeter():
     def get_power(self):
         inst = self.rm.open_resource(self.powermeterID, timeout=1)
         power_meter = ThorlabsPM100(inst=inst)
-        return power_meter
+        return power_meter.read
+
+    # Performs zero adjustment routine
+    def zero(self):
+        inst = self.rm.open_resource(self.powermeterID, timeout=1)
+        power_meter = ThorlabsPM100(inst=inst)
+        power_meter.sense.correction.collect.zero.initiate()
+        time.sleep(1)
+
+    
