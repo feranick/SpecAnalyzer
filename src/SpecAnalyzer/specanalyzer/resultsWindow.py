@@ -326,11 +326,11 @@ class ResultsWindow(QMainWindow):
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
         folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save " +\
-                                  self.dfTotDeviceID.get_value(0,row,takeable=True)))
-        self.save_csv(self.dfTotDeviceID.get_value(0,row,takeable=True),
+                                  self.dfTotDeviceID.iat[0,row]))
+        self.save_csv(self.dfTotDeviceID.iat[0,row],
             self.dfTotAcqParams.iloc[[row]],
-            self.dfTotPerfData.get_value(0,row,takeable=True),
-            self.dfTotJV.get_value(0,row,takeable=True)[0], folder)
+            self.dfTotPerfData.iat[0,row],
+            self.dfTotJV.iat[0,row][0], folder)
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
@@ -431,9 +431,9 @@ class ResultsWindow(QMainWindow):
         dateTimeTag = str(datetime.now().strftime('%Y%m%d-%H%M%S_'))
         
         if dfPerfData['MPP'].count() < 2:
-            csvFilename = dateTimeTag+str(dfDeviceID.get_value(0,'Device'))+".csv"
+            csvFilename = dateTimeTag+str(dfDeviceID.at[0,'Device'])+".csv"
         else:
-            csvFilename = dateTimeTag+str(dfDeviceID.get_value(0,'Device'))+"_tracking.csv"
+            csvFilename = dateTimeTag+str(dfDeviceID.at[0,'Device'])+"_tracking.csv"
         try:
             dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
         except:
@@ -451,7 +451,7 @@ class ResultsWindow(QMainWindow):
             for filename in filenames[0]:
                 print("Open saved device data from: ", filename)
                 dftot = pd.read_csv(filename, na_filter=False)
-                deviceID = dftot.get_value(0,'Device')
+                deviceID = dftot.at[0,'Device']
                 perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Acq Date']))][:,range(1,10)]
                 JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)].astype(float)
                 dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
