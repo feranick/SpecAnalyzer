@@ -326,11 +326,11 @@ class ResultsWindow(QMainWindow):
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
         folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save " +\
-                                  self.dfTotDeviceID.iat[0,row]))
-        self.save_csv(self.dfTotDeviceID.iat[0,row],
+                                  self.dfTotDeviceID.iat[0,row][0][0]))
+        self.save_csv(self.dfTotDeviceID.iat[0,row][0][0],
             self.dfTotAcqParams.iloc[[row]],
             self.dfTotPerfData.iat[0,row],
-            self.dfTotJV.iat[0,row][0], folder)
+            self.dfTotJV.iat[0,row], folder)
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
