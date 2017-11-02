@@ -14,7 +14,7 @@ the Free Software Foundation; either version 2 of the License, or
 '''
 
 import time
-#from specanalyzer import configuration
+#from gridedgeat import configuration
 try:
     from ThorlabsPM100 import ThorlabsPM100
     import visa
@@ -44,5 +44,3 @@ class PowerMeter():
         power_meter = ThorlabsPM100(inst=inst)
         power_meter.sense.correction.collect.zero.initiate()
         time.sleep(1)
-
-    

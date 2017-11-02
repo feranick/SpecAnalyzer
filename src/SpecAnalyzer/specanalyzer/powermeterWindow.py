@@ -50,10 +50,11 @@ class PowermeterWindow(QMainWindow):
         self.powerMeterSensorAreaText.setText(str(self.parent().config.irradianceSensorArea))
 
         self.powerMeterLabel = QLabel(PowermeterWindow)
-        self.powerMeterLabel.setGeometry(QRect(20, 100, 310, 20))
+        self.powerMeterLabel.setGeometry(QRect(20, 100, 300, 20))
         self.powerMeterLabel2 = QLabel(PowermeterWindow)
         self.powerMeterLabel2.setGeometry(QRect(20, 130, 300, 20))
         self.powerMeterLabel.setText("<qt><b>Before activating, place powermeter in complete dark </b></qt>")
+
         
         self.powermeterStartButton = QPushButton(PowermeterWindow)
         self.powermeterStartButton.setGeometry(QRect(10, 160, 150, 30))
@@ -162,7 +163,7 @@ class powermeterThread(QThread):
     def run(self):
         try:
             self.pm = PowerMeter(self.powermeterID)
-            self.pm.zero() 
+            self.pm.zero()
             self.avPower = 1000*self.pm.get_power()
             numAver = 1
             while True:
