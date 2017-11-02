@@ -16,9 +16,10 @@ import sys
 from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QAction,
     QVBoxLayout,QLabel,QGraphicsView,QFileDialog,QStatusBar,
-    QGraphicsScene, QLineEdit,QMessageBox)
-from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter)
-from PyQt5.QtCore import (pyqtSlot,QRectF)
+    QGraphicsScene, QLineEdit,QMessageBox,QWidget)
+from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter,
+                         QBrush,QColor)
+from PyQt5.QtCore import (pyqtSlot,QRectF,QPoint,QRect)
 
 from .modules.camera.camera import *
 from . import logger
@@ -46,6 +47,10 @@ class CameraWindow(QMainWindow):
         self.imageLabel = QLabel()
         self.setCentralWidget(self.imageLabel)
         
+        self.begin = QPoint()
+        self.end = QPoint()
+        self.firstTimeRunning = True
+        
         # Set up ToolBar
         tb = self.addToolBar("Camera")
         updateBtn = QAction(QIcon(QPixmap()),"Update Camera Feed",self)
@@ -70,26 +75,70 @@ class CameraWindow(QMainWindow):
         tb.addAction(self.setDefaultBtn)
         tb.addSeparator()
         
-        self.cam = CameraFeed()
+        #self.cam = CameraFeed()
         tb.actionTriggered[QAction].connect(self.toolbtnpressed)
     
     # Define behavior of push buttons
     def toolbtnpressed(self,a):
         if a.text() == "Update Camera Feed":
+            self.cam = CameraFeed()
             self.cameraFeed()
         if a.text() == "Set Default Alignment":
             self.setDefault()
 
-    # Get and preprocess image
+    # Get image from feed
     def cameraFeed(self):
         self.setDefaultBtn.setEnabled(True)
         try:
+            if self.firstTimeRunning == True:
+                self.infoMessageBox()
+                self.firstTimeRunning = False
+
             self.checkAlignText.setStyleSheet("color: rgb(0, 0, 0);")
-            self.cam.grab_image()
-            self.image, self.image_data = self.cam.get_image()
+            self.img = self.cam.grab_image()
+            self.image, self.image_data, temp = self.cam.get_image(False,0,0,0,0)
             self.imageLabel.setPixmap(QPixmap.fromImage(self.image))
+        
             self.statusBar().showMessage('Camera-feed' + \
-                str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
+                 str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
+            self.statusBar().showMessage(' Drag Mouse to select area for alignment', 5000)
+        except:
+            self.statusBar().showMessage(' USB camera not connected', 5000)
+            
+    # Event driven routines for cropping image with mouse
+    def paintEvent(self, event):
+        qp = QPainter(self)
+        br = QBrush(QColor(100, 10, 10, 40))
+        qp.setBrush(br)
+        qp.drawRect(QRect(self.begin, self.end))
+
+    def mousePressEvent(self, event):
+        self.begin = event.pos()
+        self.end = event.pos()
+        self.initial = event.pos()
+        self.update()
+
+    def mouseMoveEvent(self, event):
+        self.end = event.pos()
+        self.update()
+
+    # Event driven routines for cropping image with mouse
+    # Main method for evaluating alignemnt from cropped selection
+    def mouseReleaseEvent(self, event):
+        self.begin = event.pos()
+        self.end = event.pos()
+        self.final = event.pos()
+        self.update()
+        #print(self.initial.x(), self.initial.y(), self.final.x(), self.final.y())
+        try:
+            self.image, self.image_data, self.image_orig = self.cam.get_image(True,
+                             self.initial.x(),
+                             self.final.x(),
+                             self.initial.y(),
+                             self.final.y())
+            
+            self.imageLabel.setPixmap(QPixmap.fromImage(self.image_orig))
+            
             self.alignPerc, self.iMax = self.cam.check_alignment( \
                 self.image_data,
                 self.parent().config.alignmentIntThreshold)
@@ -102,7 +151,7 @@ class CameraWindow(QMainWindow):
             else:
                 self.statusBar().showMessage(' Devices and masks appear to be correct', 5000)
         except:
-            self.statusBar().showMessage(' USB camera not connected', 5000)
+            pass
 
     # Set default values for alignment parameters
     def setDefault(self):
@@ -147,6 +196,22 @@ class CameraWindow(QMainWindow):
         msgBox.setText( "WARNING: devices and mask might be misaligned " )
         msgBox.setInformativeText( "Please realign and retry" )
         msgBox.exec_()
+    
+    # Info procedure panel
+    def infoMessageBox(self):
+        msgBox = QMessageBox( self )
+        msgBox.setIcon( QMessageBox.Information )
+        msgBox.setText( "Please follow the alignment procedure: " )
+        msgBox.setInformativeText( "1. Press \"Update camera Feed\" to get image\n2. Select with the mouse the area for alignemnt " )
+        msgBox.exec_()
+    
+    # Close camera feed upon closing window.
+    def closeEvent(self, event):
+        self.firstTimeRunning = True
+        try:
+            del self.cam
+        except:
+            pass
 
 '''
    GraphicsView
@@ -191,3 +256,4 @@ class GraphicsScene(QGraphicsScene):
         self.imlabel.setText(labeltext)
         self.image = image
         self.update()
+
