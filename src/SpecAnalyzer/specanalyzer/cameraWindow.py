@@ -201,8 +201,10 @@ class CameraWindow(QMainWindow):
     def infoMessageBox(self):
         msgBox = QMessageBox( self )
         msgBox.setIcon( QMessageBox.Information )
-        msgBox.setText( "Please follow the alignment procedure: " )
-        msgBox.setInformativeText( "1. Press \"Update camera Feed\" to get image\n2. Select with the mouse the area for alignemnt " )
+        msgBox.setText( "INFO: Please follow the alignment procedure:" )
+        msgBox.setInformativeText( "1. Press \"Update camera Feed\" to start the live feed\n"+\
+                                   "2. Press \"q\" to stop the live feed and grab image\n"+\
+                                   "3. Select with the mouse the area for alignemnt " )
         msgBox.exec_()
     
     # Close camera feed upon closing window.
