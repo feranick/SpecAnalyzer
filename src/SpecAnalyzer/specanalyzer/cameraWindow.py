@@ -209,6 +209,7 @@ class CameraWindow(QMainWindow):
     
     # Close camera feed upon closing window.
     def closeEvent(self, event):
+        self.cam.closeLiveFeed = True
         self.firstTimeRunning = True
         try:
             del self.cam

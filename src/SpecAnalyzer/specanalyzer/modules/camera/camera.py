@@ -33,6 +33,7 @@ class CameraFeed():
 
     # Grab frame into variable
     def grab_image(self):
+        self.closeLiveFeed = False
         while True:
             ret, frame = self.camera.read()
 
@@ -41,7 +42,7 @@ class CameraFeed():
 
             # Display the resulting frame
             cv2.imshow('Live Feed: push \"q\" to stop and grab frame',gray)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            if (cv2.waitKey(1) & 0xFF == ord('q')) or self.closeLiveFeed == True:
                 cv2.destroyAllWindows()
                 break
         for i in range(self.ramp_frames):
@@ -90,5 +91,6 @@ class CameraFeed():
 
     # Close connection to camera
     def close_cam(self):
+        self.closeLiveFeed = True
         cv2.destroyAllWindows()
         del(self.camera)
