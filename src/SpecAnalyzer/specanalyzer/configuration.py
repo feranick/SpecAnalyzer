@@ -98,26 +98,26 @@ class Configuration():
         self.instrConfig = self.conf['Instruments']
         self.sysConfig = self.conf['System']
 
-        self.deviceArea = eval(self.devConfig['deviceArea'])
+        self.deviceArea = self.conf.getfloat('Devices','deviceArea')
         
-        self.acqMinVoltage = eval(self.acqConfig['acqMinVoltage'])
-        self.acqMaxVoltage = eval(self.acqConfig['acqMaxVoltage'])
-        self.acqStartVoltage = eval(self.acqConfig['acqStartVoltage'])
-        self.acqStepVoltage = eval(self.acqConfig['acqStepVoltage'])
-        self.acqGateVoltage = eval(self.acqConfig['acqGateVoltage'])
-        self.acqHoldTime = eval(self.acqConfig['acqHoldTime'])
-        self.acqNumAvScans = eval(self.acqConfig['acqNumAvScans'])
-        self.acqDelBeforeMeas = eval(self.acqConfig['acqDelBeforeMeas'])
-        self.acqTrackNumPoints = eval(self.acqConfig['acqTrackNumPoints'])
-        self.acqTrackInterval = eval(self.acqConfig['acqTrackInterval'])
-        self.acqPVmode = eval(self.acqConfig['acqPVmode'])
+        self.acqMinVoltage = self.conf.getfloat('Acquisition','acqMinVoltage')
+        self.acqMaxVoltage = self.conf.getfloat('Acquisition','acqMaxVoltage')
+        self.acqStartVoltage = self.conf.getfloat('Acquisition','acqStartVoltage')
+        self.acqStepVoltage = self.conf.getfloat('Acquisition','acqStepVoltage')
+        self.acqGateVoltage = self.conf.getfloat('Acquisition','acqGateVoltage')
+        self.acqHoldTime = self.conf.getfloat('Acquisition','acqHoldTime')
+        self.acqNumAvScans = self.conf.getint('Acquisition','acqNumAvScans')
+        self.acqDelBeforeMeas = self.conf.getfloat('Acquisition','acqDelBeforeMeas')
+        self.acqTrackNumPoints = self.conf.getint('Acquisition','acqTrackNumPoints')
+        self.acqTrackInterval = self.conf.getfloat('Acquisition','acqTrackInterval')
+        self.acqPVmode = self.conf.getboolean('Acquisition','acqPVmode')
 
-        self.alignmentIntThreshold = eval(self.instrConfig['alignmentIntThreshold'])
-        self.alignmentContrastDefault = eval(self.instrConfig['alignmentContrastDefault'])
-        self.alignmentIntMax = eval(self.instrConfig['alignmentIntMax'])
+        self.alignmentIntThreshold = self.conf.getfloat('Instruments','alignmentIntThreshold')
+        self.alignmentContrastDefault = self.conf.getfloat('Instruments','alignmentContrastDefault')
+        self.alignmentIntMax = self.conf.getfloat('Instruments','alignmentIntMax')
         self.powermeterID = self.instrConfig['powermeterID']
-        self.irradiance1Sun = eval(self.instrConfig['irradiance1Sun'])
-        self.irradianceSensorArea = eval(self.instrConfig['irradianceSensorArea'])
+        self.irradiance1Sun = self.conf.getfloat('Instruments','irradiance1Sun')
+        self.irradianceSensorArea = self.conf.getfloat('Instruments','irradianceSensorArea')
         self.keithley2400ID = self.instrConfig['keithley2400ID']
         self.agilent4155cID = self.instrConfig['agilent4155cID']
 
@@ -125,7 +125,7 @@ class Configuration():
         self.loggingLevel = self.sysConfig['loggingLevel']
         self.loggingFilename = self.sysConfig['loggingFilename']
         self.csvSavingFolder = self.sysConfig['csvSavingFolder']
-        self.saveLocalCsv = eval(self.sysConfig['saveLocalCsv'])
+        self.saveLocalCsv = self.conf.getboolean('System','saveLocalCsv')
 
     # Save current parameters in configuration file
     def saveConfig(self, configFile):
