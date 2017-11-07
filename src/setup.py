@@ -11,7 +11,7 @@ setup(
     author='Nicola Ferralis',
     author_email='ferralis@mit.edu',
     url='https://github.com/feranick/SpecAnalyzer',
-    download_url='https://github.com/feranick/SpecAnalyzer/archive/0.6.1-20171007a.zip',
+    download_url='https://github.com/feranick/SpecAnalyzer/archive/master.zip',
     keywords=['PV', 'devices', 'testing'],
     license='GPLv2',
     platforms='any',
