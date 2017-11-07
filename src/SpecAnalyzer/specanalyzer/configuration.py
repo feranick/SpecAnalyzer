@@ -13,6 +13,7 @@ the Free Software Foundation; either version 2 of the License, or
 '''
 import configparser, logging, os
 from pathlib import Path
+from datetime import datetime
 from . import __version__
 
 class Configuration():
@@ -85,47 +86,50 @@ class Configuration():
         self.conf.read(configFile)
         self.sysConfig = self.conf['System']
         self.appVersion = self.sysConfig['appVersion']
-        if str(self.appVersion).rsplit('.',1)[0] != __version__.rsplit('.',1)[0] :
-            print("Configuration file is for an earlier major version of the software")
-            oldConfigFile = str(os.path.splitext(configFile)[0]+"_"+str(self.appVersion)+".ini")
+        try:
+            self.devConfig = self.conf['Devices']
+            self.acqConfig = self.conf['Acquisition']
+            self.instrConfig = self.conf['Instruments']
+            self.sysConfig = self.conf['System']
+
+            self.deviceArea = self.conf.getfloat('Devices','deviceArea')
+        
+            self.acqMinVoltage = self.conf.getfloat('Acquisition','acqMinVoltage')
+            self.acqMaxVoltage = self.conf.getfloat('Acquisition','acqMaxVoltage')
+            self.acqStartVoltage = self.conf.getfloat('Acquisition','acqStartVoltage')
+            self.acqStepVoltage = self.conf.getfloat('Acquisition','acqStepVoltage')
+            self.acqGateVoltage = self.conf.getfloat('Acquisition','acqGateVoltage')
+            self.acqHoldTime = self.conf.getfloat('Acquisition','acqHoldTime')
+            self.acqNumAvScans = self.conf.getint('Acquisition','acqNumAvScans')
+            self.acqDelBeforeMeas = self.conf.getfloat('Acquisition','acqDelBeforeMeas')
+            self.acqTrackNumPoints = self.conf.getint('Acquisition','acqTrackNumPoints')
+            self.acqTrackInterval = self.conf.getfloat('Acquisition','acqTrackInterval')
+            self.acqPVmode = self.conf.getboolean('Acquisition','acqPVmode')
+
+            self.alignmentIntThreshold = self.conf.getfloat('Instruments','alignmentIntThreshold')
+            self.alignmentContrastDefault = self.conf.getfloat('Instruments','alignmentContrastDefault')
+            self.alignmentIntMax = self.conf.getfloat('Instruments','alignmentIntMax')
+            self.powermeterID = self.instrConfig['powermeterID']
+            self.irradiance1Sun = self.conf.getfloat('Instruments','irradiance1Sun')
+            self.irradianceSensorArea = self.conf.getfloat('Instruments','irradianceSensorArea')
+            self.keithley2400ID = self.instrConfig['keithley2400ID']
+            self.agilent4155cID = self.instrConfig['agilent4155cID']
+
+            self.appVersion = self.sysConfig['appVersion']
+            self.loggingLevel = self.sysConfig['loggingLevel']
+            self.loggingFilename = self.sysConfig['loggingFilename']
+            self.csvSavingFolder = self.sysConfig['csvSavingFolder']
+            self.saveLocalCsv = self.conf.getboolean('System','saveLocalCsv')
+
+        except:
+            print("Configuration file is for an earlier version of the software")
+            oldConfigFile = str(os.path.splitext(configFile)[0] + "_" +\
+                    str(datetime.now().strftime('%Y%m%d-%H%M%S'))+".ini")
             print("Old config file backup: ",oldConfigFile)
             os.rename(configFile, oldConfigFile )
             print("Creating a new config file.")
             self.createConfig()
-        
-        self.devConfig = self.conf['Devices']
-        self.acqConfig = self.conf['Acquisition']
-        self.instrConfig = self.conf['Instruments']
-        self.sysConfig = self.conf['System']
-
-        self.deviceArea = self.conf.getfloat('Devices','deviceArea')
-        
-        self.acqMinVoltage = self.conf.getfloat('Acquisition','acqMinVoltage')
-        self.acqMaxVoltage = self.conf.getfloat('Acquisition','acqMaxVoltage')
-        self.acqStartVoltage = self.conf.getfloat('Acquisition','acqStartVoltage')
-        self.acqStepVoltage = self.conf.getfloat('Acquisition','acqStepVoltage')
-        self.acqGateVoltage = self.conf.getfloat('Acquisition','acqGateVoltage')
-        self.acqHoldTime = self.conf.getfloat('Acquisition','acqHoldTime')
-        self.acqNumAvScans = self.conf.getint('Acquisition','acqNumAvScans')
-        self.acqDelBeforeMeas = self.conf.getfloat('Acquisition','acqDelBeforeMeas')
-        self.acqTrackNumPoints = self.conf.getint('Acquisition','acqTrackNumPoints')
-        self.acqTrackInterval = self.conf.getfloat('Acquisition','acqTrackInterval')
-        self.acqPVmode = self.conf.getboolean('Acquisition','acqPVmode')
-
-        self.alignmentIntThreshold = self.conf.getfloat('Instruments','alignmentIntThreshold')
-        self.alignmentContrastDefault = self.conf.getfloat('Instruments','alignmentContrastDefault')
-        self.alignmentIntMax = self.conf.getfloat('Instruments','alignmentIntMax')
-        self.powermeterID = self.instrConfig['powermeterID']
-        self.irradiance1Sun = self.conf.getfloat('Instruments','irradiance1Sun')
-        self.irradianceSensorArea = self.conf.getfloat('Instruments','irradianceSensorArea')
-        self.keithley2400ID = self.instrConfig['keithley2400ID']
-        self.agilent4155cID = self.instrConfig['agilent4155cID']
-
-        self.appVersion = self.sysConfig['appVersion']
-        self.loggingLevel = self.sysConfig['loggingLevel']
-        self.loggingFilename = self.sysConfig['loggingFilename']
-        self.csvSavingFolder = self.sysConfig['csvSavingFolder']
-        self.saveLocalCsv = self.conf.getboolean('System','saveLocalCsv')
+            self.readConfig(configFile)
 
     # Save current parameters in configuration file
     def saveConfig(self, configFile):
