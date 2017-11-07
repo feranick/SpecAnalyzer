@@ -18,13 +18,13 @@ from . import __version__
 class Configuration():
     def __init__(self):
         self.home = str(Path.home())+"/"
-        self.configFile = str(self.home+"SpecAnalyzer.ini")
-        self.generalFolder = str(self.home+"SpecAnalyzer/")
+        self.configFile = self.home+"SpecAnalyzer.ini"
+        self.generalFolder = self.home+"SpecAnalyzer/"
         Path(self.generalFolder).mkdir(parents=True, exist_ok=True)
-        self.logFile = str(self.generalFolder+"SpecAnalyzer.log")
-        self.dataFolder = str(self.generalFolder + 'data/')
+        self.logFile = self.generalFolder+"SpecAnalyzer.log"
+        self.dataFolder = self.generalFolder + 'data/'
         Path(self.dataFolder).mkdir(parents=True, exist_ok=True)
-        self.imagesFolder = str(self.generalFolder + 'images/')
+        self.imagesFolder = self.generalFolder + 'images/'
         Path(self.imagesFolder).mkdir(parents=True, exist_ok=True)
         self.conf = configparser.ConfigParser()
         self.conf.optionxform = str
