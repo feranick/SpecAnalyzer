@@ -150,13 +150,14 @@ class AcquisitionWindow(QMainWindow):
         self.numPointsLabel.setText("Number of points")
         self.intervalLabel.setText("Interval")
         self.totTimePerDeviceLabel.setText("Total time per device")
+        
         self.saveButton = QPushButton(self.centralwidget)
-        self.saveButton.setGeometry(QRect(250, 380, 80, 60))
+        self.saveButton.setGeometry(QRect(250, 390, 80, 60))
         self.saveButton.setText("Save")
         self.saveButton.clicked.connect(self.saveParameters)
         
         self.defaultButton = QPushButton(self.centralwidget)
-        self.defaultButton.setGeometry(QRect(160, 380, 80, 60))
+        self.defaultButton.setGeometry(QRect(160, 390, 80, 60))
         self.defaultButton.setText("Default")
         self.defaultButton.clicked.connect(self.defaultParameters)
         
