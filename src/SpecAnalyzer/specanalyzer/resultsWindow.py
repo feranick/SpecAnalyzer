@@ -330,7 +330,7 @@ class ResultsWindow(QMainWindow):
         self.save_csv(self.dfTotDeviceID.iat[0,row][0][0],
             self.dfTotAcqParams.iloc[[row]],
             self.dfTotPerfData.iat[0,row],
-            self.dfTotJV.iat[0,row], folder)
+            self.dfTotJV.iat[0,row][0], folder)
 
     # Logic to remove data from devices selected from results table
     def selectDeviceRemove(self, row):
