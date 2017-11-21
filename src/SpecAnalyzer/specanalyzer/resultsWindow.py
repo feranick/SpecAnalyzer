@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import (QMainWindow,QPushButton,QVBoxLayout,QFileDialog,QWi
                              QGridLayout,QGraphicsView,QLabel,QComboBox,QLineEdit,
                              QMenuBar,QStatusBar, QApplication,QTableWidget,
                              QTableWidgetItem,QAction,QHeaderView,QMenu,QCheckBox,
-                             QHBoxLayout)
+                             QHBoxLayout,QAbstractItemView)
 from PyQt5.QtCore import (QSize,QRect,pyqtSlot,Qt)
 from PyQt5.QtGui import (QColor,QCursor)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -133,6 +133,7 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.setHorizontalHeaderItem(8,QTableWidgetItem("Acq Date"))
         self.resTableWidget.setHorizontalHeaderItem(9,QTableWidgetItem("Acq Time"))
         self.resTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.resTableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.resTableWidget.itemClicked.connect(self.onCellClick)
         self.setCentralWidget(self.centralwidget)
