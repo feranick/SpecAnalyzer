@@ -317,6 +317,7 @@ class ResultsWindow(QMainWindow):
             selectRemoveAllAction.setShortcut("Shift+Del")
             self.menu.addAction(selectCellRemoveAction)
             self.menu.addAction(selectRemoveAllAction)
+            self.menu.addSeparator()
             self.menu.addAction(selectCellSaveAction)
             self.menu.popup(QCursor.pos())
             QApplication.processEvents()
