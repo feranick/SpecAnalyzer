@@ -337,8 +337,11 @@ class ResultsWindow(QMainWindow):
         self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1)
         self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1)
         self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1)
-        self.axPVresp.get_lines()[row+2].remove()
-        self.axJVresp.get_lines()[row+2].remove()
+        try:
+            self.axPVresp.get_lines()[row+2].remove()
+            self.axJVresp.get_lines()[row+2].remove()
+        except:
+            print("Removing spectra failed")
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
         self.resTableWidget.removeRow(row)
