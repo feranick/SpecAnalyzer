@@ -310,8 +310,11 @@ class ResultsWindow(QMainWindow):
                 self.resTableWidget.rowCount() > 0 :
         
             selectCellSaveAction = QAction('Save as...', self)
+            selectCellSaveAction.setShortcut("Ctrl+s")
             selectCellRemoveAction = QAction('Remove...', self)
+            selectCellRemoveAction.setShortcut("Del")
             selectRemoveAllAction = QAction('Remove All...', self)
+            selectRemoveAllAction.setShortcut("Shift+Del")
             self.menu.addAction(selectCellRemoveAction)
             self.menu.addAction(selectRemoveAllAction)
             self.menu.addAction(selectCellSaveAction)

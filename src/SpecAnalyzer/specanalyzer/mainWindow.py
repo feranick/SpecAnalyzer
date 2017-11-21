@@ -89,12 +89,12 @@ class MainWindow(QMainWindow):
 
         # Menu entries
         self.loadConfigMenu = QAction("&Load Configuration", self)
-        self.loadConfigMenu.setShortcut("Ctrl+l")
+        self.loadConfigMenu.setShortcut("Ctrl+Shift+o")
         self.loadConfigMenu.setStatusTip('Quit')
         self.loadConfigMenu.triggered.connect(self.loadConfig)
         
         self.saveConfigMenu = QAction("&Save Configuration", self)
-        self.saveConfigMenu.setShortcut("Ctrl+s")
+        self.saveConfigMenu.setShortcut("Ctrl+Shift+s")
         self.saveConfigMenu.setStatusTip('Quit')
         self.saveConfigMenu.triggered.connect(self.saveConfig)
         
@@ -116,11 +116,11 @@ class MainWindow(QMainWindow):
         fileMenu = self.menuBar.addMenu('&File')
         fileMenu.addAction(self.quitMenu)
         fileMenu.addSeparator()
-        fileMenu.addAction(self.loadConfigMenu)
-        fileMenu.addAction(self.saveConfigMenu)
-        fileMenu.addSeparator()
         fileMenu.addAction(self.loadMenu)
         fileMenu.addAction(self.directoryMenu)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.loadConfigMenu)
+        fileMenu.addAction(self.saveConfigMenu)
         
         self.powermeterMenu = QAction("&Powermeter", self)
         self.powermeterMenu.setShortcut("Ctrl+p")
