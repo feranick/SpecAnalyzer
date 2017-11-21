@@ -257,8 +257,8 @@ class ResultsWindow(QMainWindow):
     def plotJVresp(self, JV,init):
         if init is True:
             self.initJVPlot()
-        self.axJVresp.plot(JV[:,0],JV[:,1], '.-',linewidth=0.5)
-        self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '.-',linewidth=0.5,
+        self.axJVresp.plot(JV[:,0],JV[:,1], '-',linewidth=1)
+        self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '-',linewidth=1,
             color='orange')
         self.figureJVresp.tight_layout()
         self.figurePVresp.tight_layout()
