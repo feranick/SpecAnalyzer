@@ -302,7 +302,15 @@ class ResultsWindow(QMainWindow):
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
 
-    # Enable right click on substrates for saving locally
+    # Process Key Events
+    def keyPressEvent(self, event):
+        if self.resTableWidget.rowCount() > 0:
+            if event.key() == Qt.Key_Delete:
+                selectedRows = list(set([ i.row() for i in self.resTableWidget.selectedItems()]))
+                for row in selectedRows[::-1]:
+                    self.selectDeviceRemove(row)
+
+    # Enable right click on substrates for saving locally and delete
     def contextMenuEvent(self, event):
         self.menu = QMenu(self)
         rPos = self.resTableWidget.mapFromGlobal(QCursor.pos())
