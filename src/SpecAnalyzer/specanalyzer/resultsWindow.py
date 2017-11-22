@@ -328,8 +328,8 @@ class ResultsWindow(QMainWindow):
             QApplication.processEvents()
             
             selectCellLoadAction.triggered.connect(self.read_csv)
-        for currentQTableWidgetItem in self.resTableWidget.selectedItems():
-            row = self.resTableWidget.currentRow()
+            selectedRows = list(set([ i.row() for i in self.resTableWidget.selectedItems()]))
+        for row in selectedRows[::-1]:
             selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
             selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
             selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
@@ -351,8 +351,9 @@ class ResultsWindow(QMainWindow):
         try:
             self.axPVresp.get_lines()[row+2].remove()
             self.axJVresp.get_lines()[row+2].remove()
+            print(" Removed acquisition from table: ",str(self.dfTotDeviceID.iat[0,row]))
         except:
-            print("Removing spectra failed")
+            print(" Removing substrates failed")
         self.canvasJVresp.draw()
         self.canvasPVresp.draw()
         self.resTableWidget.removeRow(row)
