@@ -337,10 +337,10 @@ class ResultsWindow(QMainWindow):
             
             selectCellLoadAction.triggered.connect(self.read_csv)
             selectedRows = list(set([ i.row() for i in self.resTableWidget.selectedItems()]))
-        for row in selectedRows[::-1]:
-            selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
-            selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
-            selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
+            for row in selectedRows[::-1]:
+                selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
+                selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
+                selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
 
     # Logic to save locally devices selected from results table
     def selectDeviceSaveLocally(self, row):
