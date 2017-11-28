@@ -55,7 +55,6 @@ class PowermeterWindow(QMainWindow):
         self.powerMeterLabel2.setGeometry(QRect(20, 130, 300, 20))
         self.powerMeterLabel.setText("<qt><b>Before activating, place powermeter in complete dark </b></qt>")
 
-        
         self.powermeterStartButton = QPushButton(PowermeterWindow)
         self.powermeterStartButton.setGeometry(QRect(10, 160, 150, 30))
         self.powermeterStartButton.clicked.connect(self.startPMAcq)
@@ -75,6 +74,8 @@ class PowermeterWindow(QMainWindow):
         self.powermeterSaveButton.setEnabled(False)
 
         self.irradiance = self.parent().config.irradiance1Sun
+        self.powerMeterDefaultText.textEdited.connect(self.setIrradianceManually)
+        self.powerMeterSensorAreaText.textEdited.connect(self.setIrradianceManually)
 
     # Logic to stop powermeter acquisition
     def stopPMAcq(self):
@@ -143,6 +144,14 @@ class PowermeterWindow(QMainWindow):
         else:
             print( " Irradiance settings not saved as default" )
             return False
+    
+    # Save new irradiance upon changing manually the default irradiance in the powermeter panel
+    def setIrradianceManually(self):
+        self.parent().config.conf['Instruments']['irradiance1Sun'] = self.powerMeterDefaultText.text()
+        self.parent().config.conf['Instruments']['irradianceSensorArea'] = self.powerMeterSensorAreaText.text()
+        with open(self.parent().config.configFile, 'w') as configfile:
+                self.parent().config.conf.write(configfile)
+        self.parent().config.readConfig(self.parent().config.configFile)
         
 # Acquisition takes place in a separate thread
 class powermeterThread(QThread):
