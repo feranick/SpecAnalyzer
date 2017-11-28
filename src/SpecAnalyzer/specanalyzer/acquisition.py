@@ -441,8 +441,8 @@ class acqThread(QThread):
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
         # measurements: voc, jsc
-        #Voc, Jsc = self.measure_voc_jsc()
-        Voc, Jsc = self.calculate_voc_jsc()
+        Voc, Jsc = self.measure_voc_jsc()
+        #Voc, Jsc = self.calculate_voc_jsc()
 
         Vpmax = PV[np.where(PV == np.amax(PV[:,1]))[0][0],0]
         Jpmax = JV[np.where(PV == np.amax(PV[:,1]))[0][0],1]
