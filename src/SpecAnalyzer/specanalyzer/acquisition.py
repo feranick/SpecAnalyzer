@@ -311,6 +311,12 @@ class acqThread(QThread):
         self.parent().source_meter.set_output(voltage = 0.)
         jsc = self.parent().source_meter.read_values(deviceArea, pvMode)[1]
         return voc, jsc
+    
+    ## measurements: voc, jsc
+    def calculate_voc_jsc(self, JV):
+        jsc = interp1d(JV[:,0],JV[:,1])(0)
+        voc = interp1d(JV[:,1],JV[:,0])(0)
+        return voc, jsc
 
     ## measurements: voc, jsc, mpp
     def measure_voc_jsc_mpp(self):
@@ -435,7 +441,8 @@ class acqThread(QThread):
         PV[:,0] = JV[:,0]
         PV[:,1] = JV[:,0]*JV[:,1]
         # measurements: voc, jsc
-        Voc, Jsc = self.measure_voc_jsc()
+        #Voc, Jsc = self.measure_voc_jsc()
+        Voc, Jsc = self.calculate_voc_jsc()
 
         Vpmax = PV[np.where(PV == np.amax(PV[:,1]))[0][0],0]
         Jpmax = JV[np.where(PV == np.amax(PV[:,1]))[0][0],1]
