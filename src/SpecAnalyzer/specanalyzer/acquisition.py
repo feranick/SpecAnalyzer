@@ -102,7 +102,8 @@ class Acquisition(QObject):
             self.parent().resultswind.setupResultTable()
         self.parent().resultswind.processDeviceData(deviceID, self.dfAcqParams, perfData, JV, saveData)
         QApplication.processEvents()
-        time.sleep(1)
+        if saveData is True:
+            time.sleep(1)
 
 # Main Class for Acquisition
 # Everything happens here!
@@ -432,6 +433,7 @@ class acqThread(QThread):
             data = np.hstack(([self.getDateTimeNow()[0],
                                    self.getDateTimeNow()[1],timeStep], data))
             perfData = np.vstack((data, perfData))
+            self.tempTracking.emit(JV, perfData, deviceID+"_tracking", False, False)
         self.tempTracking.emit(JV, perfData, deviceID+"_tracking", True, True)
         return perfData, JV
 
