@@ -454,7 +454,7 @@ class acqThread(QThread):
 
         if Voc != 0. and Jsc != 0.:
             FF = Vpmax*Jpmax/(Voc*Jsc)
-            effic = Vpmax*Jpmax/self.powerIn
+            effic = abs(100*Vpmax*Jpmax/self.powerIn)
         else:
             FF = 0.
             effic = 0.

@@ -128,7 +128,7 @@ class ResultsWindow(QMainWindow):
         self.resTableWidget.setHorizontalHeaderItem(3,QTableWidgetItem(u"VPP [V]"))
         self.resTableWidget.setHorizontalHeaderItem(4,QTableWidgetItem(u"MPP [mW/cm\u00B2]"))
         self.resTableWidget.setHorizontalHeaderItem(5,QTableWidgetItem("FF"))
-        self.resTableWidget.setHorizontalHeaderItem(6,QTableWidgetItem("PCE"))
+        self.resTableWidget.setHorizontalHeaderItem(6,QTableWidgetItem("PCE [%]"))
         self.resTableWidget.setHorizontalHeaderItem(7,QTableWidgetItem("Tracking time [s]"))
         self.resTableWidget.setHorizontalHeaderItem(8,QTableWidgetItem("Acq Date"))
         self.resTableWidget.setHorizontalHeaderItem(9,QTableWidgetItem("Acq Time"))
