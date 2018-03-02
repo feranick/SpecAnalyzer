@@ -235,6 +235,7 @@ class ResultsWindow(QMainWindow):
 
     # Plot Transient Jsc
     def plotTJsc(self, data):
+        self.toolbarTJsc.update()
         self.lineTJsc.set_data(data[:,2].astype(float), data[:,4].astype(float))
         self.axTJsc.relim()
         self.axTJsc.autoscale_view(True,True,True)
@@ -242,6 +243,7 @@ class ResultsWindow(QMainWindow):
     
     # Plot Transient Voc
     def plotTVoc(self, data):
+        self.toolbarTVoc.update()
         self.lineTVoc.set_data(data[:,2].astype(float), data[:,3].astype(float))
         self.axTVoc.relim()
         self.axTVoc.autoscale_view(True,True,True)
@@ -249,6 +251,7 @@ class ResultsWindow(QMainWindow):
 
     # Plot MPP with tracking
     def plotMPP(self, data):
+        self.toolbarMPP.update()
         self.lineMPP.set_data(data[:,2].astype(float), data[:,5].astype(float))
         self.axMPP.relim()
         self.axMPP.autoscale_view(True,True,True)
@@ -258,6 +261,8 @@ class ResultsWindow(QMainWindow):
     def plotJVresp(self, JV,init):
         if init is True:
             self.initJVPlot()
+        self.toolbarJVresp.update()
+        self.toolbarPVresp.update()
         self.axJVresp.plot(JV[:,0],JV[:,1], '-',linewidth=1)
         self.axPVresp.plot(JV[:,0],JV[:,0]*JV[:,1], '-',linewidth=1,
             color='orange')
