@@ -75,12 +75,14 @@ class ResultsWindow(QMainWindow):
         self.jvVLayout = QVBoxLayout()
         
         self.canvasJVresp = FigureCanvas(self.figureJVresp)
-        self.toolbarJVresp = NavigationToolbar(self.canvasJVresp, self)
+        #self.toolbarJVresp = NavigationToolbar(self.canvasJVresp, self)
+        self.toolbarJVresp = CustomToolbar(self.canvasJVresp, self.figureJVresp, self)
         self.toolbarJVresp.setMaximumHeight(30)
         self.toolbarJVresp.setStyleSheet("QToolBar { border: 0px }")
 
         self.canvasPVresp = FigureCanvas(self.figurePVresp)
-        self.toolbarPVresp = NavigationToolbar(self.canvasPVresp, self)
+        #self.toolbarPVresp = NavigationToolbar(self.canvasPVresp, self)
+        self.toolbarPVresp = CustomToolbar(self.canvasPVresp, self.figurePVresp, self)
         self.toolbarPVresp.setMaximumHeight(30)
         self.toolbarPVresp.setStyleSheet("QToolBar { border: 0px }")
 
@@ -507,3 +509,20 @@ class ResultsWindow(QMainWindow):
         else:
             self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(float(obj[0,2])))) #track_time
 
+'''
+   Custom Toolbar
+'''
+class CustomToolbar(NavigationToolbar):
+    def __init__(self, figure_canvas, figure, parent= None):
+        self.figure = figure
+        self.figure_canvas = figure_canvas
+        self.toolitems +=(('Log/Lin', 'Log/Lin', "Log/Lin scale", 'log_lin_scale'),)
+        NavigationToolbar.__init__(self, figure_canvas, parent=parent)
+
+    def log_lin_scale(self):
+        if len(self.figure.gca().lines) > 2:
+            if self.figure.gca().get_yscale() == 'log':
+                self.figure.gca().set_yscale('linear')
+            else:
+                self.figure.gca().set_yscale('log')
+            self.figure_canvas.draw()
