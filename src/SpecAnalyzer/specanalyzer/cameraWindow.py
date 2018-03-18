@@ -12,15 +12,16 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 '''
-import sys
+import sys, time
 from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QAction,
     QVBoxLayout,QLabel,QGraphicsView,QFileDialog,QStatusBar,
     QGraphicsScene, QLineEdit,QMessageBox,QWidget,QApplication,
-    QGraphicsRectItem,QGraphicsItem)
+    QGraphicsRectItem,QGraphicsItem,QToolBar)
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter,
-                         QBrush,QColor,QTransform,QPen)
-from PyQt5.QtCore import (pyqtSlot,QRectF,QPoint,QRect,Qt,QPointF)
+    QBrush,QColor,QTransform,QPen,QFont)
+from PyQt5.QtCore import (pyqtSlot,pyqtSignal,QRectF,QPoint,QRect,
+    Qt,QPointF)
 
 from .modules.camera.camera import *
 from . import logger
@@ -189,6 +190,18 @@ class CameraWindow(QMainWindow):
             del self.cam
         self.scene.cleanup()
 
+    # Extract pixel intensity from cursor position
+    def getPixelIntensity(self):
+        if hasattr(self,"cam"):
+            img_y, img_x, c = self.cam.img.shape
+            x = int(self.end.x())
+            y = int(self.end.y())
+            if x > 0 and y > 0 and x < img_x and y < img_y:
+                intensity = cv2.cvtColor(self.cam.img, cv2.COLOR_RGB2GRAY)[y,x]
+                msg = " Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity)
+                #self.printMsg(msg)
+                self.statusBar().showMessage(msg)
+
 '''
    QGraphicsSelectionItem
    Definition of the class to generate the rectangular selection
@@ -211,7 +224,8 @@ class GraphicsView(QGraphicsView):
     def __init__(self, parent=None):
         super(GraphicsView, self).__init__(parent)
         self.setRenderHints(QPainter.Antialiasing)
-    
+        self.setMouseTracking(True)
+        
     # Resize image when resizing cameraWindow
     def resizeEvent(self, event):
         self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
@@ -225,9 +239,11 @@ class GraphicsView(QGraphicsView):
    Custom GraphicScene having all the main content.
 '''
 class GraphicsScene(QGraphicsScene):
-
+    
+    selectionDef = pyqtSignal(bool)
     def __init__(self, parent=None):
         super(GraphicsScene, self).__init__(parent)
+        self.btnPressed = False
 
     # Create rectangular selection
     def addRect(self):
@@ -237,37 +253,46 @@ class GraphicsScene(QGraphicsScene):
         self.addItem(item)
         item.setSelected(True)
         self.setFocusItem(item)
-        #item.setToolTip(self.spotsLabel[-1])
         self.update()
 
-    # Mouse event driven routines for generating rectangular selections
+    # Mouse events routines for generating rectangular selections
     def mousePressEvent(self, event):
         if len(self.items()) !=0:
             self.removeRectangles()
         if event.button() == Qt.LeftButton:
             self.parent().begin = event.scenePos()
-            #self.parent().end = event.scenePos()
             self.parent().initial = event.scenePos()
             self.update()
+            self.btnPressed = True
 
     def mouseMoveEvent(self, event):
-        if len(self.items()) !=0:
-            self.parent().end = event.scenePos()
+        self.parent().end = event.scenePos()
+        self.parent().getPixelIntensity()
+        #print(len(self.items()))
+        #if len(self.items()) >0:
+        if self.btnPressed == True and hasattr(self.parent(),"cam"):
             self.addRect()
     
-    # Rectangular selection is
+    # Rectangular selection is defined at mouse release
     def mouseReleaseEvent(self, event):
+        self.btnPressed = False
         self.parent().end = event.scenePos()
         self.parent().final = event.scenePos()
         self.parent().update()
         try:
-            if len(self.items()) !=0:
+            if len(self.items()) ==2:
                 self.addRect()
-            self.parent().statusBar().showMessage(' Press SPACE to set Rectangular Selection', 5000)
+                self.parent().manualAlignBtn.setEnabled(True)
+                if self.parent().isAutoAlign:
+                    msg = " Press SPACE to set integration window for alignment check"
+                else:
+                    msg = " Press SPACE to set Check Alignment; ENTER to Close"
+                self.parent().printMsg(msg)
+                self.parent().view.setToolTip(msg)
         except:
             pass
 
-    # keyboard event driven routines for fixing the selection for analysis
+    # keyboard event driven routines for fixing the selection for analysis and closing image
     def keyPressEvent(self, event):
         if len(self.items())>1:
             if event.key() == Qt.Key_Space:
@@ -293,12 +318,12 @@ class GraphicsScene(QGraphicsScene):
     
     # Remove rectangular selections upon redrawing, leave image
     def removeRectangles(self):
-        """ Remove all spots from the scene (leaves background unchanged). """
         if len(self.items()) == 1 :
             self.image_item = self.items()[0]
         for item in self.items():
             self.removeItem(item)
-        self.addItem(self.image_item)
+        if hasattr(self,"image_item"):
+            self.addItem(self.image_item)
         self.update
 
     # cleaup scene and view
@@ -312,25 +337,6 @@ class GraphicsScene(QGraphicsScene):
             del self.image_orig
         except:
             pass
-
-    '''
-    def drawBackground(self, painter, rect):
-        """ Draws image in background if it exists. """
-        if hasattr(self, "image"):
-            painter.drawImage(QPoint(0, 0), self.image)
-
-    def setBackground(self, image, labeltext):
-        """ Sets the background image. """
-        if not hasattr(self, 'imlabel'):
-            self.imlabel = QGraphicsSimpleTextItem(labeltext)
-            self.imlabel.setBrush(QBrush(Qt.white))
-            self.imlabel.setPos(5, 5)
-        if not hasattr(self,"image") or len(self.items()) < 1:
-            self.addItem(self.imlabel)
-        self.imlabel.setText(labeltext)
-        self.image = image
-        self.update()
-    '''
 
 
 
