@@ -174,10 +174,17 @@ class MainWindow(QMainWindow):
         self.resultsToolbar.setStatusTip('Results Panel')
         self.resultsToolbar.triggered.connect(self.resultswind.show)
         
+        self.cameraToolbar = QAction("&Camera", self)
+        self.cameraToolbar.setShortcut("Ctrl+c")
+        self.cameraToolbar.setStatusTip('Camera and alignment')
+        self.cameraToolbar.triggered.connect(self.camerawind.show)
+        
         #toolBar = self.addToolBar("&Toolbar")
         self.toolBar.addAction(self.acquisitionToolbar)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.resultsToolbar)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.cameraToolbar)
         self.toolBar.addSeparator()
        
         #### Create status bar ####
@@ -254,11 +261,16 @@ class MainWindow(QMainWindow):
         viewResultsMenu.setShortcut("Ctrl+r")
         viewResultsMenu.setStatusTip('Display Results Window')
         viewResultsMenu.triggered.connect(lambda: self.displayMainWindow(obj.resultswind))
+        viewCameraMenu = QAction("&Camera Window", self)
+        viewCameraMenu.setShortcut("Ctrl+c")
+        viewCameraMenu.setStatusTip('Display Camera Window')
+        viewCameraMenu.triggered.connect(lambda: self.displayMainWindow(obj.camerawind))
 
         windowMenu = menuObj.addMenu('&Window')
         windowMenu.addAction(viewMainWindowMenu)
         windowMenu.addAction(viewAcquisitionMenu)
         windowMenu.addAction(viewResultsMenu)
+        windowMenu.addAction(viewCameraMenu)
 
     # Display main window
     def displayMainWindow(self, obj):
