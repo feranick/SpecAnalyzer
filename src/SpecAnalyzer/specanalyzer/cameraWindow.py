@@ -73,11 +73,11 @@ class CameraWindow(QMainWindow):
         tb.addAction(self.liveFeedBtn)
         tb.addSeparator()
         
-        self.autoAlignBtn = QAction(QIcon(QPixmap()),"Run Alignment",self)
-        self.autoAlignBtn.setEnabled(False)
-        self.autoAlignBtn.setShortcut('Ctrl+r')
-        self.autoAlignBtn.setStatusTip('Run Alignment routine')
-        tb.addAction(self.autoAlignBtn)
+        self.saveBtn = QAction(QIcon(QPixmap()),"Save Image",self)
+        self.saveBtn.setEnabled(False)
+        self.saveBtn.setShortcut('Ctrl+s')
+        self.saveBtn.setStatusTip('saveImage')
+        tb.addAction(self.saveBtn)
         tb.addSeparator()
         
         contrastAlignLabel = QLabel()
@@ -97,19 +97,15 @@ class CameraWindow(QMainWindow):
         tb.addAction(self.setDefaultBtn)
         tb.addSeparator()
         
-        self.autoAlignBtn.triggered.connect(self.autoAlign)
+        self.saveBtn.triggered.connect(self.saveImage)
         self.updateBtn.triggered.connect(lambda: self.cameraFeed(False))
         self.setDefaultBtn.triggered.connect(self.setDefault)
         self.liveFeedBtn.triggered.connect(lambda: self.cameraFeed(True))
 
-    # Define behavior of push buttons
-    # Handle the actual alignment substrate by substrate
-    def autoAlign(self):
-        pass
-
     # Get image from feed
     def cameraFeed(self, live):
         self.cam = CameraFeed()
+        self.saveBtn.setEnabled(True)
         self.setDefaultBtn.setEnabled(True)
         try:
             self.checkAlignText.setStyleSheet("color: rgb(0, 0, 0);")
@@ -182,13 +178,24 @@ class CameraWindow(QMainWindow):
         msgBox.setInformativeText( "Please realign and retry" )
         msgBox.exec_()
 
-    # Close camera feed upon closing window.
-    def closeEvent(self, event):
+    # Delete camera feed
+    def delCam(self):
         if hasattr(self,"cam"):
             self.cam.closeLiveFeed = True
-            #self.firstTimeRunning = True
             del self.cam
+
+    # Close camera feed upon closing window.
+    def closeEvent(self, event):
+        self.delCam()
+        self.saveBtn.setEnabled(False)
         self.scene.cleanup()
+        self.statusBar().showMessage("Camera: Ready")
+        
+    # Save Image to file
+    def saveImage(self):
+        filename = "calib"+str(datetime.now().strftime('_%Y%m%d_%H-%M-%S.png'))
+        print(" Image saved in: "+filename)
+        self.cam.save_image(self.parent().config.imagesFolder+filename)
 
     # Extract pixel intensity from cursor position
     def getPixelIntensity(self):
@@ -201,6 +208,12 @@ class CameraWindow(QMainWindow):
                 msg = " Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity)
                 #self.printMsg(msg)
                 self.statusBar().showMessage(msg)
+
+    # Enable/Disable Buttons
+    def enableButtons(self, flag):
+        self.saveBtn.setEnabled(flag)
+        self.updateMenu.setEnabled(flag)
+        self.liveFeedMenu.setEnabled(flag)
 
 '''
    QGraphicsSelectionItem
