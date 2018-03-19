@@ -4,8 +4,8 @@ cameraFeed.py
 Class for providing a hardware support for 
 for the cameraFeed
 
-Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
-Copyright (C) 2017 Michel Nasilowski <micheln@mit.edu>
+Copyright (C) 2017-2018 Nicola Ferralis <ferralis@mit.edu>
+Copyright (C) 2017-2018 Michel Nasilowski <micheln@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,6 +42,8 @@ class CameraFeed():
 
             # Display the resulting frame
             cv2.imshow('Live Feed: push \"q\" to stop and grab frame',gray)
+            #cv2.moveWindow('Live Feed: push \"q\" to stop and grab frame',30,30)
+
             if (cv2.waitKey(1) & 0xFF == ord('q')) or self.closeLiveFeed == True:
                 cv2.destroyAllWindows()
                 break
@@ -72,13 +74,14 @@ class CameraFeed():
 
     # Save image
     def save_image(self, filename):
-        cv2.imwrite(filename,self.img)
+        img_bw = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
+        cv2.imwrite(filename,img_bw)
 
     # Logic for checking alignment
-    def check_alignment(self, img_data, threshold):
+    def check_alignment(self, img_data, thresholdPerc):
         count = 0
         self.iMax = np.amax(img_data)
-        threshold = threshold*self.iMax
+        threshold = thresholdPerc*self.iMax
         for i in np.nditer(img_data):
             if i > threshold:
                 count = count + 1
