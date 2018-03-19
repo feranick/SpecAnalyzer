@@ -67,8 +67,9 @@ On MS Windows:
 After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go.
 
 ### Linux/Mac OSX
-From the terminal, run: ```python specanalyzer```
+From the terminal, run: ```python3 specanalyzer.py```
     
 ### Windows
-Launch by double clicking the file ```specanalyzer-windows.bat```
+From the terminal, run: ```python specanalyzer.py```
+Alternatively, launch by double clicking the file ```specanalyzer-windows.bat```
 

@@ -4,7 +4,7 @@ powermeterWindow
 Class for providing a graphical user interface for 
 powermeter panel
 
-Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
+Copyright (C) 2017-2018 Nicola Ferralis <ferralis@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

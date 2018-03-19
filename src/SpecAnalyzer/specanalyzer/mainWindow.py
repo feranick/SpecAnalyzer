@@ -2,7 +2,7 @@
 mainWindow
 -------------
 
-Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
+Copyright (C) 2017-2018 Nicola Ferralis <ferralis@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ class AboutWidget(QWidget):
         self.labelBy = QLabel("by: %s" % __author__, self)
         self.labelContact = QLabel("<qt>Contact: <a href = mailto:ferralis@mit.edu> ferralis@mit.edu</a></qt>", self)
         self.labelDetails = QLabel("Acquisition of JV curves from solar cells", self)
-        self.labelLicense = QLabel("This software is licensed under the <a href = https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html> GNU GPL v.2.0 or later</a>", self)
+        self.labelLicense = QLabel("This software is licensed under the <a href = https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html> GNU GPL v.3.0 or later</a>", self)
         
         for label in [self.labelTitle, self.labelBy,
                 self.labelContact, self.labelDetails, self.labelLicense]:
