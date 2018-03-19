@@ -4,7 +4,7 @@ cameraWindow.py
 Class for providing a graphical user interface
 for the cameraWindow
 
-Copyright (C) 2017 Nicola Ferralis <ferralis@mit.edu>
+Copyright (C) 2017-2018 Nicola Ferralis <ferralis@mit.edu>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +17,17 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QAction,
     QVBoxLayout,QLabel,QGraphicsView,QFileDialog,QStatusBar,
     QGraphicsScene, QLineEdit,QMessageBox,QWidget,QApplication,
-    QGraphicsRectItem,QGraphicsItem,QToolBar)
+    QGraphicsRectItem,QGraphicsItem,QToolBar,QMenuBar)
 from PyQt5.QtGui import (QIcon,QImage,QKeySequence,QPixmap,QPainter,
-    QBrush,QColor,QTransform,QPen,QFont)
-from PyQt5.QtCore import (pyqtSlot,pyqtSignal,QRectF,QPoint,QRect,
-    Qt,QPointF)
+                         QBrush,QColor,QTransform,QPen,QFont)
+from PyQt5.QtCore import (pyqtSlot,QRectF,QPoint,QRect,Qt,QPointF)
 
 from .modules.camera.camera import *
-from . import logger
 from .configuration import *
+from .acquisition import *
+#from .modules.xystage.xystage import *
+#from .modules.shutter.shutter import *
+#from . import logger
 
 '''
    Camera Window
@@ -36,11 +38,13 @@ class CameraWindow(QMainWindow):
         self.initUI()
         self.config = Configuration()
         self.config.readConfig(self.config.configFile)
+        #self.numRow = self.config.numSubsHolderRow
+        #self.numCol = self.config.numSubsHolderCol
     
     def initUI(self):
         # Set up Window geometry and shape
-        self.setGeometry(100, 500, 660, 480)
-        self.setWindowTitle('Camera Panel')
+        self.setGeometry(550, 300, 800, 630)
+        self.setWindowTitle('Camera Alignment Panel')
         # Set up status bar
         self.statusBar().showMessage("Camera: Ready", 5000)
         
@@ -50,87 +54,317 @@ class CameraWindow(QMainWindow):
         self.view.setScene(self.scene)
         self.view.setMinimumSize(660, 480)
         self.imageLabel = QLabel()
-        #self.setCentralWidget(self.imageLabel)
         self.setCentralWidget(self.view)
+        self.image_data = None
         
         self.begin = QPoint()
         self.end = QPoint()
         self.firstTimeRunning = True
+        self.alignOn = False
         
         # Set up ToolBar
-        tb = self.addToolBar("Camera")
-        self.updateBtn = QAction(QIcon(QPixmap()),"Get Camera Image",self)
-        self.updateBtn.setShortcut('Ctrl+c')
-        self.updateBtn.setStatusTip('Get camera feed, set integration window')
-        tb.addAction(self.updateBtn)
-        tb.addSeparator()
+        tb = QToolBar()
+        self.addToolBar(Qt.BottomToolBarArea, tb)
         
-        self.liveFeedBtn = QAction(QIcon(QPixmap()),
-                                     "Live Feed",self)
-        self.liveFeedBtn.setShortcut('Ctrl+d')
-        self.liveFeedBtn.setStatusTip('Set Default Alignment')
-        self.liveFeedBtn.setEnabled(True)
-        tb.addAction(self.liveFeedBtn)
-        tb.addSeparator()
+        #self.autoAlignBtn = QAction(QIcon(QPixmap()),"Run Automated Alignment",self)
+        #self.autoAlignBtn.setEnabled(True)
+        #self.autoAlignBtn.setShortcut('Ctrl+r')
+        #self.autoAlignBtn.setStatusTip('Run Automated Alignment Routine')
         
-        self.saveBtn = QAction(QIcon(QPixmap()),"Save Image",self)
-        self.saveBtn.setEnabled(False)
-        self.saveBtn.setShortcut('Ctrl+s')
-        self.saveBtn.setStatusTip('saveImage')
-        tb.addAction(self.saveBtn)
-        tb.addSeparator()
+        self.manualAlignBtn = QAction(QIcon(QPixmap()),"Get Image",self)
+        self.manualAlignBtn.setEnabled(True)
+        self.manualAlignBtn.setShortcut('Ctrl+m')
+        self.manualAlignBtn.setStatusTip('Get Image - Run Manual Alignment')
+        
+        self.liveAlignBtn = QAction(QIcon(QPixmap()),"Live",self)
+        self.liveAlignBtn.setEnabled(True)
+        self.liveAlignBtn.setShortcut('Ctrl+l')
+        self.liveAlignBtn.setStatusTip('Live Image - Run Manual Alignment')
+        
+        self.saveImageBtn = QAction(QIcon(QPixmap()),"Save Image",self)
+        self.saveImageBtn.setEnabled(False)
+        self.saveImageBtn.setShortcut('Ctrl+s')
+        self.saveImageBtn.setStatusTip('Save Image')
         
         contrastAlignLabel = QLabel()
-        contrastAlignLabel.setText("Check alignment [%]: ")
-        tb.addWidget(contrastAlignLabel)
+        font = QFont()
+        font.setFamily(font.defaultFamily())
+        contrastAlignLabel.setFont(font)
+        contrastAlignLabel.setText("Alignment Threshold [%]: ")
         self.checkAlignText = QLineEdit()
-        self.checkAlignText.setMaximumSize(50, 25)
+        self.checkAlignText.setMaximumSize(80, 25)
         self.checkAlignText.setReadOnly(True)
-        tb.addWidget(self.checkAlignText)
-        self.checkAlignText.show()
-        tb.addSeparator()
+        
         self.setDefaultBtn = QAction(QIcon(QPixmap()),
-                                     "Set Default Alignment",self)
+                                     "Set Alignment as Default",self)
         self.setDefaultBtn.setShortcut('Ctrl+d')
         self.setDefaultBtn.setStatusTip('Set Default Alignment')
         self.setDefaultBtn.setEnabled(False)
+        
+        self.resetBtn = QAction(QIcon(QPixmap()),
+                                     "Reset",self)
+        self.resetBtn.setShortcut('Ctrl+r')
+        self.resetBtn.setStatusTip('Reset Camera Live Interface')
+        self.resetBtn.setEnabled(False)
+
+        #tb.addAction(self.autoAlignBtn)
+        tb.addAction(self.manualAlignBtn)
+        tb.addSeparator()
+        tb.addAction(self.liveAlignBtn)
+        tb.addSeparator()
+        tb.addAction(self.saveImageBtn)
+        tb.addSeparator()
+        tb.addWidget(contrastAlignLabel)
+        tb.addWidget(self.checkAlignText)
+        self.checkAlignText.show()
+        tb.addSeparator()
         tb.addAction(self.setDefaultBtn)
         tb.addSeparator()
+        tb.addAction(self.resetBtn)
+        tb.addSeparator()
         
-        self.saveBtn.triggered.connect(self.saveImage)
-        self.updateBtn.triggered.connect(lambda: self.cameraFeed(False))
+        #self.autoAlignBtn.triggered.connect(self.autoAlign)
+        self.manualAlignBtn.triggered.connect(lambda: self.manualAlign(False))
+        self.liveAlignBtn.triggered.connect(lambda: self.manualAlign(True))
+        self.saveImageBtn.triggered.connect(self.saveImage)
         self.setDefaultBtn.triggered.connect(self.setDefault)
-        self.liveFeedBtn.triggered.connect(lambda: self.cameraFeed(True))
+        self.resetBtn.triggered.connect(self.setAlignOnFalse)
+
+        # Make Menu for plot related calls
+        self.menuBar = QMenuBar(self)
+        self.menuBar.setGeometry(0,0,1150,25)
+
+        #self.autoAlignmentMenu = QAction("&Autoalignment", self)
+        #self.autoAlignmentMenu.setShortcut("Ctrl+k")
+        #self.autoAlignmentMenu.setStatusTip('Run Autoalignment')
+        #self.autoAlignmentMenu.triggered.connect(self.autoAlign)
+
+        self.manualAlignmentMenu = QAction("&Manual alignment", self)
+        self.manualAlignmentMenu.setShortcut("Ctrl+m")
+        self.manualAlignmentMenu.setStatusTip('Run manual alignment')
+        self.manualAlignmentMenu.triggered.connect(lambda: self.manualAlign(False))
+
+        self.liveAlignmentMenu = QAction("&Manual alignment - Live", self)
+        self.liveAlignmentMenu.setShortcut("Ctrl+l")
+        self.liveAlignmentMenu.setStatusTip('Run manual alignment from live mode')
+        self.liveAlignmentMenu.triggered.connect(lambda: self.manualAlign(True))
+
+        self.saveImageMenu = QAction("&Save Image", self)
+        self.saveImageMenu.setShortcut("Ctrl+s")
+        self.saveImageMenu.setStatusTip('Save image to png file')
+        self.saveImageMenu.triggered.connect(self.saveImage)
+        self.saveImageMenu.setEnabled(False)
+        
+        alignmentMenu = self.menuBar.addMenu('&Alignment')
+        #alignmentMenu.addAction(self.autoAlignmentMenu)
+        alignmentMenu.addAction(self.manualAlignmentMenu)
+        alignmentMenu.addAction(self.liveAlignmentMenu)
+        imageMenu = self.menuBar.addMenu('&Image')
+        imageMenu.addAction(self.saveImageMenu)
+
+        self.parent().viewWindowMenus(self.menuBar, self.parent())
+     
+    '''
+    # Handle the actual alignment substrate by substrate
+    def autoAlign(self):
+        performAlignment = False
+        for j in range(self.numCol):
+            for i in range(self.numRow):
+                if self.parent().samplewind.tableWidget.item(i,j).text() != "":
+                    performAlignment = True
+        if performAlignment == False:
+            self.noSubstratesMessageBox()
+            return
+        self.isAutoAlign = True
+        self.autoAlignBtn.setEnabled(False)
+        
+        self.printMsg("Activating XY stage for automated alignment...")
+        # If stage is open in stage window, close.
+        if self.parent().stagewind.activeStage:
+            self.parent().stagewind.activateStage()
+        self.xystage = XYstage(self.parent().config.xDefStageOrigin,
+                            self.parent().config.yDefStageOrigin)
+        if self.xystage.xystageInit == False:
+            self.printMsg(" Stage not activated: automated acquisition not possible. Aborting.")
+            self.autoAlignBtn.setEnabled(True)
+            return
+        self.printMsg(" Stage activated.")
+        
+        ##########################
+        self.moveToReferenceCell()
+        ##########################
+        
+        #self.openShutter()
+        
+        self.firstRun = True
+        for j in range(self.numCol):
+            for i in range(self.numRow):
+                # Convert to correct substrate number in holder
+                substrateNum = Acquisition().getSubstrateNumber(i,j)
+                
+                # Check if the holder has a substrate in that slot
+                if self.parent().samplewind.tableWidget.item(i,j).text() != ""  and \
+                        self.parent().samplewind.activeSubs[i,j] == True:
+                    self.parent().samplewind.colorCellAcq(i,j,"yellow")
+                                        
+                    # Move stage to desired substrate
+                    if self.xystage.xystageInit is True:
+                        self.printMsg("\nMoving stage to substrate #"+ \
+                                        str(substrateNum) + \
+                                        ": ("+str(4-i)+", "+str(4-j)+")")
+                        self.xystage.move_to_substrate_4x4(substrateNum)
+                        time.sleep(0.1)
+
+                        # Perform alignment analysis 
+                        self.cam = CameraFeed()
+                        self.setWindowTitle('Camera Alignment Panel - Substrate #'+\
+                                    str(substrateNum)+" ("+\
+                                    self.parent().samplewind.tableWidget.item(i,j).text()+")")
+                        self.setSelWindow(False)
+                        if hasattr(self,"cam"):
+                            alignFlag, alignPerc, iMax = self.alignment()
+                        else:
+                            self.deactivateStage()
+                            return
+                        if alignFlag == 0:
+                            self.parent().samplewind.colorCellAcq(i,j,"white")
+                            self.printMsg(" Substrate #"+str(substrateNum)+" aligned (alignPerc = "+ str(alignPerc)+")")
+                        else:
+                            self.parent().samplewind.colorCellAcq(i,j,"grey")
+                            if alignFlag == 1:
+                                self.printMsg(" Substrate #"+str(substrateNum)+" Empty! (alignPerc = "+ str(alignPerc)+")")
+                            if alignFlag == 2:
+                                self.printMsg(" Substrate #"+str(substrateNum)+" not aligned! (alignPerc = "+ str(alignPerc)+")")
+                        self.delCam()
+        self.printMsg("\nAuto-alignment completed")
+        #self.deactivateStage()
+        #self.closeShutter()
+        
+        self.enableButtons(True)
+        self.setWindowTitle('Camera Alignment Panel')
+    '''
+
+    # Perform manual alignment
+    def manualAlign(self, live):
+        #self.openShutter()
+        self.cam = CameraFeed()
+        self.resetBtn.setEnabled(True)
+        self.saveImageMenu.setEnabled(True)
+        self.saveImageBtn.setEnabled(True)
+        self.isAutoAlign = False
+        self.firstRun = True
+        self.alignOn = True
+        self.scene.selectionDef.connect(self.checkManualAlign)
+        self.setSelWindow(live)
+        self.resetBtn.setEnabled(True)
+        QApplication.processEvents()
+        while self.alignOn:
+            time.sleep(0.1)
+            QApplication.processEvents()
+
+        try:
+            self.scene.selectionDef.disconnect()
+        except:
+            pass
+        self.scene.cleanup()
+        self.delCam()
+        self.enableButtons(True)
+        self.saveImageMenu.setEnabled(False)
+        self.saveImageBtn.setEnabled(False)
+        #self.closeShutter()
+        
+    # Routine for manual alignment check
+    def checkManualAlign(self):
+        self.alignFlag, self.alignPerc, self.iMax = self.alignment()
+        if self.alignFlag == 0:
+            self.inAlignmentMessageBox()
+            self.printMsg(" Devices and masks appear to be correctly aligned (alignPerc = "+ str(self.alignPerc)+")")
+        else:
+            self.outAlignmentMessageBox(self.alignFlag)
+
+    # Define selection window 
+    def setSelWindow(self, live):
+        self.cameraFeed(live)
+        if self.firstRun:
+            self.printMsg(" Use Mouse to set the integration window")
+        while self.firstRun:
+            time.sleep(0.05)
+            QApplication.processEvents()
+            pass
+        self.firstRun = False
+            
+    # Alignment routine
+    def alignment(self):
+        image, image_data, image_orig = self.cam.get_image(True,
+                             int(self.initial.x()),
+                             int(self.final.x()),
+                             int(self.initial.y()),
+                             int(self.final.y()))
+                
+        alignPerc, iMax = self.cam.check_alignment( \
+                image_data,
+                self.config.alignmentIntThreshold)
+        print(" DEBUG: alignPerc: ",alignPerc,"; iMax: ",iMax)
+
+        self.checkAlignText.setText(str(alignPerc))
+        if float(alignPerc) > self.config.alignmentContrastDefault:
+            self.checkAlignText.setStyleSheet("color: rgb(255, 0, 255);")
+            alignFlag = 1
+        else:
+            if float(iMax) > self.config.alignmentIntMax:
+                self.checkAlignText.setStyleSheet("color: rgb(255, 0, 255);")
+                alignFlag = 2
+            else:
+                alignFlag = 0
+        return alignFlag, alignPerc, iMax
+    
+    '''
+    # Old Alignment routine
+    def alignment(self):
+        image, image_data, image_orig = self.cam.get_image(True,
+                             int(self.initial.x()),
+                             int(self.final.x()),
+                             int(self.initial.y()),
+                             int(self.final.y()))
+                
+        alignPerc, iMax = self.cam.check_alignment( \
+                image_data,
+                self.config.alignmentIntThreshold)
+        print(" DEBUG: alignPerc: ",alignPerc,"; iMax: ",iMax)
+
+        self.checkAlignText.setText(str(alignPerc))
+        if float(alignPerc) > self.config.alignmentContrastDefault \
+                and float(iMax) > self.config.alignmentIntMax:
+            self.checkAlignText.setStyleSheet("color: rgb(255, 0, 255);")
+            return 1, alignPerc, iMax
+        else:
+            return 0, alignPerc, iMax
+    '''
 
     # Get image from feed
     def cameraFeed(self, live):
-        self.cam = CameraFeed()
-        self.saveBtn.setEnabled(True)
+        self.scene.cleanup()
         self.setDefaultBtn.setEnabled(True)
         try:
             self.checkAlignText.setStyleSheet("color: rgb(0, 0, 0);")
+            self.enableButtons(False)
             if live:
-                self.liveFeedBtn.setText("Set integration window")
-                self.updateBtn.setEnabled(False)
+                self.parent().stagewind.setGeometry(700, 60, 310, 400)
+                self.parent().stagewind.show()
                 QApplication.processEvents()
                 self.img = self.cam.grab_image_live()
             else:
-                self.updateBtn.setText("Set integration window")
-                self.liveFeedBtn.setEnabled(False)
                 QApplication.processEvents()
                 self.img = self.cam.grab_image()
             self.image, self.image_data, temp = self.cam.get_image(False,0,0,0,0)
             
             pixMap = QPixmap.fromImage(self.image)
             self.scene.addPixmap(pixMap)
-            #self.imageLabel.setPixmap(QPixmap.fromImage(self.image))
             self.view.fitInView(self.view.sceneRect(), Qt.KeepAspectRatio)
 
             self.statusBar().showMessage('Camera-feed' + \
                  str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
             self.statusBar().showMessage(' Drag Mouse to select area for alignment', 5000)
-            self.liveFeedBtn.setEnabled(True)
-            self.updateBtn.setEnabled(True)
         except:
             self.statusBar().showMessage(' USB camera not connected', 5000)
 
@@ -156,27 +390,81 @@ class CameraWindow(QMainWindow):
         ret = msgBox.exec_()
 
         if ret == QMessageBox.Yes:
-            self.filename = "calib"+str(datetime.now().strftime('_%Y%m%d_%H-%M-%S.png'))
             self.parent().config.conf['Instruments']['alignmentContrastDefault'] = str(self.alignPerc)
             self.parent().config.conf['Instruments']['alignmentIntMax'] = str(self.iMax)
             with open(self.parent().config.configFile, 'w') as configfile:
                 self.parent().config.conf.write(configfile)
             self.parent().config.readConfig(self.parent().config.configFile)
-            print(" New alignment settings saved as default. Image saved in: ", self.filename)
-            logger.info(" New camera alignment settings saved as default. Image saved in: "+self.filename)
-            self.cam.save_image(self.parent().config.imagesFolder+self.filename)
+            self.printMsg(" New alignment settings saved as default.")
+            self.saveImage()
             return True
         else:
-            print( " Alignment settings not saved as default" )
+            self.printMsg( " Alignment settings not saved as default")
             return False
 
     # Warning box for misalignment
-    def outAlignmentMessageBox(self):
+    def outAlignmentMessageBox(self, flag):
+        msgBox = QMessageBox( self )
+        msgBox.setIcon( QMessageBox.Warning )
+        if flag == 1:
+            msgBox.setText( "WARNING:\nNo substrate appears to be loaded " )
+            msgBox.setInformativeText( "Please check and retry...\nClose this box and press ENTER to close" )
+            self.printMsg(" No substrates appear to be loaded (alignPerc = "+ str(self.alignPerc)+")")
+        if flag == 2:
+            msgBox.setText( "WARNING:\nDevices and mask may be misaligned " )
+            msgBox.setInformativeText( "Please realign and retry...\nClose this box and press ENTER to close" )
+            self.printMsg(" Devices and masks are not aligned! (alignPerc = "+ str(self.alignPerc)+")")
+        msgBox.exec_()
+    
+    # Warning box for misalignment
+    def inAlignmentMessageBox(self):
         msgBox = QMessageBox( self )
         msgBox.setIcon( QMessageBox.Information )
-        msgBox.setText( "WARNING: devices and mask might be misaligned " )
-        msgBox.setInformativeText( "Please realign and retry" )
+        msgBox.setText( "GOOD!\nDevices and mask are correctly aligned " )
+        msgBox.setInformativeText( " Close this box and press ENTER to close" )
         msgBox.exec_()
+
+    # No substrate selected box
+    def noSubstratesMessageBox(self):
+        msgBox = QMessageBox( self )
+        msgBox.setIcon( QMessageBox.Information )
+        msgBox.setText( "WARNING:\nNo substrates selected " )
+        msgBox.setInformativeText( "Please add the substrates in the substrate window" )
+        msgBox.exec_()
+    
+    '''
+    # Action for stop button
+    def moveToReferenceCell(self):
+        msg = "Moving to the Reference cell first?"
+        self.printMsg(msg)
+        reply = QMessageBox.question(self.parent(), 'Message',
+                     msg, QMessageBox.No, QMessageBox.Yes)
+
+        if reply == QMessageBox.Yes:
+            self.printMsg("Moving stage to reference cell...")
+            QApplication.processEvents()
+            self.xystage.move_abs(float(self.config.xPosRefCell),
+                              float(self.config.yPosRefCell))
+            self.printMsg(msg)
+            msgBox = QMessageBox( self )
+            msgBox.setIcon( QMessageBox.Information )
+            msgBox.setText( "Push OK to continue..." )
+            msgBox.setInformativeText( "... once you're done with the reference cell" )
+            msgBox.exec_()
+        else:
+            pass
+    '''
+    # Show message on log and terminal
+    def printMsg(self, msg):
+        print(msg)
+        self.statusBar().showMessage(msg)
+        logger.info(msg)
+    
+    # Save Image to file
+    def saveImage(self):
+        filename = "calib"+str(datetime.now().strftime('_%Y%m%d_%H-%M-%S.png'))
+        self.printMsg(" Image saved in: "+filename)
+        self.cam.save_image(self.parent().config.imagesFolder+filename)
 
     # Delete camera feed
     def delCam(self):
@@ -186,16 +474,59 @@ class CameraWindow(QMainWindow):
 
     # Close camera feed upon closing window.
     def closeEvent(self, event):
+        #self.parent().stagewind.close()
+        self.firstRun = False
+        self.alignOn = False
+        self.enableButtons(True)
         self.delCam()
-        self.saveBtn.setEnabled(False)
         self.scene.cleanup()
         self.statusBar().showMessage("Camera: Ready")
-        
-    # Save Image to file
-    def saveImage(self):
-        filename = "calib"+str(datetime.now().strftime('_%Y%m%d_%H-%M-%S.png'))
-        print(" Image saved in: "+filename)
-        self.cam.save_image(self.parent().config.imagesFolder+filename)
+
+    '''
+    # Deactivate stage after alignment
+    def deactivateStage(self):
+        self.printMsg(" Moving stage to parking position")
+        self.xystage.move_abs(5,5)
+        self.printMsg("Deactivating Stage...")
+        self.xystage.end_stage_control()
+        del self.xystage
+        self.printMsg("Stage deactivated")
+
+    # Activate shutter
+    def openShutter(self):
+        self.printMsg("Activating shutter...")
+        try:
+            self.shutter = Shutter()
+            self.shutter.open()
+            self.printMsg(" Shutter activated and open.")
+        except:
+            self.printMsg(" Shutter not activated: no acquisition possible")
+            return
+
+    # Deactivate shutter
+    def closeShutter(self):
+        if hasattr(self,"shutter"):
+            try:
+                self.shutter.closed()
+                del self.shutter
+                self.printMsg("Shutter deactivated")
+            except:
+                pass
+    '''
+    # Enable/Disable Buttons
+    def enableButtons(self, flag):
+        #self.autoAlignBtn.setEnabled(flag)
+        self.manualAlignBtn.setEnabled(flag)
+        self.liveAlignBtn.setEnabled(flag)
+        self.manualAlignmentMenu.setEnabled(flag)
+        #self.autoAlignmentMenu.setEnabled(flag)
+        self.liveAlignmentMenu.setEnabled(flag)
+
+    # Set alignOn variable as False
+    def setAlignOnFalse(self):
+        self.alignOn = False
+        self.firstRun = False
+        self.resetBtn.setEnabled(False)
 
     # Extract pixel intensity from cursor position
     def getPixelIntensity(self):
@@ -208,12 +539,6 @@ class CameraWindow(QMainWindow):
                 msg = " Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity)
                 #self.printMsg(msg)
                 self.statusBar().showMessage(msg)
-
-    # Enable/Disable Buttons
-    def enableButtons(self, flag):
-        self.saveBtn.setEnabled(flag)
-        self.updateMenu.setEnabled(flag)
-        self.liveFeedMenu.setEnabled(flag)
 
 '''
    QGraphicsSelectionItem
@@ -238,14 +563,10 @@ class GraphicsView(QGraphicsView):
         super(GraphicsView, self).__init__(parent)
         self.setRenderHints(QPainter.Antialiasing)
         self.setMouseTracking(True)
-        
+    
     # Resize image when resizing cameraWindow
     def resizeEvent(self, event):
         self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
-    
-    def drawBackground(self, painter, rect):
-        painter.fillRect(rect, QBrush(Qt.lightGray))
-        self.scene().drawBackground(painter, rect)
 
 '''
    GraphicsScene
@@ -309,25 +630,10 @@ class GraphicsScene(QGraphicsScene):
     def keyPressEvent(self, event):
         if len(self.items())>1:
             if event.key() == Qt.Key_Space:
-                self.parent().updateBtn.setText("Get Camera Image")
-                self.parent().liveFeedBtn.setText("Live Feed")
-                self.image, self.image_data, self.image_orig = self.parent().cam.get_image(True,
-                             int(self.parent().initial.x()),
-                             int(self.parent().final.x()),
-                             int(self.parent().initial.y()),
-                             int(self.parent().final.y()))
-                
-                self.alignPerc, self.iMax = self.parent().cam.check_alignment( \
-                self.image_data,
-                self.parent().config.alignmentIntThreshold)
-
-                self.parent().checkAlignText.setText(str(self.alignPerc))
-                if float(self.alignPerc) > self.parent().config.alignmentContrastDefault \
-                    and float(self.iMax) > self.parent().config.alignmentIntMax:
-                    self.parent().checkAlignText.setStyleSheet("color: rgb(255, 0, 255);")
-                    self.parent().outAlignmentMessageBox()
-                else:
-                    self.parent().statusBar().showMessage(' Devices and masks appear to be correct', 5000)
+                self.parent().firstRun = False
+                self.selectionDef.emit(True)
+            if event.key() == Qt.Key_Return:
+                self.parent().alignOn=False
     
     # Remove rectangular selections upon redrawing, leave image
     def removeRectangles(self):
@@ -350,7 +656,6 @@ class GraphicsScene(QGraphicsScene):
             del self.image_orig
         except:
             pass
-
 
 
 
