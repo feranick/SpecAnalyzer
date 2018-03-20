@@ -246,6 +246,7 @@ class CameraWindow(QMainWindow):
 
     # Perform manual alignment
     def manualAlign(self, live):
+        self.delCam()
         #self.openShutter()
         self.cam = CameraFeed()
         self.resetBtn.setEnabled(True)
@@ -520,7 +521,7 @@ class CameraWindow(QMainWindow):
         self.liveAlignBtn.setEnabled(flag)
         self.manualAlignmentMenu.setEnabled(flag)
         #self.autoAlignmentMenu.setEnabled(flag)
-        self.liveAlignmentMenu.setEnabled(flag)
+        #self.liveAlignmentMenu.setEnabled(flag)
 
     # Set alignOn variable as False
     def setAlignOnFalse(self):
