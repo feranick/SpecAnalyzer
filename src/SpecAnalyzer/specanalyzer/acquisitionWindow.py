@@ -220,11 +220,11 @@ class AcquisitionWindow(QMainWindow):
         minV = -100
         try:
             validateStartVoltage = QDoubleValidator(float(self.minVText.text()),
-                                    float(self.maxVText.text()),1,self.startVText)
+                                    float(self.maxVText.text()),6,self.startVText)
             validateMaxVoltage = QDoubleValidator(float(self.minVText.text()),
-                                    maxV,1,self.maxVText)
+                                    maxV,6,self.maxVText)
             validateMinVoltage = QDoubleValidator(minV,
-                                    float(self.maxVText.text()),1,self.minVText)
+                                    float(self.maxVText.text()),6,self.minVText)
         except:
             pass
                                     
