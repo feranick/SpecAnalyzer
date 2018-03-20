@@ -531,7 +531,10 @@ class CameraWindow(QMainWindow):
     # Extract pixel intensity from cursor position
     def getPixelIntensity(self):
         if hasattr(self,"cam"):
-            img_y, img_x, c = self.cam.img.shape
+            try:
+                img_y, img_x, c = self.cam.img.shape
+            except:
+                img_y, img_x, c = 0,0,1
             x = int(self.end.x())
             y = int(self.end.y())
             if x > 0 and y > 0 and x < img_x and y < img_y:
