@@ -350,8 +350,8 @@ class CameraWindow(QMainWindow):
             self.checkAlignText.setStyleSheet("color: rgb(0, 0, 0);")
             self.enableButtons(False)
             if live:
-                self.parent().stagewind.setGeometry(700, 60, 310, 400)
-                self.parent().stagewind.show()
+                #self.parent().stagewind.setGeometry(700, 60, 310, 400)
+                #self.parent().stagewind.show()
                 QApplication.processEvents()
                 self.img = self.cam.grab_image_live()
             else:
