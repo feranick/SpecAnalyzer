@@ -357,17 +357,18 @@ class CameraWindow(QMainWindow):
             else:
                 QApplication.processEvents()
                 self.img = self.cam.grab_image()
-            self.image, self.image_data, temp = self.cam.get_image(False,0,0,0,0)
+            if hasattr(self,"cam"):
+                self.image, self.image_data, temp = self.cam.get_image(False,0,0,0,0)
             
-            pixMap = QPixmap.fromImage(self.image)
-            self.scene.addPixmap(pixMap)
+                pixMap = QPixmap.fromImage(self.image)
+                self.scene.addPixmap(pixMap)
             self.view.fitInView(self.view.sceneRect(), Qt.KeepAspectRatio)
 
             self.statusBar().showMessage('Camera-feed' + \
                  str(datetime.now().strftime(' (%Y-%m-%d %H-%M-%S)')), 5000)
             self.statusBar().showMessage(' Drag Mouse to select area for alignment', 5000)
         except:
-            self.statusBar().showMessage(' USB camera not connected', 5000)
+            self.statusBar().showMessage(' Camera not connected', 5000)
 
     # Set default values for alignment parameters
     def setDefault(self):

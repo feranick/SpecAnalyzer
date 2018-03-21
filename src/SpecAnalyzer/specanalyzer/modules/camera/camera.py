@@ -34,16 +34,22 @@ class CameraFeed():
     # Grab frame into variable from live
     def grab_image_live(self):
         self.closeLiveFeed = False
+        windowTitle = 'Live Feed: push \"q\" to stop and grab frame'
         while True:
             ret, frame = self.camera.read()
 
+            cv2.namedWindow(windowTitle)
             # Our operations on the frame come here
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            # Display the resulting frame
-            cv2.imshow('Live Feed: push \"q\" to stop and grab frame',gray)
-            #cv2.moveWindow('Live Feed: push \"q\" to stop and grab frame',30,30)
-
+            
+            def mouse_callback(event, x, y, flags, param):
+                if event == cv2.EVENT_LBUTTONDOWN:
+                    intensity = gray[y,x]
+                    print(" Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity))
+        
+            cv2.setMouseCallback(windowTitle, mouse_callback)
+            cv2.imshow(windowTitle,gray)
+        
             if (cv2.waitKey(1) & 0xFF == ord('q')) or self.closeLiveFeed == True:
                 cv2.destroyAllWindows()
                 break
