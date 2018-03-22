@@ -92,7 +92,7 @@ class CameraWindow(QMainWindow):
         contrastAlignLabel.setFont(font)
         contrastAlignLabel.setText("Alignment Threshold [%]: ")
         self.checkAlignText = QLineEdit()
-        self.checkAlignText.setMaximumSize(80, 25)
+        self.checkAlignText.setMaximumSize(40, 25)
         self.checkAlignText.setReadOnly(True)
         
         self.setDefaultBtn = QAction(QIcon(QPixmap()),
@@ -106,6 +106,12 @@ class CameraWindow(QMainWindow):
         self.resetBtn.setShortcut('Ctrl+r')
         self.resetBtn.setStatusTip('Reset Camera Live Interface')
         self.resetBtn.setEnabled(False)
+        
+        self.intensityLabel = QLabel()
+        font = QFont()
+        font.setFamily(font.defaultFamily())
+        self.intensityLabel.setFont(font)
+        self.intensityLabel.setText("")
 
         #tb.addAction(self.autoAlignBtn)
         tb.addAction(self.manualAlignBtn)
@@ -122,13 +128,14 @@ class CameraWindow(QMainWindow):
         tb.addSeparator()
         tb.addAction(self.resetBtn)
         tb.addSeparator()
+        tb.addWidget(self.intensityLabel)
         
         #self.autoAlignBtn.triggered.connect(self.autoAlign)
         self.manualAlignBtn.triggered.connect(lambda: self.manualAlign(False))
         self.liveAlignBtn.triggered.connect(lambda: self.manualAlign(True))
         self.saveImageBtn.triggered.connect(self.saveImage)
         self.setDefaultBtn.triggered.connect(self.setDefault)
-        self.resetBtn.triggered.connect(self.setAlignOnFalse)
+        self.resetBtn.triggered.connect(lambda: self.setAlignOn(False))
 
         # Make Menu for plot related calls
         self.menuBar = QMenuBar(self)
@@ -254,15 +261,15 @@ class CameraWindow(QMainWindow):
         self.saveImageBtn.setEnabled(True)
         self.isAutoAlign = False
         self.firstRun = True
+        if self.alignOn == False:
+            self.scene.selectionDef.connect(self.checkManualAlign)
         self.alignOn = True
-        self.scene.selectionDef.connect(self.checkManualAlign)
         self.setSelWindow(live)
         self.resetBtn.setEnabled(True)
         QApplication.processEvents()
         while self.alignOn:
             time.sleep(0.1)
             QApplication.processEvents()
-
         try:
             self.scene.selectionDef.disconnect()
         except:
@@ -517,18 +524,19 @@ class CameraWindow(QMainWindow):
     '''
     # Enable/Disable Buttons
     def enableButtons(self, flag):
+        pass
         #self.autoAlignBtn.setEnabled(flag)
-        self.manualAlignBtn.setEnabled(flag)
-        self.liveAlignBtn.setEnabled(flag)
-        self.manualAlignmentMenu.setEnabled(flag)
+        #self.manualAlignBtn.setEnabled(flag)
+        #self.liveAlignBtn.setEnabled(flag)
+        #self.manualAlignmentMenu.setEnabled(flag)
         #self.autoAlignmentMenu.setEnabled(flag)
         #self.liveAlignmentMenu.setEnabled(flag)
 
     # Set alignOn variable as False
-    def setAlignOnFalse(self):
-        self.alignOn = False
-        self.firstRun = False
-        self.resetBtn.setEnabled(False)
+    def setAlignOn(self, flag):
+        self.alignOn = flag
+        self.firstRun = flag
+        self.resetBtn.setEnabled(flag)
 
     # Extract pixel intensity from cursor position
     def getPixelIntensity(self):
@@ -541,9 +549,11 @@ class CameraWindow(QMainWindow):
             y = int(self.end.y())
             if x > 0 and y > 0 and x < img_x and y < img_y:
                 intensity = cv2.cvtColor(self.cam.img, cv2.COLOR_RGB2GRAY)[y,x]
-                msg = " Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity)
+                #msg = " Intensity pixel at ["+str(x)+", "+str(y)+"]: "+str(intensity)
+                msg = " Int: <b>"+str(intensity)+"</b> - ["+str(x)+", "+str(y)+"] "
                 #self.printMsg(msg)
-                self.statusBar().showMessage(msg)
+                #self.statusBar().showMessage(msg)
+                self.intensityLabel.setText(msg)
 
 '''
    QGraphicsSelectionItem
