@@ -485,11 +485,16 @@ class CameraWindow(QMainWindow):
     def closeEvent(self, event):
         #self.parent().stagewind.close()
         self.firstRun = False
-        self.alignOn = False
         self.enableButtons(True)
         self.delCam()
         self.scene.cleanup()
+        try:
+            self.alignOn = False
+            self.scene.selectionDef.disconnect()
+        except:
+            pass
         self.statusBar().showMessage("Camera: Ready")
+        self.intensityLabel.setText("")
 
     '''
     # Deactivate stage after alignment
