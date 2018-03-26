@@ -68,8 +68,7 @@ class CameraFeed():
     # Process image
     def get_image(self, crop, x1, x2, y1, y2):
         if crop == True:
-            #cv2.rectangle(self.img,(x1,y1),(x2,y2),(0,255,0),3)
-            self.img1 = self.img[y1:y2, x1:x2]
+            self.img1 = self.img[min(y1,y2):max(y1,y2), min(x1,x2):max(x1,x2)]
         else:
             self.img1 = self.img
         self.img_raw = Image.fromarray(self.img1).convert('L')
