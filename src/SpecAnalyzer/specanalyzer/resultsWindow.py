@@ -466,10 +466,9 @@ class ResultsWindow(QMainWindow):
             csvFilename = dateTimeTag+str(dfDeviceID.at[0,'Device'])+"_tracking.csv"
         try:
             dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
+            msg=" Device data saved on: "+folder+"/"+csvFilename
         except:
-            self.set_dir_saved()
-            dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
-        msg=" Device data saved on: "+folder+"/"+csvFilename
+            msg=" Device data not saved"
         print(msg)
         logger.info(msg)
 
