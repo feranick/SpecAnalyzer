@@ -7,7 +7,7 @@ setup(
         'pyvisa', 'opencv-contrib-python', 'pandas',
         'ThorlabsPM100;platform_system=="Windows"',],
     entry_points={'gui_scripts' : ['specanalyzer=SpecAnalyzer.__main__:main']},
-    version='1.0.0',
+    version='1.1.0',
     description='Automated measurements of Current/Voltage profiles for photovoltaic solar cells',
     long_description= """ Control software for automated measurements of Current/Voltage profiles, device tracking for photovoltaic solar cells """,
     author_email='ferralis@mit.edu',
