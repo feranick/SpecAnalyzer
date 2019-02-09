@@ -363,7 +363,8 @@ class ResultsWindow(QMainWindow):
     def selectDeviceSaveLocally(self, selectedRows):
         folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save..."))
         for row in selectedRows:
-            self.save_csv(self.dfTotDeviceID.iat[0,row][0][0],
+            print(self.dfTotDeviceID.iat[0,row])
+            self.save_csv(self.dfTotDeviceID.iat[0,row],
                 self.dfTotAcqParams.iloc[[row]],
                 self.dfTotPerfData.iat[0,row],
                 self.dfTotJV.iat[0,row][0], folder)
@@ -465,7 +466,6 @@ class ResultsWindow(QMainWindow):
         dfJV = self.makeDFJV(JV)
     
         dfDeviceID = pd.DataFrame({'Device':[deviceID]})
-        print(deviceID)
         dfTot = pd.concat([dfDeviceID, dfPerfData], axis = 1)
         dfTot = pd.concat([dfTot,dfJV], axis = 1)
         dfTot = pd.concat([dfTot,dfAcqParams], axis = 1)
