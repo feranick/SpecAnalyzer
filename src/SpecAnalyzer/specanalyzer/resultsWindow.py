@@ -330,6 +330,8 @@ class ResultsWindow(QMainWindow):
             selectCellLoadAction.setStatusTip('Load csv data from saved file')
             selectCellSaveAction = QAction('Save as...', self)
             selectCellSaveAction.setShortcut("Ctrl+s")
+            selectCellSaveAllAction = QAction('Save All...', self)
+            selectCellSaveAllAction.setShortcut("Ctrl+Shift+s")
             selectCellRemoveAction = QAction('Remove...', self)
             selectCellRemoveAction.setShortcut("Del")
             selectRemoveAllAction = QAction('Remove All...', self)
@@ -339,39 +341,42 @@ class ResultsWindow(QMainWindow):
             self.menu.addSeparator()
             self.menu.addAction(selectCellLoadAction)
             self.menu.addAction(selectCellSaveAction)
+            self.menu.addAction(selectCellSaveAllAction)
             self.menu.popup(QCursor.pos())
             QApplication.processEvents()
             
             selectCellLoadAction.triggered.connect(self.read_csv)
             selectedRows = list(set([ i.row() for i in self.resTableWidget.selectedItems()]))
-            for row in selectedRows[::-1]:
-                selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(row))
-                selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(row))
-                selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
+            #for row in selectedRows[::-1]:
+            selectCellSaveAction.triggered.connect(lambda: self.selectDeviceSaveLocally(selectedRows))
+            selectCellSaveAllAction.triggered.connect(lambda: self.selectDeviceSaveLocally(list(range(self.resTableWidget.rowCount()))))
+            selectCellRemoveAction.triggered.connect(lambda: self.selectDeviceRemove(selectedRows))
+            selectRemoveAllAction.triggered.connect(lambda: self.clearPlots(True,True))
 
-    # Logic to save locally devices selected from results table
-    def selectDeviceSaveLocally(self, row):
-        folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save " +\
-                                  self.dfTotDeviceID.iat[0,row][0][0]))
-        self.save_csv(self.dfTotDeviceID.iat[0,row][0][0],
-            self.dfTotAcqParams.iloc[[row]],
-            self.dfTotPerfData.iat[0,row],
-            self.dfTotJV.iat[0,row][0], folder)
+    # Logic to save locally selected devices from results table
+    def selectDeviceSaveLocally(self, selectedRows):
+        folder = str(QFileDialog.getExistingDirectory(self, "Select directory where to save..."))
+        for row in selectedRows:
+            self.save_csv(self.dfTotDeviceID.iat[0,row][0][0],
+                self.dfTotAcqParams.iloc[[row]],
+                self.dfTotPerfData.iat[0,row],
+                self.dfTotJV.iat[0,row][0], folder)
 
     # Logic to remove data from devices selected from results table
-    def selectDeviceRemove(self, row):
-        self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1)
-        self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1)
-        self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1)
-        try:
-            self.axPVresp.get_lines()[row+2].remove()
-            self.axJVresp.get_lines()[row+2].remove()
-            print(" Removed acquisition from table: ",str(self.dfTotDeviceID.iat[0,row]))
-        except:
-            print(" Removing substrates failed")
-        self.canvasJVresp.draw()
-        self.canvasPVresp.draw()
-        self.resTableWidget.removeRow(row)
+    def selectDeviceRemove(self, selectedRows):
+        for row in selectedRows:
+            self.dfTotDeviceID.drop(self.dfTotDeviceID.columns[row], axis=1)
+            self.dfTotPerfData.drop(self.dfTotPerfData.columns[row], axis=1)
+            self.dfTotJV.drop(self.dfTotJV.columns[row], axis=1)
+            try:
+                self.axPVresp.get_lines()[row+2].remove()
+                self.axJVresp.get_lines()[row+2].remove()
+                print(" Removed acquisition from table: ",str(self.dfTotDeviceID.iat[0,row]))
+            except:
+                print(" Removing substrates failed")
+            self.canvasJVresp.draw()
+            self.canvasPVresp.draw()
+            self.resTableWidget.removeRow(row)
 
     # Add row and initialize it within the table
     def setupResultTable(self):
@@ -458,12 +463,12 @@ class ResultsWindow(QMainWindow):
         dfTot = pd.concat([dfTot,dfJV], axis = 1)
         dfTot = pd.concat([dfTot,dfAcqParams], axis = 1)
         
-        dateTimeTag = str(datetime.now().strftime('%Y%m%d-%H%M%S_'))
-        
+        dateTimeTag = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
+        csvFilename = deviceID+"_"+dateTimeTag
         if dfPerfData['MPP'].count() < 2:
-            csvFilename = dateTimeTag+str(dfDeviceID.at[0,'Device'])+".csv"
+            csvFilename +=".csv"
         else:
-            csvFilename = dateTimeTag+str(dfDeviceID.at[0,'Device'])+"_tracking.csv"
+            csvFilename +="_tracking.csv"
         try:
             dfTot.to_csv(folder+"/"+csvFilename, sep=',', index=False)
             msg=" Device data saved on: "+folder+"/"+csvFilename
@@ -508,9 +513,9 @@ class ResultsWindow(QMainWindow):
         else:
             self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(float(obj[0,2])))) #track_time
 
-'''
-   Custom Toolbar
-'''
+####################################################################
+#   Custom Toolbar with linear/log button
+####################################################################
 class CustomToolbar(NavigationToolbar):
     def __init__(self, figure_canvas, figure, parent= None):
         self.figure = figure
