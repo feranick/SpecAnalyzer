@@ -505,12 +505,8 @@ class ResultsWindow(QMainWindow):
     # Populate result table.
     def fillTableData(self, deviceID, obj):
         self.resTableWidget.setItem(self.lastRowInd, 0,QTableWidgetItem(deviceID))
-        self.resTableWidget.setItem(self.lastRowInd, 1,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,3].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 2,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,4].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 3,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,5].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 4,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,6].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 5,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,7].astype(float)))))
-        self.resTableWidget.setItem(self.lastRowInd, 6,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,8].astype(float)))))
+        for i in range(1,7,1):
+            self.resTableWidget.setItem(self.lastRowInd, i,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,i+2].astype(float)))))
         #self.resTableWidget.setItem(self.lastRowInd, 7,QTableWidgetItem("{0:0.3f}".format(np.mean(obj[:,2].astype(float)))))
         self.resTableWidget.setItem(self.lastRowInd, 8,QTableWidgetItem(obj[0,0]))
         self.resTableWidget.setItem(self.lastRowInd, 9,QTableWidgetItem(obj[0,1]))
