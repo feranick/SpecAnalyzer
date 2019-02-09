@@ -152,7 +152,7 @@ class ResultsWindow(QMainWindow):
         self.saveAllMenu.setShortcut("Ctrl+Shift+s")
         self.saveAllMenu.setStatusTip('Save all data into csv')
         self.saveAllMenu.triggered.connect(lambda: self.selectDeviceSaveLocally(list(range(self.resTableWidget.rowCount()))))
-        self.directoryMenu = QAction("&Set saving directory", self)
+        self.directoryMenu = QAction("&Set directory for saved files", self)
         self.directoryMenu.setShortcut("Ctrl+s")
         self.directoryMenu.setStatusTip('Set directory for saved files')
         self.directoryMenu.triggered.connect(self.set_dir_saved)
