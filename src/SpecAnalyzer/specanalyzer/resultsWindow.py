@@ -465,6 +465,7 @@ class ResultsWindow(QMainWindow):
         dfJV = self.makeDFJV(JV)
     
         dfDeviceID = pd.DataFrame({'Device':[deviceID]})
+        print(deviceID)
         dfTot = pd.concat([dfDeviceID, dfPerfData], axis = 1)
         dfTot = pd.concat([dfTot,dfJV], axis = 1)
         dfTot = pd.concat([dfTot,dfAcqParams], axis = 1)
@@ -492,8 +493,8 @@ class ResultsWindow(QMainWindow):
                 print("Open saved device data from: ", filename)
                 dftot = pd.read_csv(filename, na_filter=False)
                 deviceID = dftot.at[0,'Device']
-                perfData = dftot.as_matrix()[range(0,np.count_nonzero(dftot['Acq Date']))][:,range(1,10)]
-                JV = dftot.as_matrix()[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)].astype(float)
+                perfData = dftot.values[range(0,np.count_nonzero(dftot['Acq Date']))][:,range(1,10)]
+                JV = dftot.values[range(0,np.count_nonzero(dftot['V']))][:,np.arange(10,12)].astype(float)
                 dfAcqParams = dftot.loc[0:1, 'Acq Min Voltage':'Comments']
                 self.plotData(deviceID, perfData, JV, False)
                 self.setupResultTable()
